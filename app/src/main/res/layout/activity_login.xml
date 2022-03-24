@@ -19,10 +19,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logo" >
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText_Usuario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/linearProgress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_marginTop="0.5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:indeterminateAnimationType="disjoint"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/passwordTextField"
@@ -39,6 +51,7 @@
         app:endIconMode="password_toggle" >
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText_Password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword" />
