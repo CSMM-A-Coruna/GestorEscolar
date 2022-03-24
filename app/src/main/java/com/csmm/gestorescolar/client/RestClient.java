@@ -1,6 +1,7 @@
 package com.csmm.gestorescolar.client;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -53,6 +54,21 @@ public class RestClient {
                     public void onResponse(JSONObject response) {
                         UsuarioDTO usuarioDTO = new UsuarioDTO(response);
                         handler.sessionRequestDidComplete(usuarioDTO);
+                        //Guardo esos valores en un objeto SharedPreferences usando su Editor
+                        SharedPreferences sharedPref = context.getSharedPreferences("login", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("token", usuarioDTO.getToken());
+                        editor.putInt("id", usuarioDTO.getId());
+                        editor.putString("usuario", usuarioDTO.getUsuario());
+                        editor.putString("nombre", usuarioDTO.getNombre());
+                        editor.putString("apellido1", usuarioDTO.getApellido1());
+                        editor.putString("apellido2", usuarioDTO.getApellido2());
+                        editor.putString("nacimiento", usuarioDTO.getNacimiento());
+                        editor.putString("dni", usuarioDTO.getDni());
+                        editor.putString("oa", usuarioDTO.getOa());
+                        editor.putInt("accesos", usuarioDTO.getAccesos());
+                        editor.putString("tipoUsuario", usuarioDTO.getTipoUsuario());
+                        editor.commit();
                     }
             }, new DefaultErrorHandler(handler)
         );

@@ -16,12 +16,13 @@ public class UsuarioDTO {
     private String oa;
     private int accesos;
     private String tipoUsuario;
+    private String token;
     private JSONObject tokenDecoded;
 
     public UsuarioDTO(JSONObject token) {
         try {
-            System.out.println("test");
-            this.tokenDecoded = JWTUtils.decoded(token.getString("token"));
+            this.token = token.getString("token");
+            this.tokenDecoded = JWTUtils.decoded(this.token);
             this.id = tokenDecoded.getInt("id");
             this.usuario = tokenDecoded.getString("usuario");
             this.nombre = tokenDecoded.getString("nombre");
@@ -35,6 +36,10 @@ public class UsuarioDTO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String getToken() {
+        return token;
     }
 
     public int getId() {
