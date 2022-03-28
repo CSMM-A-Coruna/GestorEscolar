@@ -38,13 +38,15 @@ public class MainActivity extends AppCompatActivity {
         String apellido2 = preferences.getString("apellido2", null);
 
         setSupportActionBar(binding.appBarMain.toolbar);
+
         binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Botón de crear una nueva comunicación", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
+
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         View headerView = navigationView.getHeaderView(0);
@@ -53,7 +55,16 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
+                R.id.nav_comunicaciones,
+                R.id.nav_horario,
+                R.id.nav_diario,
+                R.id.nav_calificaciones,
+                R.id.nav_entrevistas,
+                R.id.nav_documentacion,
+                R.id.nav_extraescolares,
+                R.id.nav_enfermeria,
+                R.id.nav_llavero,
+                R.id.nav_misdatos)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);

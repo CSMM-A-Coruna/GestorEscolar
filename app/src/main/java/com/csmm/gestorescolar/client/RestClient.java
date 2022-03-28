@@ -20,7 +20,7 @@ public class RestClient {
     private Context context;
 
 
-    private final String REST_API_BASE_URL = "http://192.168.28.33:3000/v1";
+    private final String REST_API_BASE_URL = "http://192.168.68.113:3000/v1";
 
     private static RestClient instance = null;
 

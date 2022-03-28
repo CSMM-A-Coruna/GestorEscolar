@@ -1,4 +1,4 @@
-package com.csmm.gestorescolar.screens.main.ui.slideshow;
+package com.csmm.gestorescolar.screens.main.ui.horario;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,22 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.csmm.gestorescolar.databinding.FragmentSlideshowBinding;
+import com.csmm.gestorescolar.databinding.FragmentHorarioBinding;
 
-public class SlideshowFragment extends Fragment {
+public class HorarioFragment extends Fragment {
 
-    private FragmentSlideshowBinding binding;
+    private FragmentHorarioBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        SlideshowViewModel slideshowViewModel =
-                new ViewModelProvider(this).get(SlideshowViewModel.class);
+        HorarioViewModel horarioViewModel =
+                new ViewModelProvider(this).get(HorarioViewModel.class);
 
-        binding = FragmentSlideshowBinding.inflate(inflater, container, false);
+        binding = FragmentHorarioBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textSlideshow;
-        slideshowViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        final TextView textView = binding.textHorario;
+        horarioViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 

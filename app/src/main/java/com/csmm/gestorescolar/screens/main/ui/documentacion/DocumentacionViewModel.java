@@ -1,16 +1,16 @@
-package com.csmm.gestorescolar.screens.main.ui.gallery;
+package com.csmm.gestorescolar.screens.main.ui.documentacion;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class GalleryViewModel extends ViewModel {
+public class DocumentacionViewModel extends ViewModel {
 
     private final MutableLiveData<String> mText;
 
-    public GalleryViewModel() {
+    public DocumentacionViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is gallery fragment");
+        mText.setValue("Pantalla 'Documentación'");
     }
 
     public LiveData<String> getText() {

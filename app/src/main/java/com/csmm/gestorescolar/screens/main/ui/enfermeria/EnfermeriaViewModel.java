@@ -1,16 +1,16 @@
-package com.csmm.gestorescolar.screens.main.ui.home;
+package com.csmm.gestorescolar.screens.main.ui.enfermeria;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class HomeViewModel extends ViewModel {
+public class EnfermeriaViewModel extends ViewModel {
 
     private final MutableLiveData<String> mText;
 
-    public HomeViewModel() {
+    public EnfermeriaViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+        mText.setValue("Pantalla 'Enfermeria'");
     }
 
     public LiveData<String> getText() {

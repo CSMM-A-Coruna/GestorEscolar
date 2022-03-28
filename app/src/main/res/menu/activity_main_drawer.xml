@@ -3,18 +3,66 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group>
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/nav_comunicaciones"
             android:icon="@drawable/ic_menu_camera"
-            android:title="@string/menu_home" />
+            android:title="@string/menu_comunicaciones" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_horario"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/menu_gallery" />
+            android:title="Horario" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_diario"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_slideshow" />
+            android:title="Diario" />
+        <item
+            android:id="@+id/nav_calificaciones"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Calificaciones" />
+        <item
+            android:id="@+id/nav_entrevistas"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Entrevistas" />
+        <item
+            android:id="@+id/nav_documentacion"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Documentación" />
+        <item
+            android:id="@+id/nav_extraescolares"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Extraescolares" />
+        <item
+            android:id="@+id/nav_enfermeria"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Enfermería" />
+        <item
+            android:id="@+id/nav_llavero"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Llavero" />
+        <item android:id="@+id/nav_misdatos"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Mis datos" />
     </group>
+
+   <!-- <item android:title="Credenciales">
+        <menu>
+        </menu>
+    </item> -->
+
+    <!-- Sección de configuración -->
+    <item
+        android:id="@+id/configuration_section"
+        android:title="Configuración">
+        <menu>
+            <item
+                android:id="@+id/nav_ajustes"
+                android:icon="@android:drawable/ic_menu_preferences"
+                android:title="Ajustes" />
+            <item
+                android:id="@+id/nav_cerrarsesion"
+                android:icon="@android:drawable/ic_lock_power_off"
+                android:title="Cerrar sesión" />
+        </menu>
+    </item>
 </menu>
