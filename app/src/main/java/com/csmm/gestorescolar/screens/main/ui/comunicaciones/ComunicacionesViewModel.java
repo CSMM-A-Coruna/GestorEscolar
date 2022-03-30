@@ -16,4 +16,8 @@ public class ComunicacionesViewModel extends ViewModel {
     public LiveData<String> getText() {
         return mText;
     }
+
+    public void setmText(String texto) {
+        mText.setValue(texto);
+    }
 }

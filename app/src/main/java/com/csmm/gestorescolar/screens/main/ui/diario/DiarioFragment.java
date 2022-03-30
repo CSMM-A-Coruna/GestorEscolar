@@ -10,18 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.csmm.gestorescolar.databinding.FragmentDiarioBinding;
+import com.csmm.gestorescolar.databinding.DiarioFragmentBinding;
 
 public class DiarioFragment extends Fragment {
 
-    private FragmentDiarioBinding binding;
+    private DiarioFragmentBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         DiarioViewModel diarioViewModel =
                 new ViewModelProvider(this).get(DiarioViewModel.class);
 
-        binding = FragmentDiarioBinding.inflate(inflater, container, false);
+        binding = DiarioFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textDiario;

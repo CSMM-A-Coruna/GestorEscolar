@@ -18,7 +18,7 @@ public class LauncherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        setContentView(R.layout.splash_activity);
         thisIntent = getIntent();
 
         Handler handler = new Handler();
@@ -26,7 +26,7 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     private void startLoginActivity() {
-        SharedPreferences sharedPref = getSharedPreferences("login", MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("user", MODE_PRIVATE);
         if(sharedPref.getString("token", null) != null) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

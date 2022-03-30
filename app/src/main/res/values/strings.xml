@@ -11,4 +11,10 @@
     <string name="menu_comunicaciones">Comunicaciones</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+
+    <string-array name="spinner_alumnos">
+        <item>Todos</item>
+        <item>Juan Rodríguez</item>
+        <item>Iria Rodríguez</item>
+    </string-array>
 </resources>

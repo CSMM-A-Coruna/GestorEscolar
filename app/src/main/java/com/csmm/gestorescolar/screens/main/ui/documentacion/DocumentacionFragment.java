@@ -10,18 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.csmm.gestorescolar.databinding.FragmentDocumentacionBinding;
+import com.csmm.gestorescolar.databinding.DocumentacionFragmentBinding;
 
 public class DocumentacionFragment extends Fragment {
 
-    private FragmentDocumentacionBinding binding;
+    private DocumentacionFragmentBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         DocumentacionViewModel documentacionViewModel =
                 new ViewModelProvider(this).get(DocumentacionViewModel.class);
 
-        binding = FragmentDocumentacionBinding.inflate(inflater, container, false);
+        binding = DocumentacionFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textDocumentacion;

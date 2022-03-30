@@ -10,18 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.csmm.gestorescolar.databinding.FragmentEnfermeriaBinding;
+import com.csmm.gestorescolar.databinding.EnfermeriaFragmentBinding;
 
 public class EnfermeriaFragment extends Fragment {
 
-    private FragmentEnfermeriaBinding binding;
+    private EnfermeriaFragmentBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         EnfermeriaViewModel enfermeriaViewModel =
                 new ViewModelProvider(this).get(EnfermeriaViewModel.class);
 
-        binding = FragmentEnfermeriaBinding.inflate(inflater, container, false);
+        binding = EnfermeriaFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textEnfermeria;

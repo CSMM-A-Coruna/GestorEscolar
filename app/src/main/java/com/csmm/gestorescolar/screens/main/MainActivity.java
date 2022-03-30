@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
 import com.csmm.gestorescolar.R;
-import com.csmm.gestorescolar.databinding.ActivityMainBinding;
+import com.csmm.gestorescolar.databinding.MainActivityBinding;
 import com.csmm.gestorescolar.screens.auth.LoginActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -23,13 +23,13 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private ActivityMainBinding binding;
+    private MainActivityBinding binding;
     private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = MainActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         preferences = getSharedPreferences("login", MODE_PRIVATE);
@@ -70,6 +70,25 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+    }
+
+
+    protected OnBackPressedListener onBackPressedListener;
+
+    public interface OnBackPressedListener {
+        void doBack();
+    }
+
+    public void setOnBackPressedListener(OnBackPressedListener onBackPressedListener) {
+        this.onBackPressedListener = onBackPressedListener;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (onBackPressedListener != null)
+            onBackPressedListener.doBack();
+        else
+            super.onBackPressed();
     }
 
     @Override

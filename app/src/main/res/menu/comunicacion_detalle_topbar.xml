@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/iconResponder"
+        android:icon="@drawable/ic_responder_enviar"
+        android:title="Volver"
+        android:contentDescription="Volver"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/iconTopFavorite"
+        android:icon="@drawable/ic_star_black_24dp"
+        android:title="Favorito"
+        android:contentDescription="Marcar como favorito"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/eliminar"
+        android:icon="@drawable/ic_borrar"
+        android:title="Eliminar"
+        android:contentDescription="Eliminar una comunicación"
+        app:showAsAction="ifRoom" />
+
+<!--    <item
+        android:id="@+id/test"
+        android:title="test"
+        android:contentDescription="test"
+        app:showAsAction="never" /> -->
+
+</menu>

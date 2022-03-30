@@ -10,19 +10,19 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import com.csmm.gestorescolar.databinding.FragmentCerrarsesionBinding;
+import com.csmm.gestorescolar.databinding.CerrarsesionFragmentBinding;
 import com.csmm.gestorescolar.screens.auth.LoginActivity;
 
 public class CerrarsesionFragment extends Fragment {
 
-    private FragmentCerrarsesionBinding binding;
+    private CerrarsesionFragmentBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         CerrarsesionViewModel cerrarsesionViewModel =
                 new ViewModelProvider(this).get(CerrarsesionViewModel.class);
 
-        binding = FragmentCerrarsesionBinding.inflate(inflater, container, false);
+        binding = CerrarsesionFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         SharedPreferences preferences;

@@ -15,7 +15,7 @@ public class UsuarioDTO {
     private String dni;
     private String oa;
     private int accesos;
-    private String tipoUsuario;
+    private int tipoUsuario;
     private String token;
     private JSONObject tokenDecoded;
 
@@ -32,7 +32,20 @@ public class UsuarioDTO {
             this.dni = tokenDecoded.getString("nacimiento");
             this.oa = tokenDecoded.getString("oa");
             this.accesos = tokenDecoded.getInt("accesos");
-            this.tipoUsuario = tokenDecoded.getString("tipoUsuario");
+            switch (tokenDecoded.getString("tipoUsuario")) {
+                case "alumnos":
+                    this.tipoUsuario = 1;
+                    break;
+                case "familias":
+                    this.tipoUsuario = 2;
+                    break;
+                case "profesores":
+                    this.tipoUsuario = 3;
+                    break;
+                case "administradores":
+                    this.tipoUsuario = 4;
+                    break;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,7 +91,7 @@ public class UsuarioDTO {
         return accesos;
     }
 
-    public String getTipoUsuario() {
+    public int getTipoUsuario() {
         return tipoUsuario;
     }
 

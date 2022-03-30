@@ -10,18 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.csmm.gestorescolar.databinding.FragmentEntrevistasBinding;
+import com.csmm.gestorescolar.databinding.EntrevistasFragmentBinding;
 
 public class EntrevistasFragment extends Fragment {
 
-    private FragmentEntrevistasBinding binding;
+    private EntrevistasFragmentBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         EntrevistasViewModel entrevistasViewModel =
                 new ViewModelProvider(this).get(EntrevistasViewModel.class);
 
-        binding = FragmentEntrevistasBinding.inflate(inflater, container, false);
+        binding = EntrevistasFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textEntrevistas;

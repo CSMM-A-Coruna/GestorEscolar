@@ -10,18 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.csmm.gestorescolar.databinding.FragmentCalificacionesBinding;
+import com.csmm.gestorescolar.databinding.CalificacionesFragmentBinding;
 
 public class CalificacionesFragment extends Fragment {
 
-    private FragmentCalificacionesBinding binding;
+    private CalificacionesFragmentBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         CalificacionesViewModel calificacionessViewModel =
                 new ViewModelProvider(this).get(CalificacionesViewModel.class);
 
-        binding = FragmentCalificacionesBinding.inflate(inflater, container, false);
+        binding = CalificacionesFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textCalificaciones;

@@ -9,65 +9,65 @@
         android:id="@+id/nav_comunicaciones"
         android:name="com.csmm.gestorescolar.screens.main.ui.comunicaciones.ComunicacionesFragment"
         android:label="@string/menu_comunicaciones"
-        tools:layout="@layout/fragment_comunicaciones" />
+        tools:layout="@layout/comunicaciones_fragment" />
 
     <fragment
         android:id="@+id/nav_horario"
         android:name="com.csmm.gestorescolar.screens.main.ui.horario.HorarioFragment"
         android:label="Horario"
-        tools:layout="@layout/fragment_horario" />
+        tools:layout="@layout/horario_fragment" />
 
     <fragment
         android:id="@+id/nav_diario"
         android:name="com.csmm.gestorescolar.screens.main.ui.diario.DiarioFragment"
         android:label="Diario"
-        tools:layout="@layout/fragment_diario" />
+        tools:layout="@layout/diario_fragment" />
 
     <fragment
         android:id="@+id/nav_calificaciones"
         android:name="com.csmm.gestorescolar.screens.main.ui.calificaciones.CalificacionesFragment"
         android:label="Calificaciones"
-        tools:layout="@layout/fragment_calificaciones" />
+        tools:layout="@layout/calificaciones_fragment" />
 
     <fragment
         android:id="@+id/nav_entrevistas"
         android:name="com.csmm.gestorescolar.screens.main.ui.entrevistas.EntrevistasFragment"
         android:label="Entrevistas"
-        tools:layout="@layout/fragment_entrevistas" />
+        tools:layout="@layout/entrevistas_fragment" />
 
     <fragment
         android:id="@+id/nav_documentacion"
         android:name="com.csmm.gestorescolar.screens.main.ui.documentacion.DocumentacionFragment"
         android:label="Documentacion"
-        tools:layout="@layout/fragment_documentacion" />
+        tools:layout="@layout/documentacion_fragment" />
 
     <fragment
         android:id="@+id/nav_extraescolares"
         android:name="com.csmm.gestorescolar.screens.main.ui.extraescolares.ExtraescolaresFragment"
         android:label="Extraescolares"
-        tools:layout="@layout/fragment_extraescolares" />
+        tools:layout="@layout/extraescolares_fragment" />
 
     <fragment
         android:id="@+id/nav_enfermeria"
         android:name="com.csmm.gestorescolar.screens.main.ui.enfermeria.EnfermeriaFragment"
         android:label="Enfermeria"
-        tools:layout="@layout/fragment_enfermeria" />
+        tools:layout="@layout/enfermeria_fragment" />
 
     <fragment
         android:id="@+id/nav_llavero"
         android:name="com.csmm.gestorescolar.screens.main.ui.llavero.LlaveroFragment"
         android:label="Llavero"
-        tools:layout="@layout/fragment_llavero" />
+        tools:layout="@layout/llavero_fragment" />
 
     <fragment
         android:id="@+id/nav_misdatos"
         android:name="com.csmm.gestorescolar.screens.main.ui.misdatos.MisDatosFragment"
         android:label="Llavero"
-        tools:layout="@layout/fragment_misdatos" />
+        tools:layout="@layout/misdatos_fragment" />
 
     <fragment
         android:id="@+id/nav_cerrarsesion"
         android:name="com.csmm.gestorescolar.screens.main.ui.cerrarsesion.CerrarsesionFragment"
         android:label="Cerrar Sesión"
-        tools:layout="@layout/fragment_cerrarsesion" />
+        tools:layout="@layout/cerrarsesion_fragment" />
 </navigation>

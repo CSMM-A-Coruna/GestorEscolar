@@ -29,6 +29,9 @@
         <activity
             android:name=".screens.auth.LoginActivity"
             android:exported="false" />
+        <activity
+            android:name=".screens.main.ui.comunicaciones.ComunicacionDetalle"
+            android:exported="false" />
     </application>
 
 </manifest>
