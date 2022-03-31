@@ -44,10 +44,10 @@ public class ComunicacionDetalle extends AppCompatActivity {
 
         Bundle mBundle = getIntent().getExtras();
         if (mBundle != null) {
-            mSender.setText(mBundle.getString("sender"));
-            mEmailTitle.setText(mBundle.getString("title"));
-            mEmailDetails.setText(mBundle.getString("details"));
-            mEmailTime.setText(mBundle.getString("time"));
+            mSender.setText(mBundle.getString("remite"));
+            mEmailTitle.setText(mBundle.getString("asunto"));
+            mEmailDetails.setText(mBundle.getString("texto"));
+            mEmailTime.setText(mBundle.getString("fecha"));
             if(mBundle.getBoolean("importante")) {
                 toggleFavIcon();
             }
@@ -79,7 +79,7 @@ public class ComunicacionDetalle extends AppCompatActivity {
         if(favIconMarked) {
             favIcon.setTint(getResources().getColor(R.color.gris));
         } else {
-            favIcon.setTint(getResources().getColor(R.color.teal_200));
+            favIcon.setTint(getResources().getColor(R.color.importante));
         }
         favIconMarked = !favIconMarked;
     }

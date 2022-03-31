@@ -1,5 +1,6 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.csmm.gestorescolar.R;
+import com.csmm.gestorescolar.client.RestClient;
+import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
+import com.csmm.gestorescolar.client.handlers.CommsRecibidasResponseHandler;
 import com.csmm.gestorescolar.databinding.ComunicacionesFragmentBinding;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesAdapter;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesData;
@@ -26,10 +30,12 @@ import java.util.List;
 public class ComunicacionesFragment extends Fragment {
 
     private ComunicacionesFragmentBinding binding;
-    private final List<ComunicacionesData> toggleList = new ArrayList<>();
+    private final List<ComunicacionDTO> toggleList = new ArrayList<>();
+    List<ComunicacionDTO> mEmailData = new ArrayList<>();
     RecyclerView mRecyclerView;
     SwipeRefreshLayout swipLayout;
-    List<ComunicacionesData> mEmailData = new ArrayList<>();
+    ComunicacionesAdapter mMailAdapter;
+    Spinner spinner;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -43,7 +49,7 @@ public class ComunicacionesFragment extends Fragment {
         swipLayout = root.findViewById(R.id.swipe_layout);
 
         // Asignamos el spinner
-        Spinner spinner = root.findViewById(R.id.spinnerAlumnos);
+        spinner = root.findViewById(R.id.spinnerAlumnos);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(root.getContext(),
                 R.array.spinner_alumnos, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -55,32 +61,41 @@ public class ComunicacionesFragment extends Fragment {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(root.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         // Creamos los datos hardcodeados (de momento)
-        setHardcodedData();
         // Asignamos el adaptador
-        ComunicacionesAdapter mMailAdapter = new ComunicacionesAdapter(root.getContext(), mEmailData);
-        mRecyclerView.setAdapter(mMailAdapter);
-
-        // Creamos un onListener para el spinner, y seleccionamos los datos de la lista que nos inteteresa
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        RestClient.getInstance(root.getContext()).getComunicacionesRecibidas(new CommsRecibidasResponseHandler() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                Object item = adapterView.getItemAtPosition(position);
-                toggleList.clear();
-                if (item != null) {
-                    if(!item.toString().equals("Todos")){
-                        mEmailData.forEach(data -> {
-                            if(data.getmAlumnoAsociado().equals(item.toString())) {
-                                toggleList.add(data);
+            public void sessionRequestDidComplete(List<ComunicacionDTO> response) {
+                mEmailData = response;
+                mMailAdapter = new ComunicacionesAdapter(root.getContext(), mEmailData);
+                mRecyclerView.setAdapter(mMailAdapter);
+                // Creamos un onListener para el spinner, y seleccionamos los datos de la lista que nos inteteresa
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                        Object item = adapterView.getItemAtPosition(position);
+                        toggleList.clear();
+                        if (item != null) {
+                            if(!item.toString().equals("Todos")){
+                                mEmailData.forEach(data -> {
+                                    if(data.getAlumnoAsociado().equals(item.toString())) {
+                                        toggleList.add(data);
+                                    }
+                                });
+                            } else {
+                                toggleList.addAll(mEmailData);
                             }
-                        });
-                    } else {
-                        toggleList.addAll(mEmailData);
+                            mMailAdapter.updateData(toggleList);
+                        }
                     }
-                    mMailAdapter.updateData(toggleList);
-                }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {}
+                });
             }
+
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {}
+            public void requestDidFail(int statusCode) {
+                System.out.println(statusCode);
+            }
         });
         return root;
     }
@@ -95,25 +110,49 @@ public class ComunicacionesFragment extends Fragment {
         new CargarNuevosEmails().execute();
     }
 
-    private class CargarNuevosEmails extends AsyncTask<Void, Void, Void> {
+    private class CargarNuevosEmails extends AsyncTask<List<ComunicacionDTO>, List<ComunicacionDTO>, List<ComunicacionDTO>> {
+        List<ComunicacionDTO> newComs = new ArrayList<>();
+        final Object async = new Object();
         @Override
-        protected Void doInBackground(Void... params) {
+        protected List<ComunicacionDTO> doInBackground(List<ComunicacionDTO>... params) {
             try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+                RestClient.getInstance(getContext()).getComunicacionesRecibidas(new CommsRecibidasResponseHandler() {
+                    @Override
+                    public void sessionRequestDidComplete(List<ComunicacionDTO> response) {
+                        newComs = response;
+                        CargarNuevosEmails.this.async.notify();
+                    }
+
+                    @Override
+                    public void requestDidFail(int statusCode) {
+                        CargarNuevosEmails.this.async.notify();
+                        newComs = null;
+                    }
+                });
+                synchronized (CargarNuevosEmails.this.async) {
+                    try {
+                        CargarNuevosEmails.this.async.wait();
+                        return newComs;
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                        return null;
+                    }
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
+                return null;
             }
-            return null;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(List<ComunicacionDTO> aVoid) {
             super.onPostExecute(aVoid);
+            updateData(aVoid);
             swipLayout.setRefreshing(false);
         }
     }
 
-    private void setHardcodedData() {
+    /*private void setHardcodedData() {
         ComunicacionesData mEmail = new ComunicacionesData("Juan", "Juan Rodríguez",  "Reunión",
                 "Texto de prueba....",
                 "10:42am", false, false);
@@ -150,7 +189,10 @@ public class ComunicacionesFragment extends Fragment {
                 "Adjunto las calificaciones del segundo trimestre de Historia",
                 "16:04pm", true, false);
         mEmailData.add(mEmail);
+    }*/
 
+    private void updateData(List<ComunicacionDTO> list) {
+        mMailAdapter.updateData(list);
     }
     @Override
     public void onDestroyView() {

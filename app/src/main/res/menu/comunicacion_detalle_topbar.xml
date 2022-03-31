@@ -4,9 +4,9 @@
 
     <item
         android:id="@+id/iconResponder"
-        android:icon="@drawable/ic_responder_enviar"
-        android:title="Volver"
-        android:contentDescription="Volver"
+        android:icon="@drawable/ic_responder"
+        android:title="Responder"
+        android:contentDescription="Responder"
         app:showAsAction="ifRoom" />
 
     <item

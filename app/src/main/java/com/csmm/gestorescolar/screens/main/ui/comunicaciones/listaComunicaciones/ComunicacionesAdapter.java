@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.csmm.gestorescolar.R;
+import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.databinding.ComunicacionesDetalleBinding;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.ComunicacionDetalle;
 
@@ -21,10 +22,10 @@ import java.util.List;
 
 public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesViewHolder> {
 
-    private List<ComunicacionesData> mEmailData;
+    private List<ComunicacionDTO> mEmailData;
     private Context mContext;
 
-    public ComunicacionesAdapter(Context mContext, List<ComunicacionesData> mEmailData) {
+    public ComunicacionesAdapter(Context mContext, List<ComunicacionDTO> mEmailData) {
         this.mEmailData = mEmailData;
         this.mContext = mContext;
     }
@@ -38,16 +39,16 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
 
     @Override
     public void onBindViewHolder(final ComunicacionesViewHolder holder, int position) {
-        holder.mSender.setText(mEmailData.get(position).getmSender());
-        holder.mEmailTitle.setText(mEmailData.get(position).getmTitle());
-        holder.mEmailDetails.setText(mEmailData.get(position).getmDetails());
-        holder.mEmailTime.setText(mEmailData.get(position).getmTime());
-        if(mEmailData.get(position).getmImportante()) {
-            holder.mFavorite.setColorFilter(ContextCompat.getColor(mContext, com.google.android.material.R.color.abc_btn_colored_borderless_text_material));
+        holder.mSender.setText(mEmailData.get(position).getNombreRemite());
+        holder.mEmailTitle.setText(mEmailData.get(position).getAsunto());
+        holder.mEmailDetails.setText(mEmailData.get(position).getTexto());
+        holder.mEmailTime.setText(mEmailData.get(position).getFecha());
+        if(mEmailData.get(position).isImportante()) {
+            holder.mFavorite.setColorFilter(ContextCompat.getColor(mContext, R.color.importante));
         } else {
             holder.mFavorite.clearColorFilter();
         }
-        if(!mEmailData.get(position).getmLeido()) {
+        if(mEmailData.get(position).getLeida().equals("null")) {
             holder.itemView.setBackgroundColor(0xffffffff);
             holder.mSender.setTypeface(null, Typeface.BOLD);
             holder.mEmailTitle.setTypeface(null, Typeface.BOLD);
@@ -63,7 +64,7 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
                     holder.mFavorite.clearColorFilter();
                 } else {
                     holder.mFavorite.setColorFilter(ContextCompat.getColor(mContext,
-                            com.google.android.material.R.color.abc_btn_colored_borderless_text_material));
+                            R.color.importante));
                 }
             }
         });
@@ -72,10 +73,10 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
             @Override
             public void onClick(View view) {
                 Intent mIntent = new Intent(mContext, ComunicacionDetalle.class);
-                mIntent.putExtra("sender", holder.mSender.getText().toString());
-                mIntent.putExtra("title", holder.mEmailTitle.getText().toString());
-                mIntent.putExtra("details", holder.mEmailDetails.getText().toString());
-                mIntent.putExtra("time", holder.mEmailTime.getText().toString());
+                mIntent.putExtra("remite", holder.mSender.getText().toString());
+                mIntent.putExtra("asunto", holder.mEmailTitle.getText().toString());
+                mIntent.putExtra("texto", holder.mEmailDetails.getText().toString());
+                mIntent.putExtra("fecha", holder.mEmailTime.getText().toString());
                 if(holder.mFavorite.getColorFilter() != null) {
                     mIntent.putExtra("importante", true);
                 } else {
@@ -88,7 +89,7 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
 
     }
 
-    public void updateData(List<ComunicacionesData> data) {
+    public void updateData(List<ComunicacionDTO> data) {
         this.mEmailData = data;
         notifyDataSetChanged();
     }

@@ -2,36 +2,97 @@ package com.csmm.gestorescolar.client.dtos;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.Date;
 
 public class ComunicacionDTO {
     private int idComunicacion;
     private int idRemite;
     private int idDestino;
-    private String alumnoAsociado;
     private String tipoRemite;
     private String tipoDestino;
+    private int idAlumnoAsociado;
     private String asunto;
     private String texto;
+    private boolean importante;
     private String fecha;
+    private String leida;
+    private String eliminado;
+    private String alumnoAsociado;
     private String nombreRemite;
     private String nombreDestino;
 
     public ComunicacionDTO(JSONObject jsonObject) {
         try {
-            this.idComunicacion = jsonObject.getInt("idComunicacion");
-            this.idRemite = jsonObject.getInt("idRemite");
-            this.idDestino = jsonObject.getInt("idDestino");
-            this.alumnoAsociado = jsonObject.getString("alumnoAsociado");
-            this.tipoRemite = jsonObject.getString("tipoRemite");
-            this.tipoDestino = jsonObject.getString("tipoDestino");
+            this.idComunicacion = jsonObject.getInt("id_comunicacion");
+            this.idRemite = jsonObject.getInt("id_remite");
+            this.idDestino = jsonObject.getInt("id_destino");
+            this.tipoRemite = jsonObject.getString("tipo_remite");
+            this.tipoDestino = jsonObject.getString("tipo_destino");
+            this.idAlumnoAsociado = jsonObject.getInt("id_alumnoAsociado");
             this.asunto = jsonObject.getString("asunto");
             this.texto = jsonObject.getString("texto");
-            this.fecha = jsonObject.getString("fecha");
+            if(jsonObject.getInt("importante") == 0) {
+                this.importante = false;
+            } else {
+                this.importante = true;
+            }
+            this.fecha = formatearFecha(jsonObject.getString("fecha"));
+            this.leida = jsonObject.getString("leida");
+            this.eliminado = jsonObject.getString("eliminado");
+            this.alumnoAsociado = jsonObject.getString("nombre_alumnoAsociado");
             this.nombreRemite = jsonObject.getString("nombreRemite");
             this.nombreDestino = jsonObject.getString("nombreDestino");
         } catch (JSONException ex) {
             ex.printStackTrace();
         }
+    }
+    private String formatearFecha(String fecha) {
+        try {
+            java.util.Date msgDate = Date.from(Instant.parse(fecha));
+            java.util.Date currentDate = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(currentDate);
+            calendar.add(Calendar.DATE, -1);
+            String finalDate;
+            if(msgDate.before(calendar.getTime())) {
+                String day, month;
+                if(msgDate.getDay()<10) {
+                    day = "0"+msgDate.getDay();
+                } else {
+                    day = String.valueOf(msgDate.getDay());
+                }
+                if(msgDate.getMonth()<10) {
+                    month = "0"+msgDate.getMonth();
+                } else {
+                    month = String.valueOf(msgDate.getMonth());
+                }
+                SimpleDateFormat df = new SimpleDateFormat("yyyy");
+                String year = df.format(msgDate);
+                finalDate = day+"/"+month+"/"+year;
+
+            } else {
+                String hour, minutes;
+                if(msgDate.getHours()<10) {
+                    hour = "0"+msgDate.getHours();
+                } else {
+                    hour = String.valueOf(msgDate.getHours());
+                }
+                if(msgDate.getMinutes()<10) {
+                    minutes = "0"+msgDate.getMinutes();
+                } else {
+                    minutes = String.valueOf(msgDate.getMinutes());
+                }
+                finalDate = hour+":"+minutes;
+            }
+            return finalDate;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+
     }
 
     public int getIdComunicacion() {
@@ -46,16 +107,16 @@ public class ComunicacionDTO {
         return idDestino;
     }
 
-    public String getAlumnoAsociado() {
-        return alumnoAsociado;
-    }
-
     public String getTipoRemite() {
         return tipoRemite;
     }
 
     public String getTipoDestino() {
         return tipoDestino;
+    }
+
+    public int getIdAlumnoAsociado() {
+        return idAlumnoAsociado;
     }
 
     public String getAsunto() {
@@ -66,8 +127,24 @@ public class ComunicacionDTO {
         return texto;
     }
 
+    public boolean isImportante() {
+        return importante;
+    }
+
     public String getFecha() {
         return fecha;
+    }
+
+    public String getLeida() {
+        return leida;
+    }
+
+    public String getEliminado() {
+        return eliminado;
+    }
+
+    public String getAlumnoAsociado() {
+        return alumnoAsociado;
     }
 
     public String getNombreRemite() {

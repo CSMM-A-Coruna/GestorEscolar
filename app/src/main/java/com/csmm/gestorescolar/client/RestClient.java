@@ -30,7 +30,7 @@ public class RestClient {
     private Context context;
 
 
-    private final String REST_API_BASE_URL = "http://192.168.11.27:3000/v1";
+    private final String REST_API_BASE_URL = "http://192.168.28.31:3000/v1";
 
     private static RestClient instance = null;
 
@@ -83,13 +83,13 @@ public class RestClient {
     }
 
     public void getComunicacionesRecibidas(CommsRecibidasResponseHandler handler) {
-        SharedPreferences sharedPref = context.getSharedPreferences("login", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
         String savedtoken= sharedPref.getString("token",null);
         int savedId = sharedPref.getInt("id", 0);
         int tipoDestino = sharedPref.getInt("tipoUsuario", 0);
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
-                REST_API_BASE_URL + "/comms/received?user_id=" + savedId + "&tipo_destino=" + tipoDestino,
+                REST_API_BASE_URL + "/comms/received?user_id=" + savedId,
                 null,
                 response -> {
                     List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();

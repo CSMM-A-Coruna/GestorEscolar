@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         binding = MainActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        preferences = getSharedPreferences("login", MODE_PRIVATE);
+        preferences = getSharedPreferences("user", MODE_PRIVATE);
         String nombre = preferences.getString("nombre", null);
         String apellido1 = preferences.getString("apellido1", null);
         String apellido2 = preferences.getString("apellido2", null);

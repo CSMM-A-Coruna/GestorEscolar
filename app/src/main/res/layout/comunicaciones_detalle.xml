@@ -109,9 +109,9 @@
             app:layout_constraintTop_toBottomOf="@id/tvEmailDetails"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:icon="@drawable/ic_volver2"
+            app:icon="@drawable/ic_volver"
             style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:text=" Volver"
+            android:text="Volver"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
