@@ -59,32 +59,19 @@ public class ComunicacionDTO {
             String finalDate;
             if(msgDate.before(calendar.getTime())) {
                 String day, month;
-                if(msgDate.getDay()<10) {
-                    day = "0"+msgDate.getDay();
-                } else {
-                    day = String.valueOf(msgDate.getDay());
-                }
-                if(msgDate.getMonth()<10) {
-                    month = "0"+msgDate.getMonth();
-                } else {
-                    month = String.valueOf(msgDate.getMonth());
-                }
-                SimpleDateFormat df = new SimpleDateFormat("yyyy");
+                SimpleDateFormat df = new SimpleDateFormat("dd");
+                day = df.format(msgDate);
+                df = new SimpleDateFormat("MM");
+                month = df.format(msgDate);
+                df = new SimpleDateFormat("yyyy");
                 String year = df.format(msgDate);
                 finalDate = day+"/"+month+"/"+year;
-
             } else {
                 String hour, minutes;
-                if(msgDate.getHours()<10) {
-                    hour = "0"+msgDate.getHours();
-                } else {
-                    hour = String.valueOf(msgDate.getHours());
-                }
-                if(msgDate.getMinutes()<10) {
-                    minutes = "0"+msgDate.getMinutes();
-                } else {
-                    minutes = String.valueOf(msgDate.getMinutes());
-                }
+                SimpleDateFormat df = new SimpleDateFormat("HH");
+                hour = df.format(msgDate);
+                df = new SimpleDateFormat("mm");
+                minutes = df.format(msgDate);
                 finalDate = hour+":"+minutes;
             }
             return finalDate;
@@ -93,6 +80,10 @@ public class ComunicacionDTO {
             return "";
         }
 
+    }
+
+    public void setImportante(boolean importante) {
+        this.importante = importante;
     }
 
     public int getIdComunicacion() {

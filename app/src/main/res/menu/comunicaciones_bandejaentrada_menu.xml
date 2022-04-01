@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/recibidos"
+        android:enabled="true"
+        android:title="Recibidos"/>
+    <item
+        android:id="@+id/enviados"
+        android:enabled="true"
+        android:title="Enviados" />
+    <item
+        android:id="@+id/papelera"
+        android:enabled="true"
+        android:title="Papelera"/>
+</menu>

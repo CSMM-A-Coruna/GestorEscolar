@@ -1,8 +1,10 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.RecoverySystem;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,33 +22,45 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
-import com.csmm.gestorescolar.client.handlers.CommsRecibidasResponseHandler;
+import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
+import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
 import com.csmm.gestorescolar.databinding.ComunicacionesFragmentBinding;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesAdapter;
-import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesData;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComunicacionesFragment extends Fragment {
 
     private ComunicacionesFragmentBinding binding;
-    private final List<ComunicacionDTO> toggleList = new ArrayList<>();
-    List<ComunicacionDTO> mEmailData = new ArrayList<>();
-    RecyclerView mRecyclerView;
-    SwipeRefreshLayout swipLayout;
-    ComunicacionesAdapter mMailAdapter;
-    Spinner spinner;
+    private List<ComunicacionDTO> toggleList = new ArrayList<>();
+    private List<ComunicacionDTO> allList = new ArrayList<>();
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout swipLayout;
+    private ComunicacionesAdapter mAdapter;
+    private Spinner spinner;
+    private SharedPreferences sharedPreferences;
+    private BottomNavigationView navButton;
+    private String currentNav;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        //ComunicacionesViewModel comunicacionesViewModel = new ViewModelProvider(this).get(ComunicacionesViewModel.class);
-        //comunicacionesViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        sharedPreferences = getContext().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
+        currentNav = "recibidos";
 
         binding = ComunicacionesFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         // Asignamos el swipe to refresh
         swipLayout = root.findViewById(R.id.swipe_layout);
+
+        navButton = root.findViewById(R.id.bottom_navigation);
 
         // Asignamos el spinner
         spinner = root.findViewById(R.id.spinnerAlumnos);
@@ -60,42 +74,77 @@ public class ComunicacionesFragment extends Fragment {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(root.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        // Creamos los datos hardcodeados (de momento)
-        // Asignamos el adaptador
-        RestClient.getInstance(root.getContext()).getComunicacionesRecibidas(new CommsRecibidasResponseHandler() {
+
+        RestClient.getInstance(root.getContext()).getComunicacionesRecibidas(new GetComunicacionesRecibidasResponseHandler() {
             @Override
             public void sessionRequestDidComplete(List<ComunicacionDTO> response) {
-                mEmailData = response;
-                mMailAdapter = new ComunicacionesAdapter(root.getContext(), mEmailData);
-                mRecyclerView.setAdapter(mMailAdapter);
-                // Creamos un onListener para el spinner, y seleccionamos los datos de la lista que nos inteteresa
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                        Object item = adapterView.getItemAtPosition(position);
-                        toggleList.clear();
-                        if (item != null) {
-                            if(!item.toString().equals("Todos")){
-                                mEmailData.forEach(data -> {
-                                    if(data.getAlumnoAsociado().equals(item.toString())) {
-                                        toggleList.add(data);
-                                    }
-                                });
-                            } else {
-                                toggleList.addAll(mEmailData);
-                            }
-                            mMailAdapter.updateData(toggleList);
-                        }
-                    }
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {}
-                });
+                allList.addAll(response);
             }
 
             @Override
             public void requestDidFail(int statusCode) {
-                System.out.println(statusCode);
+                if(statusCode!=404) {
+                    try {
+                        JSONArray json = new JSONArray(sharedPreferences.getString("lista_recibidas", null));
+                        List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
+                        for(int i = 0; i < json.length(); i++) {
+                            try {
+                                JSONObject iterationElement = json.getJSONObject(i);
+                                ComunicacionDTO com = new ComunicacionDTO(iterationElement);
+                                listaComunicaciones.add(com);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        allList.addAll(listaComunicaciones);
+                        Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Snackbar.make(mRecyclerView, "No has recibido ninguna comunicación", Snackbar.LENGTH_SHORT).show();
+                }
             }
+        });
+
+
+        mAdapter = new ComunicacionesAdapter(root.getContext(), allList);
+        mRecyclerView.setAdapter(mAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                Object item = adapterView.getItemAtPosition(position);
+                toggleList.clear();
+                if (item != null) {
+                    if(!item.toString().equals("Todos")){
+                        allList.forEach(data -> {
+                            if(data.getAlumnoAsociado().equals(item.toString())) {
+                                toggleList.add(data);
+                            }
+                        });
+                    } else {
+                        toggleList.addAll(allList);
+                    }
+                    mAdapter.updateData(toggleList);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
+
+        navButton.setOnItemSelectedListener(item -> {
+            if(item.getItemId() == R.id.enviados) {
+                currentNav = "enviados";
+                updateToEnviadas();
+            } else if(item.getItemId() == R.id.recibidos) {
+                currentNav = "recibidos";
+                updateToRecibidos();
+            } else if(item.getItemId() == R.id.papelera) {
+                currentNav = "papelera";
+                //!TODO updateToPapelera();
+            }
+            return true;
         });
         return root;
     }
@@ -110,93 +159,120 @@ public class ComunicacionesFragment extends Fragment {
         new CargarNuevosEmails().execute();
     }
 
-    private class CargarNuevosEmails extends AsyncTask<List<ComunicacionDTO>, List<ComunicacionDTO>, List<ComunicacionDTO>> {
-        List<ComunicacionDTO> newComs = new ArrayList<>();
-        final Object async = new Object();
+    private class CargarNuevosEmails extends AsyncTask<Void, Void, Void> {
         @Override
-        protected List<ComunicacionDTO> doInBackground(List<ComunicacionDTO>... params) {
+        protected Void doInBackground(Void... params) {
             try {
-                RestClient.getInstance(getContext()).getComunicacionesRecibidas(new CommsRecibidasResponseHandler() {
-                    @Override
-                    public void sessionRequestDidComplete(List<ComunicacionDTO> response) {
-                        newComs = response;
-                        CargarNuevosEmails.this.async.notify();
-                    }
-
-                    @Override
-                    public void requestDidFail(int statusCode) {
-                        CargarNuevosEmails.this.async.notify();
-                        newComs = null;
-                    }
-                });
-                synchronized (CargarNuevosEmails.this.async) {
-                    try {
-                        CargarNuevosEmails.this.async.wait();
-                        return newComs;
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                        return null;
-                    }
+                if(currentNav.equals("enviados")) {
+                    updateToEnviadas();
+                } else if(currentNav.equals("recibidos")) {
+                    //updateToRecibidos();
+                } else if(currentNav.equals("papelera")) {
+                    //!TODO updateToPapelera();
                 }
+                Thread.sleep(600);
             } catch (Exception e) {
                 e.printStackTrace();
-                return null;
             }
+            return null;
         }
 
         @Override
-        protected void onPostExecute(List<ComunicacionDTO> aVoid) {
+        protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            updateData(aVoid);
             swipLayout.setRefreshing(false);
         }
     }
 
-    /*private void setHardcodedData() {
-        ComunicacionesData mEmail = new ComunicacionesData("Juan", "Juan Rodríguez",  "Reunión",
-                "Texto de prueba....",
-                "10:42am", false, false);
-        mEmailData.add(mEmail);
-        mEmail = new ComunicacionesData("Sandra", "Juan Rodríguez", "Calificaciones 2ºTrimestre",
-                "Adjunto las calificaciones del segundo trimestre de Historia",
-                "16:04pm", false, true);
-        mEmailData.add(mEmail);
-        mEmail = new ComunicacionesData("Sandra", "Juan Rodríguez", "Calificaciones 2ºTrimestre",
-                "Adjunto las calificaciones del segundo trimestre de Historia",
-                "16:04pm", true, true);
-        mEmailData.add(mEmail);
-        mEmail = new ComunicacionesData("Sandra", "Juan Rodríguez", "Calificaciones 2ºTrimestre",
-                "Adjunto las calificaciones del segundo trimestre de Historia",
-                "16:04pm", true, false);
-        mEmailData.add(mEmail);
-        mEmail = new ComunicacionesData("Sandra", "Juan Rodríguez", "Calificaciones 2ºTrimestre",
-                "Adjunto las calificaciones del segundo trimestre de Historia",
-                "16:04pm", true, false);
-        mEmailData.add(mEmail);
-        mEmail = new ComunicacionesData("Sandra", "Juan Rodríguez", "Calificaciones 2ºTrimestre",
-                "Adjunto las calificaciones del segundo trimestre de Historia",
-                "16:04pm", true, false);
-        mEmailData.add(mEmail);
-        mEmail = new ComunicacionesData("Sandra", "Iria Rodríguez", "Calificaciones 2ºTrimestre",
-                "Adjunto las calificaciones del segundo trimestre de Historia",
-                "16:04pm", true, false);
-        mEmailData.add(mEmail);
-        mEmail = new ComunicacionesData("Sandra", "Iria Rodríguez", "Calificaciones 2ºTrimestre",
-                "Adjunto las calificaciones del segundo trimestre de Historia",
-                "16:04pm", true, false);
-        mEmailData.add(mEmail);
-        mEmail = new ComunicacionesData("Sandra", "Iria Rodríguez", "Calificaciones 2ºTrimestre",
-                "Adjunto las calificaciones del segundo trimestre de Historia",
-                "16:04pm", true, false);
-        mEmailData.add(mEmail);
-    }*/
-
     private void updateData(List<ComunicacionDTO> list) {
-        mMailAdapter.updateData(list);
+        mAdapter.updateData(list);
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        new CargarNuevosEmails().execute();
+    }
+
+    private void updateToRecibidos() {
+        allList.clear();
+        toggleList.clear();
+        RestClient.getInstance(getContext()).getComunicacionesRecibidas(new GetComunicacionesRecibidasResponseHandler() {
+            @Override
+            public void sessionRequestDidComplete(List<ComunicacionDTO> response) {
+                allList.addAll(response);
+                updateData(allList);
+            }
+
+            @Override
+            public void requestDidFail(int statusCode) {
+                if(statusCode!=404) {
+                    try {
+                        JSONArray json = new JSONArray(sharedPreferences.getString("lista_recibidas", null));
+                        List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
+                        for(int i = 0; i < json.length(); i++) {
+                            try {
+                                JSONObject iterationElement = json.getJSONObject(i);
+                                ComunicacionDTO com = new ComunicacionDTO(iterationElement);
+                                listaComunicaciones.add(com);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        allList.addAll(listaComunicaciones);
+                        Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Snackbar.make(mRecyclerView, "No has recibido ninguna comunicación", Snackbar.LENGTH_SHORT).show();
+                }
+                updateData(allList);
+            }
+        });
+    }
+
+    private void updateToEnviadas() {
+        allList.clear();
+        toggleList.clear();
+        RestClient.getInstance(getContext()).getComunicacionesEnviadas(new GetComunicacionesEnviadasResponseHandler() {
+            @Override
+            public void sessionRequestDidComplete(List<ComunicacionDTO> response) {
+                allList.addAll(response);
+                updateData(allList);
+            }
+
+            @Override
+            public void requestDidFail(int statusCode) {
+                if(statusCode!=404) {
+                    try {
+                        JSONArray json = new JSONArray(sharedPreferences.getString("lista_enviadas", null));
+                        List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
+                        for(int i = 0; i < json.length(); i++) {
+                            try {
+                                JSONObject iterationElement = json.getJSONObject(i);
+                                ComunicacionDTO com = new ComunicacionDTO(iterationElement);
+                                listaComunicaciones.add(com);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        allList.addAll(listaComunicaciones);
+                        Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Snackbar.make(mRecyclerView, "No has recibido ninguna comunicación", Snackbar.LENGTH_SHORT).show();
+                }
+                updateData(allList);
+            }
+        });
     }
 }

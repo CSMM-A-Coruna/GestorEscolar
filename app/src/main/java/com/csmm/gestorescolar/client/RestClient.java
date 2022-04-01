@@ -12,11 +12,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
-import com.csmm.gestorescolar.client.handlers.CommsRecibidasResponseHandler;
+import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
+import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
-import com.csmm.gestorescolar.client.handlers.LoginResponseHandler;
+import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
+import com.csmm.gestorescolar.client.handlers.PostLoginResponseHandler;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,7 +31,7 @@ public class RestClient {
     private Context context;
 
 
-    private final String REST_API_BASE_URL = "http://192.168.28.31:3000/v1";
+    private final String REST_API_BASE_URL = "http://172.20.10.2:3000/v1";
 
     private static RestClient instance = null;
 
@@ -47,7 +48,7 @@ public class RestClient {
     }
 
 
-    public void postLogin(String usuario, String password, LoginResponseHandler handler) {
+    public void postLogin(String usuario, String password, PostLoginResponseHandler handler) {
         JSONObject cuerpoPeticion = new JSONObject();
         try {
             cuerpoPeticion.put("usuario", usuario);
@@ -62,31 +63,15 @@ public class RestClient {
                 response -> {
                     UsuarioDTO usuarioDTO = new UsuarioDTO(response);
                     handler.sessionRequestDidComplete(usuarioDTO);
-                    //Guardo esos valores en un objeto SharedPreferences usando su Editor
-                    SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString("token", usuarioDTO.getToken());
-                    editor.putInt("id", usuarioDTO.getId());
-                    editor.putString("usuario", usuarioDTO.getUsuario());
-                    editor.putString("nombre", usuarioDTO.getNombre());
-                    editor.putString("apellido1", usuarioDTO.getApellido1());
-                    editor.putString("apellido2", usuarioDTO.getApellido2());
-                    editor.putString("nacimiento", usuarioDTO.getNacimiento());
-                    editor.putString("dni", usuarioDTO.getDni());
-                    editor.putString("oa", usuarioDTO.getOa());
-                    editor.putInt("accesos", usuarioDTO.getAccesos());
-                    editor.putInt("tipoUsuario", usuarioDTO.getTipoUsuario());
-                    editor.commit();
                 }, new DefaultErrorHandler(handler)
         );
         queue.add(request);
     }
 
-    public void getComunicacionesRecibidas(CommsRecibidasResponseHandler handler) {
+    public void getComunicacionesRecibidas(GetComunicacionesRecibidasResponseHandler handler) {
         SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
         String savedtoken= sharedPref.getString("token",null);
         int savedId = sharedPref.getInt("id", 0);
-        int tipoDestino = sharedPref.getInt("tipoUsuario", 0);
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
                 REST_API_BASE_URL + "/comms/received?user_id=" + savedId,
@@ -103,6 +88,15 @@ public class RestClient {
                             handler.requestDidFail(-1);
                         }
                     }
+                    SharedPreferences comunicacionesCache = context.getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
+                    String lista = response.toString();
+                    if(!lista.equals(comunicacionesCache.getString("lista_recibidas", null))) {
+                        System.out.println("Hay datos nuevos");
+                        SharedPreferences.Editor editor = comunicacionesCache.edit();
+                        editor.clear();
+                        editor.putString("lista_recibidas", lista);
+                        editor.commit();
+                    }
                     // Never forget to call the handler method!
                     handler.sessionRequestDidComplete(listaComunicaciones);
                 }, new DefaultErrorHandler(handler)
@@ -117,6 +111,76 @@ public class RestClient {
                 return headers;
             }
         };
+        queue.add(request);
+    }
+
+    public void getComunicacionesEnviadas(GetComunicacionesEnviadasResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        int savedId = sharedPref.getInt("id", 0);
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                REST_API_BASE_URL + "/comms/sent?user_id=" + savedId,
+                null,
+                response -> {
+                    List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
+                    for(int i = 0; i < response.length(); i++) {
+                        try {
+                            JSONObject iterationElement = response.getJSONObject(i);
+                            ComunicacionDTO com = new ComunicacionDTO(iterationElement);
+                            listaComunicaciones.add(com);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            handler.requestDidFail(-1);
+                        }
+                    }
+                    SharedPreferences comunicacionesCache = context.getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
+                    String lista = response.toString();
+                    if(!lista.equals(comunicacionesCache.getString("lista_enviadas", null))) {
+                        System.out.println("Hay datos nuevos");
+                        SharedPreferences.Editor editor = comunicacionesCache.edit();
+                        editor.clear();
+                        editor.putString("lista_enviadas", lista);
+                        editor.commit();
+                    }
+                    // Never forget to call the handler method!
+                    handler.sessionRequestDidComplete(listaComunicaciones);
+                }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
+        queue.add(request);
+    }
+
+    public void postEstadoComunicacion(int id, String estado, PostEstadoComunicacionHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                REST_API_BASE_URL + "/comms/update?id_com=" + id + "&state=" + estado,
+                null,
+                response -> {
+                        handler.sessionRequestDidComplete(true);
+                    }, new DefaultErrorHandler(handler)
+                ) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                    // Añadimos la cabecera deseada
+                    if (savedtoken!=null) {
+                        headers.put("Authorization", "Bearer " + savedtoken);
+                    }
+                    return headers;
+                }
+            };
         queue.add(request);
     }
 }
