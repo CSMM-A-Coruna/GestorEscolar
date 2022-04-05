@@ -29,7 +29,7 @@ public class UsuarioDTO {
             this.apellido1 = tokenDecoded.getString("apellido1");
             this.apellido2 = tokenDecoded.getString("apellido2");
             this.nacimiento = tokenDecoded.getString("nacimiento");
-            this.dni = tokenDecoded.getString("nacimiento");
+            this.dni = tokenDecoded.getString("dni");
             this.oa = tokenDecoded.getString("oa");
             this.accesos = tokenDecoded.getInt("accesos");
             switch (tokenDecoded.getString("tipoUsuario")) {

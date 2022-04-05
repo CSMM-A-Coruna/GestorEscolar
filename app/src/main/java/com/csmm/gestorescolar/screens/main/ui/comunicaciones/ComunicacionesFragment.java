@@ -22,6 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
+import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
 import com.csmm.gestorescolar.databinding.ComunicacionesFragmentBinding;
@@ -50,7 +51,6 @@ public class ComunicacionesFragment extends Fragment {
     private String currentNav;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         sharedPreferences = getContext().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
         currentNav = "recibidos";
 
@@ -74,52 +74,17 @@ public class ComunicacionesFragment extends Fragment {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(root.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-
-        RestClient.getInstance(root.getContext()).getComunicacionesRecibidas(new GetComunicacionesRecibidasResponseHandler() {
-            @Override
-            public void sessionRequestDidComplete(List<ComunicacionDTO> response) {
-                allList.addAll(response);
-            }
-
-            @Override
-            public void requestDidFail(int statusCode) {
-                if(statusCode!=404) {
-                    try {
-                        JSONArray json = new JSONArray(sharedPreferences.getString("lista_recibidas", null));
-                        List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
-                        for(int i = 0; i < json.length(); i++) {
-                            try {
-                                JSONObject iterationElement = json.getJSONObject(i);
-                                ComunicacionDTO com = new ComunicacionDTO(iterationElement);
-                                listaComunicaciones.add(com);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        allList.addAll(listaComunicaciones);
-                        Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Snackbar.make(mRecyclerView, "No has recibido ninguna comunicación", Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-
-        mAdapter = new ComunicacionesAdapter(root.getContext(), allList);
+        mAdapter = new ComunicacionesAdapter(getContext(), allList);
         mRecyclerView.setAdapter(mAdapter);
-
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 Object item = adapterView.getItemAtPosition(position);
                 toggleList.clear();
-                if (item != null) {
+                if (item != null && allList.size() > 0) {
                     if(!item.toString().equals("Todos")){
                         allList.forEach(data -> {
-                            if(data.getAlumnoAsociado().equals(item.toString())) {
+                            if(data.getNombreAlumnoAsociado().equals(item.toString())) {
                                 toggleList.add(data);
                             }
                         });
@@ -142,7 +107,7 @@ public class ComunicacionesFragment extends Fragment {
                 updateToRecibidos();
             } else if(item.getItemId() == R.id.papelera) {
                 currentNav = "papelera";
-                //!TODO updateToPapelera();
+                updateToPapelera();
             }
             return true;
         });
@@ -166,9 +131,9 @@ public class ComunicacionesFragment extends Fragment {
                 if(currentNav.equals("enviados")) {
                     updateToEnviadas();
                 } else if(currentNav.equals("recibidos")) {
-                    //updateToRecibidos();
+                    updateToRecibidos();
                 } else if(currentNav.equals("papelera")) {
-                    //!TODO updateToPapelera();
+                    updateToPapelera();
                 }
                 Thread.sleep(600);
             } catch (Exception e) {
@@ -214,7 +179,7 @@ public class ComunicacionesFragment extends Fragment {
             public void requestDidFail(int statusCode) {
                 if(statusCode!=404) {
                     try {
-                        JSONArray json = new JSONArray(sharedPreferences.getString("lista_recibidas", null));
+                        JSONArray json = new JSONArray(sharedPreferences.getString("recibidas", null));
                         List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
                         for(int i = 0; i < json.length(); i++) {
                             try {
@@ -250,9 +215,49 @@ public class ComunicacionesFragment extends Fragment {
 
             @Override
             public void requestDidFail(int statusCode) {
+                if(statusCode!=404 && sharedPreferences.getString("enviadas", null) != null) {
+                    try {
+                        JSONArray json = new JSONArray(sharedPreferences.getString("enviadas", null));
+                        List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
+                        for (int i = 0; i < json.length(); i++) {
+                            try {
+                                JSONObject iterationElement = json.getJSONObject(i);
+                                ComunicacionDTO com = new ComunicacionDTO(iterationElement);
+                                listaComunicaciones.add(com);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        allList.addAll(listaComunicaciones);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
+                } else if(statusCode==404) {
+                    Snackbar.make(mRecyclerView, "No has recibido ninguna comunicación", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
+                }
+                updateData(allList);
+            }
+        });
+    }
+
+    private void updateToPapelera() {
+        allList.clear();
+        toggleList.clear();
+        RestClient.getInstance(getContext()).getComunicacionesBorradas(new GetComunicacionesBorradasResponseHandler() {
+            @Override
+            public void sessionRequestDidComplete(List<ComunicacionDTO> response) {
+                allList.addAll(response);
+                updateData(allList);
+            }
+
+            @Override
+            public void requestDidFail(int statusCode) {
                 if(statusCode!=404) {
                     try {
-                        JSONArray json = new JSONArray(sharedPreferences.getString("lista_enviadas", null));
+                        JSONArray json = new JSONArray(sharedPreferences.getString("borradas", null));
                         List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
                         for(int i = 0; i < json.length(); i++) {
                             try {

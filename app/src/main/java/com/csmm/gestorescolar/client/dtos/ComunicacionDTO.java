@@ -20,7 +20,8 @@ public class ComunicacionDTO {
     private String fecha;
     private String leida;
     private String eliminado;
-    private String alumnoAsociado;
+    private String estado;
+    private String nombreAlumnoAsociado;
     private String nombreRemite;
     private String nombreDestino;
 
@@ -39,12 +40,15 @@ public class ComunicacionDTO {
             } else {
                 this.importante = true;
             }
-            this.fecha = formatearFecha(jsonObject.getString("fecha"));
-            this.leida = jsonObject.getString("leida");
-            this.eliminado = jsonObject.getString("eliminado");
-            this.alumnoAsociado = jsonObject.getString("nombre_alumnoAsociado");
-            this.nombreRemite = jsonObject.getString("nombreRemite");
-            this.nombreDestino = jsonObject.getString("nombreDestino");
+            if(!jsonObject.getString("fecha").equals("null")) {
+                this.fecha = formatearFecha(jsonObject.getString("fecha"));
+            }
+            this.leida = String.valueOf(jsonObject.get("leida"));
+            this.eliminado = String.valueOf(jsonObject.get("eliminado"));
+            this.estado = jsonObject.getString("estado");
+            this.nombreAlumnoAsociado = jsonObject.getString("nombre_alumnoAsociado");
+            this.nombreRemite = jsonObject.getString("nombre_remite");
+            this.nombreDestino = jsonObject.getString("nombre_destino");
         } catch (JSONException ex) {
             ex.printStackTrace();
         }
@@ -134,8 +138,12 @@ public class ComunicacionDTO {
         return eliminado;
     }
 
-    public String getAlumnoAsociado() {
-        return alumnoAsociado;
+    public String getEstado() {
+        return estado;
+    }
+
+    public String getNombreAlumnoAsociado() {
+        return nombreAlumnoAsociado;
     }
 
     public String getNombreRemite() {

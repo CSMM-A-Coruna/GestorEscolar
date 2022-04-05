@@ -1,8 +1,6 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones;
-import android.app.Activity;
-import android.graphics.PorterDuff;
+
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,12 +13,6 @@ import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
-
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Vector;
 
 public class ComunicacionDetalle extends AppCompatActivity {
 
@@ -53,35 +45,37 @@ public class ComunicacionDetalle extends AppCompatActivity {
 
         Bundle mBundle = getIntent().getExtras();
         if (mBundle != null) {
-            mSender.setText(mBundle.getString("remite"));
             mEmailTitle.setText(mBundle.getString("asunto"));
             mEmailDetails.setText(mBundle.getString("texto"));
             mEmailTime.setText(mBundle.getString("fecha"));
-            idComunicacion = mBundle.getInt("id_com");
-            leida = mBundle.getString("leida");
-            eliminado = mBundle.getString("eliminado");
-            if(mBundle.getBoolean("importante")) {
-                toggleFavIcon();
+            if(mBundle.getString("estado").equals("recibida")) {
+                mSender.setText(mBundle.getString("remite"));
+                idComunicacion = mBundle.getInt("id_com");
+                leida = mBundle.getString("leida");
+                eliminado = mBundle.getString("eliminado");
+                if(mBundle.getBoolean("importante")) {
+                    toggleFavIcon();
+                }
+                topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getItemId() == R.id.iconTopFavorite) {
+                            toggleFavIcon();
+                        } else if(item.getItemId() == R.id.iconResponder) {
+                            Snackbar.make(mEmailTime, "Por implementar", Snackbar.LENGTH_SHORT).show();
+                        } else if(item.getItemId() == R.id.eliminar) {
+                            Snackbar.make(mEmailTime, "Por implementar", Snackbar.LENGTH_SHORT).show();
+                        }
+                        return false;
+                    }
+                });
+                if(leida.equals("null")) {
+                    updateServer("leida");
+                }
+            } else {
+                topBar.setVisibility(View.GONE);
             }
         }
-
-        if(leida.equals("null")) {
-            updateServer("leida");
-        }
-
-        topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                 if(item.getItemId() == R.id.iconTopFavorite) {
-                     toggleFavIcon();
-                } else if(item.getItemId() == R.id.iconResponder) {
-                     //Snackbar.make(mEmailTime, "Por implementar", Snackbar.LENGTH_SHORT).show();
-                 } else if(item.getItemId() == R.id.eliminar) {
-                     //Snackbar.make(mEmailTime, "Por implementar", Snackbar.LENGTH_SHORT).show();
-                 }
-                return false;
-            }
-        });
 
         volverButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putString("oa", dto.getOa());
                         editor.putInt("accesos", dto.getAccesos());
                         editor.putInt("tipoUsuario", dto.getTipoUsuario());
-                        editor.commit();
+                        editor.apply();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                     }

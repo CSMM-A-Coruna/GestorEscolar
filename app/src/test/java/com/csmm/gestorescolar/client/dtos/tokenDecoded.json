@@ -1,0 +1,14 @@
+{
+  "id": 3,
+  "usuario": "mariamb",
+  "nombre": "María del Carmen",
+  "apellido1": "Miramontes",
+  "apellido2": "Blanco",
+  "nacimiento": "0000-00-00",
+  "dni": "55555555P",
+  "oa": "a",
+  "accesos": 4,
+  "tipoUsuario": "familias",
+  "iat": 1648798412,
+  "exp": 1648883012
+}
