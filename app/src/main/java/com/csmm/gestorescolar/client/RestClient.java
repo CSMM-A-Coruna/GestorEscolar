@@ -12,6 +12,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
+import com.csmm.gestorescolar.client.handlers.CompareDataResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
@@ -66,6 +67,37 @@ public class RestClient {
                     handler.sessionRequestDidComplete(usuarioDTO);
                 }, new DefaultErrorHandler(handler)
         );
+        queue.add(request);
+    }
+
+    public void compareData(CompareDataResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        JSONObject cuerpoPeticion = new JSONObject();
+        try {
+            cuerpoPeticion.put("token", savedtoken);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                REST_API_BASE_URL + "/auth/update",
+                cuerpoPeticion,
+                response -> {
+                    UsuarioDTO usuarioDTO = new UsuarioDTO(response);
+                    handler.sessionRequestDidComplete(usuarioDTO);
+                }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
         queue.add(request);
     }
 

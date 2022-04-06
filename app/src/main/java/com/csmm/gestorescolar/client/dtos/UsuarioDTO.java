@@ -2,6 +2,7 @@ package com.csmm.gestorescolar.client.dtos;
 
 import com.csmm.gestorescolar.client.helpers.JWTUtils;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class UsuarioDTO {
@@ -18,6 +19,7 @@ public class UsuarioDTO {
     private int tipoUsuario;
     private String token;
     private JSONObject tokenDecoded;
+    private JSONArray alumnosAsociados;
 
     public UsuarioDTO(JSONObject token) {
         try {
@@ -46,6 +48,7 @@ public class UsuarioDTO {
                     this.tipoUsuario = 4;
                     break;
             }
+            this.alumnosAsociados = tokenDecoded.getJSONArray("alumnosAsociados");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,6 +96,10 @@ public class UsuarioDTO {
 
     public int getTipoUsuario() {
         return tipoUsuario;
+    }
+
+    public JSONArray getAlumnosAsociados() {
+        return alumnosAsociados;
     }
 
     public JSONObject getTokenDecoded() {
