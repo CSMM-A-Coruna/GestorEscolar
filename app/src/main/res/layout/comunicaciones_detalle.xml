@@ -72,7 +72,7 @@
             app:layout_constraintTop_toBottomOf="@id/tvEmailTitle"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="5dp"
-            app:layout_constraintHorizontal_bias="0.06"
+            app:layout_constraintHorizontal_bias="0.12"
             android:text="TextView"
             android:textSize="16sp"
             android:textStyle="bold" />

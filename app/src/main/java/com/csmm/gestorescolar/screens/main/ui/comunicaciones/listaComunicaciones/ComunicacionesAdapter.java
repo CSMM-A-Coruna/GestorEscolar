@@ -117,7 +117,6 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
                 ((Activity)  mContext).overridePendingTransition(R.anim.fadein, R.anim.fadeout);
             }
         });
-
     }
 
     public void updateData(List<ComunicacionDTO> data) {

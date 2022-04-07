@@ -64,7 +64,8 @@ public class ComunicacionDetalle extends AppCompatActivity {
                         } else if(item.getItemId() == R.id.iconResponder) {
                             Snackbar.make(mEmailTime, "Por implementar", Snackbar.LENGTH_SHORT).show();
                         } else if(item.getItemId() == R.id.eliminar) {
-                            Snackbar.make(mEmailTime, "Por implementar", Snackbar.LENGTH_SHORT).show();
+                            updateServer("eliminado");
+                            finish();
                         }
                         return false;
                     }
