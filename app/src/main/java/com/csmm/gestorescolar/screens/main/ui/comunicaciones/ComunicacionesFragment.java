@@ -78,7 +78,9 @@ public class ComunicacionesFragment extends Fragment {
             listAlumnos.add("Todos");
             for(int i = 0; i < alumnos.length(); i++) {
                 JSONObject json = alumnos.getJSONObject(i);
-                listAlumnos.add(json.getString("nombre"));
+                String nombreAlumno = json.getString("nombre");
+                String[] splited = nombreAlumno.split("\\s+");
+                listAlumnos.add(splited[0]);
             }
         } catch (JSONException e) {
             e.printStackTrace();
