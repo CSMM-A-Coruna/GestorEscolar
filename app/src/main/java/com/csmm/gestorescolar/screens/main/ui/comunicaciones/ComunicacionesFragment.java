@@ -76,11 +76,10 @@ public class ComunicacionesFragment extends Fragment {
         try {
             JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
             listAlumnos.add("Todos");
+            System.out.println(alumnos);
             for(int i = 0; i < alumnos.length(); i++) {
                 JSONObject json = alumnos.getJSONObject(i);
-                String nombreAlumno = json.getString("nombre");
-                String[] splited = nombreAlumno.split("\\s+");
-                listAlumnos.add(splited[0]);
+                listAlumnos.add(json.getString("nombre"));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -88,6 +87,12 @@ public class ComunicacionesFragment extends Fragment {
         String[] arrayAlumnos = new String[listAlumnos.size()];
         for(int j =0;j<listAlumnos.size();j++){
             arrayAlumnos[j] = listAlumnos.get(j);
+        }
+        String[] arrayAlumnosSoloNombre = new String[listAlumnos.size()];
+        for(int i=0; i<listAlumnos.size(); i++) {
+            String nombre = listAlumnos.get(i);
+            String[] splited = nombre.split("\\s+");
+            arrayAlumnosSoloNombre[i] = splited[0];
         }
         filtrarAlumnos.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,7 +114,7 @@ public class ComunicacionesFragment extends Fragment {
                                 filterData();
                             }
                         })
-                        .setSingleChoiceItems(arrayAlumnos, alumnoChecked[0], new DialogInterface.OnClickListener() {
+                        .setSingleChoiceItems(arrayAlumnosSoloNombre, alumnoChecked[0], new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 alumnoChecked[0] = i;

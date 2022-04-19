@@ -25,6 +25,7 @@ public class ComunicacionDetalle extends AppCompatActivity {
     Drawable favIcon;
     boolean favIconMarked;
     int idComunicacion;
+    int idDestino;
     String leida;
     String eliminado;
 
@@ -51,6 +52,7 @@ public class ComunicacionDetalle extends AppCompatActivity {
             if(mBundle.getString("estado").equals("recibida")) {
                 mSender.setText(mBundle.getString("remite"));
                 idComunicacion = mBundle.getInt("id_com");
+                idDestino = mBundle.getInt("id_destino");
                 leida = mBundle.getString("leida");
                 eliminado = mBundle.getString("eliminado");
                 if(mBundle.getBoolean("importante")) {
@@ -100,7 +102,7 @@ public class ComunicacionDetalle extends AppCompatActivity {
     }
 
     private void updateServer(String estado) {
-        RestClient.getInstance(getApplicationContext()).postEstadoComunicacion(idComunicacion, estado, new PostEstadoComunicacionHandler() {
+        RestClient.getInstance(getApplicationContext()).postEstadoComunicacion(idComunicacion, estado, idDestino, new PostEstadoComunicacionHandler() {
             @Override
             public void sessionRequestDidComplete(boolean update) {
 

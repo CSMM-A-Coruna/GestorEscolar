@@ -234,12 +234,12 @@ public class RestClient {
     }
 
 
-    public void postEstadoComunicacion(int id, String estado, PostEstadoComunicacionHandler handler) {
+    public void postEstadoComunicacion(int id, String estado, int idDestino, PostEstadoComunicacionHandler handler) {
         SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
         String savedtoken= sharedPref.getString("token",null);
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,
-                REST_API_BASE_URL + "/comms/update?id_com=" + id + "&state=" + estado,
+                REST_API_BASE_URL + "/comms/update?id_com=" + id + "&id_destino=" + idDestino + "&state=" + estado,
                 null,
                 response -> {
                         handler.sessionRequestDidComplete(true);

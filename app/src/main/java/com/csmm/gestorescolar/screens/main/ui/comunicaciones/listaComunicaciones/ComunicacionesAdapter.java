@@ -79,7 +79,7 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
                         mEmailData.get(holder.getAdapterPosition()).setImportante(true);
                         estado = "importante";
                     }
-                    RestClient.getInstance(mContext).postEstadoComunicacion(mEmailData.get(holder.getAdapterPosition()).getIdComunicacion(), estado, new PostEstadoComunicacionHandler() {
+                    RestClient.getInstance(mContext).postEstadoComunicacion(mEmailData.get(holder.getAdapterPosition()).getIdComunicacion(), estado, mEmailData.get(holder.getAdapterPosition()).getIdDestino(), new PostEstadoComunicacionHandler() {
                         @Override
                         public void sessionRequestDidComplete(boolean update) { }
                         @Override
@@ -102,6 +102,7 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
                 mIntent.putExtra("id_com", mEmailData.get(holder.getAdapterPosition()).getIdComunicacion());
                 mIntent.putExtra("remite", holder.mSender.getText().toString());
                 mIntent.putExtra("destino", mEmailData.get(holder.getAdapterPosition()).getNombreDestino());
+                mIntent.putExtra("id_destino", mEmailData.get(holder.getAdapterPosition()).getIdDestino());
                 mIntent.putExtra("asunto", holder.mEmailTitle.getText().toString());
                 mIntent.putExtra("texto", holder.mEmailDetails.getText().toString());
                 mIntent.putExtra("fecha", holder.mEmailTime.getText().toString());
