@@ -27,7 +27,7 @@ public class UsuarioDTO_UnitTest {
             JSONObject jsonObject = new JSONObject(jsonString);
             UsuarioDTO usuarioDTO = new UsuarioDTO(jsonObject);
 
-            assertEquals(usuarioDTO.getToken(),   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXN1YXJpbyI6Im1hcmlhbWIiLCJub21icmUiOiJNYXLDrWEgZGVsIENhcm1lbiIsImFwZWxsaWRvMSI6Ik1pcmFtb250ZXMiLCJhcGVsbGlkbzIiOiJCbGFuY28iLCJuYWNpbWllbnRvIjoiMDAwMC0wMC0wMCIsImRuaSI6IjU1NTU1NTU1UCIsIm9hIjoiYSIsImFjY2Vzb3MiOjQsInRpcG9Vc3VhcmlvIjoiZmFtaWxpYXMiLCJpYXQiOjE2NDg3OTg0MTIsImV4cCI6MTY0ODg4MzAxMn0.Ay0DagysPOmIH_f5F6OlHDqpLp5hLh_QRnRfqn4Whbk");
+            assertEquals(usuarioDTO.getToken(),   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXN1YXJpbyI6ImFsYmVydG9nbCIsIm5vbWJyZSI6IkFsYmVydG8iLCJhcGVsbGlkbzEiOiJHYXJjw61hIiwiYXBlbGxpZG8yIjoiTG9wZXoiLCJuYWNpbWllbnRvIjoiMDAwMC0wMC0wMCIsImRuaSI6IjU1NTU1NTU1UCIsIm9hIjoibyIsImFjY2Vzb3MiOjQsInRpcG9Vc3VhcmlvIjoiZmFtaWxpYXMiLCJhbHVtbm9zQXNvY2lhZG9zIjpbeyJpZCI6MSwibm9tYnJlIjoiTWFyaW8gR2FyY8OtYSBQw6lyZXoiLCJyZWxhY2lvbiI6IlBhZHJlIn0seyJpZCI6Niwibm9tYnJlIjoiUGVwZSBHYXJjw61hIFDDqXJleiIsInJlbGFjaW9uIjoiUGFkcmUifV0sImlhdCI6MTY1MDQ0NjE0OCwiZXhwIjoxNjUwNTMwNzQ4fQ.XKWgvSk476eLM9et8oIuskSTD_wc1IXgxjAoUUjeu_k");
 
             BufferedReader userJson = new BufferedReader(
                     new FileReader("src/test/java/com/csmm/gestorescolar/client/dtos/tokenDecoded.json"));
@@ -41,14 +41,14 @@ public class UsuarioDTO_UnitTest {
             JSONObject userJsonObject = new JSONObject(userJsonString);
 
             //assertEquals(usuarioDTO.getTokenDecoded(), userJsonObject);
-            assertEquals(usuarioDTO.getId(), 3);
-            assertEquals(usuarioDTO.getUsuario(), "mariamb");
-            assertEquals(usuarioDTO.getNombre(), "María del Carmen");
-            assertEquals(usuarioDTO.getApellido1(), "Miramontes");
-            assertEquals(usuarioDTO.getApellido2(), "Blanco");
+            assertEquals(usuarioDTO.getId(), 1);
+            assertEquals(usuarioDTO.getUsuario(), "albertogl");
+            assertEquals(usuarioDTO.getNombre(), "Alberto");
+            assertEquals(usuarioDTO.getApellido1(), "García");
+            assertEquals(usuarioDTO.getApellido2(), "Lopez");
             assertEquals(usuarioDTO.getNacimiento(), "0000-00-00");
             assertEquals(usuarioDTO.getDni(), "55555555P");
-            assertEquals(usuarioDTO.getOa(), "a");
+            assertEquals(usuarioDTO.getOa(), "o");
             assertEquals(usuarioDTO.getAccesos(), 4);
             assertEquals(usuarioDTO.getTipoUsuario(), 2);
 

@@ -41,15 +41,15 @@ public class ComunicacionDTO_UnitTest {
             assertEquals(dto.getIdComunicacion(), 3);
             assertEquals(dto.getIdRemite(), 2);
             assertEquals(dto.getIdDestino(), 2);
-            assertEquals(dto.getTipoRemite(), 2);
-            assertEquals(dto.getTipoDestino(), 3);
+            assertEquals(dto.getTipoRemite(), "2");
+            assertEquals(dto.getTipoDestino(), "3");
             assertEquals(dto.getIdAlumnoAsociado(), 4);
             assertEquals(dto.getAsunto(), "Calificaciones 2º Trimestre");
             assertEquals(dto.getTexto(), "Prueba...");
             assertFalse(dto.isImportante());
-            assertEquals(dto.getFecha(), "18:53");
             assertEquals(dto.getLeida(), "null");
             assertEquals(dto.getEliminado(), "null");
+            assertEquals(dto.getEstado(), "recibida");
             assertEquals(dto.getNombreAlumnoAsociado(), "Mario García Pérez");
             assertEquals(dto.getNombreRemite(), "Juana María Pérez");
             assertEquals(dto.getNombreDestino(), "Pedro López");
