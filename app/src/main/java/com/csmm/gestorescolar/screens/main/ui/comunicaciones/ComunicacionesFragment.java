@@ -14,14 +14,12 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
@@ -36,16 +34,24 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComunicacionesFragment extends Fragment {
 
+
+    /**
+     * tutor
+     * enfermería
+     * informática
+     * administración
+     *
+     * con opción de CC al tutor
+     */
+    
     private ComunicacionesFragmentBinding binding;
     private List<ComunicacionDTO> toggleList = new ArrayList<>();
     private List<ComunicacionDTO> allList = new ArrayList<>();
@@ -80,46 +86,31 @@ public class ComunicacionesFragment extends Fragment {
         navButton = root.findViewById(R.id.bottom_navigation);
         nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
 
+
+        // Animación fab
         nuevaComButton.setScaleX(0);
         nuevaComButton.setScaleY(0);
+        final Interpolator interpolador = AnimationUtils.loadInterpolator(getContext(),
+                android.R.interpolator.fast_out_slow_in);
+        nuevaComButton.animate()
+                .scaleX(1)
+                .scaleY(1)
+                .setInterpolator(interpolador)
+                .setDuration(600)
+                .setStartDelay(1000)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {}
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            final Interpolator interpolador = AnimationUtils.loadInterpolator(getContext(),
-                    android.R.interpolator.fast_out_slow_in);
+                    @Override
+                    public void onAnimationEnd(Animator animation) {}
 
-            nuevaComButton.animate()
-                    .scaleX(1)
-                    .scaleY(1)
-                    .setInterpolator(interpolador)
-                    .setDuration(600)
-                    .setStartDelay(1000)
-                    .setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
+                    @Override
+                    public void onAnimationCancel(Animator animation) {}
 
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            /*nuevaComButton.animate()
-                                    .scaleY(0)
-                                    .scaleX(0)
-                                    .setInterpolator(interpolador)
-                                    .setDuration(600)
-                                    .start();*/
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-
-                        }
-                    });
-        }
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {}
+                });
 
         nuevaComButton.setOnClickListener(new View.OnClickListener() {
             @Override
