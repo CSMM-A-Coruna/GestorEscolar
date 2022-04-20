@@ -400,6 +400,7 @@ public class ComunicacionesFragment extends Fragment {
             filtradoPropiedad[0] = "Todos";
             checkedItem[0] = 0;
             alumnoChecked[0] = 0;
+            chipFiltrarAlumno.setVisibility(View.GONE);
         } else {
             filtradoPropiedad[0] = "Todos";
             checkedItem[0] = 0;
@@ -449,6 +450,7 @@ public class ComunicacionesFragment extends Fragment {
             filtradoPropiedad[0] = "Todos";
             checkedItem[0] = 0;
             alumnoChecked[0] = 0;
+            chipFiltrarAlumno.setVisibility(View.GONE);
         } else {
             filtradoPropiedad[0] = "Todos";
             checkedItem[0] = 0;

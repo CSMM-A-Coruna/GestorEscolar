@@ -19,6 +19,7 @@ import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponse
 import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
 import com.csmm.gestorescolar.client.handlers.PostLoginResponseHandler;
+import com.csmm.gestorescolar.client.handlers.PostSendComunicacionResponseHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -255,6 +256,42 @@ public class RestClient {
                     return headers;
                 }
             };
+        queue.add(request);
+    }
+
+    public void postSendComunicacion(String asunto, String texto, int idRemite, int tipoDestino, int idDestino, int idAlumnoAsociado, PostSendComunicacionResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("asunto", asunto);
+            body.put("texto", texto);
+            body.put("id_remite", idRemite);
+            body.put("tipo_destino", tipoDestino);
+            body.put("id_destino", idDestino);
+            body.put("id_alumnoAsociado", idAlumnoAsociado);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                REST_API_BASE_URL + "/comms/send",
+                body,
+                response -> {
+
+                }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
         queue.add(request);
     }
 }

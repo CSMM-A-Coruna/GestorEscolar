@@ -1,5 +1,6 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -64,7 +65,17 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
                         if(item.getItemId() == R.id.iconTopFavorite) {
                             toggleFavIcon();
                         } else if(item.getItemId() == R.id.iconResponder) {
-                            Snackbar.make(mEmailTime, "Por implementar", Snackbar.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), ComunicacionDetalleResponder.class);
+                            intent.putExtra("id_destino", mBundle.getInt("id_remite"));
+                            intent.putExtra("tipo_destino", mBundle.getString("tipo_remite"));
+                            intent.putExtra("destino", mBundle.getString("remite"));
+                            intent.putExtra("id_remite", idDestino);
+                            intent.putExtra("remite", mBundle.getString("destino"));
+                            intent.putExtra("asunto", mBundle.getString("asunto"));
+                            intent.putExtra("texto", mBundle.getString("texto"));
+                            intent.putExtra("fecha", mBundle.getString("fecha"));
+                            intent.putExtra("id_alumnoAsociado", mBundle.getInt("id_alumnoAsociado"));
+                            startActivity(intent);
                         } else if(item.getItemId() == R.id.eliminar) {
                             updateServer("eliminado");
                             finish();
