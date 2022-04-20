@@ -27,6 +27,7 @@ import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponse
 import com.csmm.gestorescolar.databinding.ComunicacionesFragmentBinding;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -47,6 +48,7 @@ public class ComunicacionesFragment extends Fragment {
     private ComunicacionesAdapter mAdapter;
     private Button filtrarAlumnos;
     private ImageButton filtrar;
+    private Chip chipFiltrarAlumno;
     private SharedPreferences sharedPreferences;
     private BottomNavigationView navButton;
     private String currentNav;
@@ -67,6 +69,7 @@ public class ComunicacionesFragment extends Fragment {
         swipLayout = root.findViewById(R.id.swipe_layout);
         filtrarAlumnos = root.findViewById(R.id.btnFiltrarAlumnos);
         filtrar = root.findViewById(R.id.btnFiltros);
+        chipFiltrarAlumno = root.findViewById(R.id.chipFiltradoAlumnos);
         navButton = root.findViewById(R.id.bottom_navigation);
 
 
@@ -188,21 +191,27 @@ public class ComunicacionesFragment extends Fragment {
     private void filterData() {
         if(filtradoPropiedad[0].equals("Todos") && filtradoAlumno[0].equals("Todos")) {
             updateData(allList);
+            chipFiltrarAlumno.setVisibility(View.GONE);
         } else if(!filtradoAlumno[0].equals("Todos")) {
+            chipFiltrarAlumno.setVisibility(View.VISIBLE);
+            chipFiltrarAlumno.setText(filtradoAlumno[0]);
             List<ComunicacionDTO> lista = new ArrayList<>();
             if(filtradoPropiedad[0].equals("No leídos")) {
+                chipFiltrarAlumno.setText(filtradoAlumno[0] + " - " + filtradoPropiedad[0]);
                 allList.forEach(data -> {
                     if(data.getLeida().equals("null")) {
                         lista.add(data);
                     }
                 });
             } else if(filtradoPropiedad[0].equals("Leídos")) {
+                chipFiltrarAlumno.setText(filtradoAlumno[0] + " - " + filtradoPropiedad[0]);
                 allList.forEach(data -> {
                     if(!data.getLeida().equals("null")) {
                         lista.add(data);
                     }
                 });
             } else if(filtradoPropiedad[0].equals("Importantes")) {
+                chipFiltrarAlumno.setText(filtradoAlumno[0] + " - " + filtradoPropiedad[0]);
                 allList.forEach(data -> {
                     if(data.isImportante()) {
                         lista.add(data);
@@ -214,6 +223,8 @@ public class ComunicacionesFragment extends Fragment {
             filtroAlumno(lista, filtradoAlumno[0]);
         } else {
             toggleList.clear();
+            chipFiltrarAlumno.setVisibility(View.VISIBLE);
+            chipFiltrarAlumno.setText(filtradoPropiedad[0]);
             if(filtradoPropiedad[0].equals("No leídos")) {
                 allList.forEach(data -> {
                     if(data.getLeida().equals("null")) {

@@ -14,9 +14,9 @@
         android:backgroundTint="@color/white"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_filter"
-        app:layout_constraintBottom_toTopOf="@id/swipe_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/divider"
         android:layout_marginEnd="7dp"/>
 
     <Button
@@ -40,16 +40,27 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/btnFiltrarAlumnos"/>
 
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chipFiltradoAlumnos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/divider"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="10dp"
+        android:text="filtrado"
+        android:visibility="gone"/>
+
+
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="47dp"
-        app:layout_constraintTop_toBottomOf="@id/btnFiltrarAlumnos"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/chipFiltradoAlumnos"
         app:layout_constraintBottom_toBottomOf="@id/bottom_navigation"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-            <androidx.recyclerview.widget.RecyclerView
+        app:layout_constraintEnd_toEndOf="parent" >
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
