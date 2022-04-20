@@ -50,7 +50,19 @@
         android:text="filtrado"
         android:visibility="gone"/>
 
-
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/nuevaComunicacionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.96"
+        android:layout_marginBottom="45dp"
+        android:contentDescription="Nueva comunicación"
+        app:srcCompat="@drawable/ic_pencil"
+        app:backgroundTint="@color/white"
+        app:tint="@color/teal_700" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_layout"

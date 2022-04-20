@@ -1,13 +1,17 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 
@@ -25,10 +29,12 @@ import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseH
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
 import com.csmm.gestorescolar.databinding.ComunicacionesFragmentBinding;
+import com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle.ComunicacionDetalleNueva;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
@@ -51,6 +57,7 @@ public class ComunicacionesFragment extends Fragment {
     private Chip chipFiltrarAlumno;
     private SharedPreferences sharedPreferences;
     private BottomNavigationView navButton;
+    private FloatingActionButton nuevaComButton;
     private String currentNav;
     final String[] filtradoAlumno = {"Todos"};
     final String[] filtradoPropiedad = {"Todos"};
@@ -71,7 +78,56 @@ public class ComunicacionesFragment extends Fragment {
         filtrar = root.findViewById(R.id.btnFiltros);
         chipFiltrarAlumno = root.findViewById(R.id.chipFiltradoAlumnos);
         navButton = root.findViewById(R.id.bottom_navigation);
+        nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
 
+        nuevaComButton.setScaleX(0);
+        nuevaComButton.setScaleY(0);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            final Interpolator interpolador = AnimationUtils.loadInterpolator(getContext(),
+                    android.R.interpolator.fast_out_slow_in);
+
+            nuevaComButton.animate()
+                    .scaleX(1)
+                    .scaleY(1)
+                    .setInterpolator(interpolador)
+                    .setDuration(600)
+                    .setStartDelay(1000)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            /*nuevaComButton.animate()
+                                    .scaleY(0)
+                                    .scaleX(0)
+                                    .setInterpolator(interpolador)
+                                    .setDuration(600)
+                                    .start();*/
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    });
+        }
+
+        nuevaComButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ComunicacionDetalleNueva.class);
+                startActivity(intent);
+            }
+        });
 
         // Selector de alumnos
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
@@ -184,6 +240,9 @@ public class ComunicacionesFragment extends Fragment {
             }
             return true;
         });
+
+        cargarDatos();
+
         return root;
     }
 
@@ -302,11 +361,11 @@ public class ComunicacionesFragment extends Fragment {
         binding = null;
     }
 
-    @Override
+    /*@Override
     public void onStart() {
         super.onStart();
         new CargarNuevosEmails().execute();
-    }
+    }*/
 
     private void updateToRecibidos(boolean filter) {
         allList.clear();
@@ -400,7 +459,6 @@ public class ComunicacionesFragment extends Fragment {
             filtradoPropiedad[0] = "Todos";
             checkedItem[0] = 0;
             alumnoChecked[0] = 0;
-            chipFiltrarAlumno.setVisibility(View.GONE);
         } else {
             filtradoPropiedad[0] = "Todos";
             checkedItem[0] = 0;
@@ -450,7 +508,6 @@ public class ComunicacionesFragment extends Fragment {
             filtradoPropiedad[0] = "Todos";
             checkedItem[0] = 0;
             alumnoChecked[0] = 0;
-            chipFiltrarAlumno.setVisibility(View.GONE);
         } else {
             filtradoPropiedad[0] = "Todos";
             checkedItem[0] = 0;
