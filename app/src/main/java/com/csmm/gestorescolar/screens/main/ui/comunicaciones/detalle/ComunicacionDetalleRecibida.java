@@ -1,4 +1,4 @@
-package com.csmm.gestorescolar.screens.main.ui.comunicaciones;
+package com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -14,7 +14,7 @@ import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
-public class ComunicacionDetalle extends AppCompatActivity {
+public class ComunicacionDetalleRecibida extends AppCompatActivity {
 
     TextView mSender;
     TextView mEmailTitle;
@@ -32,7 +32,7 @@ public class ComunicacionDetalle extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.comunicaciones_detalle);
+        setContentView(R.layout.comunicaciones_detalle_recibida);
 
         mSender = findViewById(R.id.tvEmailSender);
         mEmailTitle = findViewById(R.id.tvEmailTitle);

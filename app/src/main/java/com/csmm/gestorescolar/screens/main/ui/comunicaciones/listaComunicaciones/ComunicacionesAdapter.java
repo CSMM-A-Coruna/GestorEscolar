@@ -2,14 +2,11 @@ package com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicacione
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,8 +14,9 @@ import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
-import com.csmm.gestorescolar.databinding.ComunicacionesDetalleBinding;
-import com.csmm.gestorescolar.screens.main.ui.comunicaciones.ComunicacionDetalle;
+import com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle.ComunicacionDetalleEnviada;
+import com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle.ComunicacionDetallePapelera;
+import com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle.ComunicacionDetalleRecibida;
 
 import java.util.List;
 
@@ -105,7 +103,14 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(mContext, ComunicacionDetalle.class);
+                Intent mIntent;
+                if(mEmailData.get(holder.getAdapterPosition()).getEstado().equals("recibida")) {
+                    mIntent = new Intent(mContext, ComunicacionDetalleRecibida.class);
+                } else if (mEmailData.get(holder.getAdapterPosition()).getEstado().equals("enviada")) {
+                    mIntent = new Intent(mContext, ComunicacionDetalleEnviada.class);
+                } else {
+                    mIntent = new Intent(mContext, ComunicacionDetallePapelera.class);
+                }
                 mIntent.putExtra("id_com", mEmailData.get(holder.getAdapterPosition()).getIdComunicacion());
                 mIntent.putExtra("remite", holder.mSender.getText().toString());
                 mIntent.putExtra("destino", mEmailData.get(holder.getAdapterPosition()).getNombreDestino());

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".screens.main.ui.comunicaciones.ComunicacionDetalle">
+    tools:context=".screens.main.ui.comunicaciones.detalle.ComunicacionDetalleRecibida">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:menu="@menu/comunicacion_detalle_topbar"
+            app:menu="@menu/comunicacion_detalle_recibida_topbar"
             style="@style/Widget.MaterialComponents.Toolbar.Surface"
             />
         <!--app:navigationIcon="@drawable/ic_volver"-->

@@ -13,6 +13,12 @@
         android:theme="@style/Theme.GestorEscolar"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".screens.main.ui.comunicaciones.detalle.ComunicacionDetallePapelera"
+            android:exported="false" />
+        <activity
+            android:name=".screens.main.ui.comunicaciones.detalle.ComunicacionDetalleEnviada"
+            android:exported="false" />
+        <activity
             android:name=".screens.main.MainActivity"
             android:exported="false"
             android:label="@string/title_activity_main"
@@ -30,7 +36,7 @@
             android:name=".screens.auth.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".screens.main.ui.comunicaciones.ComunicacionDetalle"
+            android:name=".screens.main.ui.comunicaciones.detalle.ComunicacionDetalleRecibida"
             android:exported="false" />
     </application>
 
