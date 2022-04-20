@@ -57,9 +57,15 @@ public class LauncherActivity extends AppCompatActivity {
 
                 @Override
                 public void requestDidFail(int statusCode) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    if(statusCode != 401) {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
                 }
             });
         } else {

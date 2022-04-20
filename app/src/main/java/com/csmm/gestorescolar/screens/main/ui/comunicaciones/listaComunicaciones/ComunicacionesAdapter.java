@@ -44,10 +44,17 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
         holder.mEmailTitle.setText(mEmailData.get(holder.getAdapterPosition()).getAsunto());
         holder.mEmailDetails.setText(mEmailData.get(holder.getAdapterPosition()).getTexto());
         holder.mEmailTime.setText(mEmailData.get(holder.getAdapterPosition()).getFecha());
+
         if(mEmailData.get(holder.getAdapterPosition()).getEstado().equals("enviada")) {
-            holder.mSender.setText("Para: " + mEmailData.get(holder.getAdapterPosition()).getNombreDestino());
+            String nombre = mEmailData.get(holder.getAdapterPosition()).getNombreDestino();
+            String[] splited = nombre.split("\\s+");
+            String nombreSplit = splited[0] + " " +splited[1];
+            holder.mSender.setText("Para: " + nombreSplit);
         } else {
-            holder.mSender.setText(mEmailData.get(holder.getAdapterPosition()).getNombreRemite());
+            String nombre = mEmailData.get(holder.getAdapterPosition()).getNombreRemite();
+            String[] splited = nombre.split("\\s+");
+            String nombreSplit = splited[0] + " " + splited[1];
+            holder.mSender.setText(nombreSplit);
         }
         if(mEmailData.get(holder.getAdapterPosition()).getEstado().equals("recibida")) {
             holder.mFavorite.setVisibility(View.VISIBLE);
