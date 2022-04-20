@@ -79,7 +79,6 @@ public class ComunicacionesFragment extends Fragment {
         try {
             JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
             listAlumnos.add("Todos");
-            System.out.println(alumnos);
             for(int i = 0; i < alumnos.length(); i++) {
                 JSONObject json = alumnos.getJSONObject(i);
                 listAlumnos.add(json.getString("nombre"));
