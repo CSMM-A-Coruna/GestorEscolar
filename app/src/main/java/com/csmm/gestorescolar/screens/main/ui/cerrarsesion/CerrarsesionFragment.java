@@ -26,7 +26,9 @@ public class CerrarsesionFragment extends Fragment {
         View root = binding.getRoot();
 
         SharedPreferences preferences;
-        preferences = getActivity().getSharedPreferences("login", Context.MODE_PRIVATE);
+        preferences = getActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
+        preferences.edit().clear().apply();
+        preferences = getActivity().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
         preferences.edit().clear().apply();
         Intent intent = new Intent(getContext(), LoginActivity.class);
         startActivity(intent);

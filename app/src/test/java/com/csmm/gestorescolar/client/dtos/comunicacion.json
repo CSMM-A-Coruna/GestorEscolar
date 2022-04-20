@@ -1,0 +1,18 @@
+{
+  "id_comunicacion": 3,
+  "id_remite": 2,
+  "id_destino": 2,
+  "tipo_remite": "2",
+  "tipo_destino": "3",
+  "id_alumnoAsociado": 4,
+  "asunto": "Calificaciones 2º Trimestre",
+  "texto": "Prueba...",
+  "importante": 0,
+  "fecha": "2022-03-31T16:53:49Z",
+  "leida": null,
+  "eliminado": null,
+  "estado": "recibida",
+  "nombre_alumnoAsociado": "Mario García Pérez",
+  "nombre_remite": "Juana María Pérez",
+  "nombre_destino": "Pedro López"
+}

@@ -1,0 +1,24 @@
+{
+  "id": 1,
+  "usuario": "albertogl",
+  "nombre": "Alberto",
+  "apellido1": "García",
+  "apellido2": "Lopez",
+  "nacimiento": "0000-00-00",
+  "dni": "55555555P",
+  "oa": "o",
+  "accesos": 4,
+  "tipoUsuario": "familias",
+  "alumnosAsociados": [
+    {
+    "id": 1,
+    "nombre": "Mario García Pérez",
+    "relacion": "Padre"
+    },
+    {
+      "id": 6,
+      "nombre": "Pepe García Pérez",
+      "relacion": "Padre"
+    }
+  ]
+}
