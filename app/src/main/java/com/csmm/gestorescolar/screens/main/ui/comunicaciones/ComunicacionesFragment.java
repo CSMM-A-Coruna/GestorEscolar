@@ -51,7 +51,7 @@ public class ComunicacionesFragment extends Fragment {
      *
      * con opción de CC al tutor
      */
-    
+
     private ComunicacionesFragmentBinding binding;
     private List<ComunicacionDTO> toggleList = new ArrayList<>();
     private List<ComunicacionDTO> allList = new ArrayList<>();
