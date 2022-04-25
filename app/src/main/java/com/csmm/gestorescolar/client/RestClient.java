@@ -34,7 +34,7 @@ public class RestClient {
     private Context context;
 
 
-    private final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1 ";
+    private final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
 
     private static RestClient instance = null;
 
