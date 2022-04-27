@@ -60,15 +60,15 @@ public class ComunicacionesFragment extends Fragment {
     private ComunicacionesAdapter mAdapter;
     private Button filtrarAlumnos;
     private ImageButton filtrar;
-    private Chip chipFiltrarAlumno;
+    private Chip chipFiltro;
     private SharedPreferences sharedPreferences;
     private BottomNavigationView navButton;
     private FloatingActionButton nuevaComButton;
     private String currentNav;
-    final String[] filtradoAlumno = {"Todos"};
-    final String[] filtradoPropiedad = {"Todos"};
-    final int[] alumnoChecked = {0};
-    final int[] checkedItem = {0};
+    final String[] filtradoAlumnoString = {"Todos"};
+    final String[] filtradoPropiedadString = {"Todos"};
+    final int[] filtradoAlumnoInt = {0};
+    final int[] filtradoPropiedadInt = {0};
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,7 +82,7 @@ public class ComunicacionesFragment extends Fragment {
         swipLayout = root.findViewById(R.id.swipe_layout);
         filtrarAlumnos = root.findViewById(R.id.btnFiltrarAlumnos);
         filtrar = root.findViewById(R.id.btnFiltros);
-        chipFiltrarAlumno = root.findViewById(R.id.chipFiltradoAlumnos);
+        chipFiltro = root.findViewById(R.id.chipFiltradoAlumnos);
         navButton = root.findViewById(R.id.bottom_navigation);
         nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
 
@@ -151,22 +151,22 @@ public class ComunicacionesFragment extends Fragment {
                         .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                alumnoChecked[0] = 0;
-                                filtradoAlumno[0] = arrayAlumnos[0];
+                                filtradoAlumnoInt[0] = 0;
+                                filtradoAlumnoString[0] = arrayAlumnos[0];
                                 filterData();
                             }
                         })
                         .setPositiveButton("Seleccionar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumno[0] = arrayAlumnos[alumnoChecked[0]];
+                                filtradoAlumnoString[0] = arrayAlumnos[filtradoAlumnoInt[0]];
                                 filterData();
                             }
                         })
-                        .setSingleChoiceItems(arrayAlumnosSoloNombre, alumnoChecked[0], new DialogInterface.OnClickListener() {
+                        .setSingleChoiceItems(arrayAlumnosSoloNombre, filtradoAlumnoInt[0], new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                alumnoChecked[0] = i;
+                                filtradoAlumnoInt[0] = i;
                             }
                         }).create().show();
             }
@@ -181,30 +181,30 @@ public class ComunicacionesFragment extends Fragment {
                         .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                checkedItem[0] = 0;
-                                filtradoPropiedad[0] = filtrosArray[0];
+                                filtradoPropiedadInt[0] = 0;
+                                filtradoPropiedadString[0] = filtrosArray[0];
                                 filterData();
                             }
                         })
                         .setPositiveButton("Filtrar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if(checkedItem[0]==1) {
-                                    filtradoPropiedad[0] = filtrosArray[1];
-                                } else if(checkedItem[0]==2){
-                                    filtradoPropiedad[0] = filtrosArray[2];
-                                } else if(checkedItem[0]==3) {
-                                    filtradoPropiedad[0] = filtrosArray[3];
+                                if(filtradoPropiedadInt[0]==1) {
+                                    filtradoPropiedadString[0] = filtrosArray[1];
+                                } else if(filtradoPropiedadInt[0]==2){
+                                    filtradoPropiedadString[0] = filtrosArray[2];
+                                } else if(filtradoPropiedadInt[0]==3) {
+                                    filtradoPropiedadString[0] = filtrosArray[3];
                                 } else {
-                                    filtradoPropiedad[0] = filtrosArray[0];
+                                    filtradoPropiedadString[0] = filtrosArray[0];
                                 }
                                 filterData();
                             }
                         })
-                        .setSingleChoiceItems(filtrosArray, checkedItem[0], new DialogInterface.OnClickListener() {
+                        .setSingleChoiceItems(filtrosArray, filtradoPropiedadInt[0], new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                checkedItem[0] = i;
+                                filtradoPropiedadInt[0] = i;
                             }
                         }).create().show();
             }
@@ -221,13 +221,13 @@ public class ComunicacionesFragment extends Fragment {
         navButton.setOnItemSelectedListener(item -> {
             if(item.getItemId() == R.id.enviados) {
                 currentNav = "enviados";
-                updateToEnviadas(!filtradoAlumno[0].equals("Todos"));
+                updateToEnviadas();
             } else if(item.getItemId() == R.id.recibidos) {
                 currentNav = "recibidos";
-                updateToRecibidos(!filtradoAlumno[0].equals("Todos"));
+                updateToRecibidos();
             } else if(item.getItemId() == R.id.papelera) {
                 currentNav = "papelera";
-                updateToPapelera(!filtradoAlumno[0].equals("Todos"));
+                updateToPapelera();
             }
             return true;
         });
@@ -238,29 +238,29 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void filterData() {
-        if(filtradoPropiedad[0].equals("Todos") && filtradoAlumno[0].equals("Todos")) {
+        if(filtradoPropiedadString[0].equals("Todos") && filtradoAlumnoString[0].equals("Todos")) {
             updateData(allList);
-            chipFiltrarAlumno.setVisibility(View.GONE);
-        } else if(!filtradoAlumno[0].equals("Todos")) {
-            chipFiltrarAlumno.setVisibility(View.VISIBLE);
-            chipFiltrarAlumno.setText(filtradoAlumno[0]);
+            chipFiltro.setVisibility(View.GONE);
+        } else if(!filtradoAlumnoString[0].equals("Todos")) {
+            chipFiltro.setVisibility(View.VISIBLE);
+            chipFiltro.setText(filtradoAlumnoString[0]);
             List<ComunicacionDTO> lista = new ArrayList<>();
-            if(filtradoPropiedad[0].equals("No leídos")) {
-                chipFiltrarAlumno.setText(filtradoAlumno[0] + " - " + filtradoPropiedad[0]);
+            if(filtradoPropiedadString[0].equals("No leídos")) {
+                chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
                 allList.forEach(data -> {
                     if(data.getLeida().equals("null")) {
                         lista.add(data);
                     }
                 });
-            } else if(filtradoPropiedad[0].equals("Leídos")) {
-                chipFiltrarAlumno.setText(filtradoAlumno[0] + " - " + filtradoPropiedad[0]);
+            } else if(filtradoPropiedadString[0].equals("Leídos")) {
+                chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
                 allList.forEach(data -> {
                     if(!data.getLeida().equals("null")) {
                         lista.add(data);
                     }
                 });
-            } else if(filtradoPropiedad[0].equals("Importantes")) {
-                chipFiltrarAlumno.setText(filtradoAlumno[0] + " - " + filtradoPropiedad[0]);
+            } else if(filtradoPropiedadString[0].equals("Importantes")) {
+                chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
                 allList.forEach(data -> {
                     if(data.isImportante()) {
                         lista.add(data);
@@ -269,24 +269,24 @@ public class ComunicacionesFragment extends Fragment {
             } else {
                 lista.addAll(allList);
             }
-            filtroAlumno(lista, filtradoAlumno[0]);
+            filtroAlumno(lista, filtradoAlumnoString[0]);
         } else {
             toggleList.clear();
-            chipFiltrarAlumno.setVisibility(View.VISIBLE);
-            chipFiltrarAlumno.setText(filtradoPropiedad[0]);
-            if(filtradoPropiedad[0].equals("No leídos")) {
+            chipFiltro.setVisibility(View.VISIBLE);
+            chipFiltro.setText(filtradoPropiedadString[0]);
+            if(filtradoPropiedadString[0].equals("No leídos")) {
                 allList.forEach(data -> {
                     if(data.getLeida().equals("null")) {
                         toggleList.add(data);
                     }
                 });
-            } else if(filtradoPropiedad[0].equals("Leídos")) {
+            } else if(filtradoPropiedadString[0].equals("Leídos")) {
                 allList.forEach(data -> {
                     if(!data.getLeida().equals("null")) {
                         toggleList.add(data);
                     }
                 });
-            } else if(filtradoPropiedad[0].equals("Importantes")) {
+            } else if(filtradoPropiedadString[0].equals("Importantes")) {
                 allList.forEach(data -> {
                     if(data.isImportante()) {
                         toggleList.add(data);
@@ -327,12 +327,16 @@ public class ComunicacionesFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                if(currentNav.equals("enviados")) {
-                    updateToEnviadas(!filtradoAlumno[0].equals("Todos"));
-                } else if(currentNav.equals("recibidos")) {
-                    updateToRecibidos(!filtradoAlumno[0].equals("Todos"));
-                } else if(currentNav.equals("papelera")) {
-                    updateToPapelera(!filtradoAlumno[0].equals("Todos"));
+                switch (currentNav) {
+                    case "enviados":
+                        updateToEnviadas();
+                        break;
+                    case "recibidos":
+                        updateToRecibidos();
+                        break;
+                    case "papelera":
+                        updateToPapelera();
+                        break;
                 }
                 Thread.sleep(600);
             } catch (Exception e) {
@@ -358,13 +362,9 @@ public class ComunicacionesFragment extends Fragment {
         binding = null;
     }
 
-    /*@Override
-    public void onStart() {
-        super.onStart();
-        new CargarNuevosEmails().execute();
-    }*/
 
-    private void updateToRecibidos(boolean filter) {
+    private void updateToRecibidos() {
+        reiniciarFiltro();
         allList.clear();
         toggleList.clear();
         RestClient.getInstance(getContext()).getComunicacionesRecibidas(new GetComunicacionesRecibidasResponseHandler() {
@@ -400,20 +400,11 @@ public class ComunicacionesFragment extends Fragment {
                 updateData(allList);
             }
         });
-        if(!filter) {
-            filtradoAlumno[0] = "Todos";
-            filtradoPropiedad[0] = "Todos";
-            checkedItem[0] = 0;
-            alumnoChecked[0] = 0;
-        } else {
-            filtradoPropiedad[0] = "Todos";
-            checkedItem[0] = 0;
-            filterData();
-        }
         filtrar.setVisibility(View.VISIBLE);
     }
 
-    private void updateToEnviadas(boolean filter) {
+    private void updateToEnviadas() {
+        reiniciarFiltro();
         allList.clear();
         toggleList.clear();
         RestClient.getInstance(getContext()).getComunicacionesEnviadas(new GetComunicacionesEnviadasResponseHandler() {
@@ -451,20 +442,11 @@ public class ComunicacionesFragment extends Fragment {
                 updateData(allList);
             }
         });
-        if(!filter) {
-            filtradoAlumno[0] = "Todos";
-            filtradoPropiedad[0] = "Todos";
-            checkedItem[0] = 0;
-            alumnoChecked[0] = 0;
-        } else {
-            filtradoPropiedad[0] = "Todos";
-            checkedItem[0] = 0;
-            filterData();
-        }
         filtrar.setVisibility(View.INVISIBLE);
     }
 
-    private void updateToPapelera(boolean filter) {
+    private void updateToPapelera() {
+        reiniciarFiltro();
         allList.clear();
         toggleList.clear();
         RestClient.getInstance(getContext()).getComunicacionesBorradas(new GetComunicacionesBorradasResponseHandler() {
@@ -500,16 +482,15 @@ public class ComunicacionesFragment extends Fragment {
                 updateData(allList);
             }
         });
-        if(!filter) {
-            filtradoAlumno[0] = "Todos";
-            filtradoPropiedad[0] = "Todos";
-            checkedItem[0] = 0;
-            alumnoChecked[0] = 0;
-        } else {
-            filtradoPropiedad[0] = "Todos";
-            checkedItem[0] = 0;
-            filterData();
-        }
         filtrar.setVisibility(View.INVISIBLE);
+    }
+
+    private void reiniciarFiltro() {
+        filtradoPropiedadString[0] = "Todos";
+        filtradoAlumnoString[0] = "Todos";
+        filtradoPropiedadInt[0] = 0;
+        filtradoAlumnoInt[0] = 0;
+        chipFiltro.setText("");
+        chipFiltro.setVisibility(View.GONE);
     }
 }
