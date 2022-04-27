@@ -164,6 +164,7 @@ public class ComunicacionDetalleResponder extends AppCompatActivity {
             return null;
         }
     }
+
     private void askPermissionAndBrowserFile() {
 
         // If you have access to the external storage, do whatever you need
