@@ -91,6 +91,17 @@
             android:textSize="14sp"
             android:text="Hola"/>
 
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAdjunto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/textoEditText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:closeIconVisible="true"
+            android:text="Adjuntos"
+            android:visibility="invisible" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

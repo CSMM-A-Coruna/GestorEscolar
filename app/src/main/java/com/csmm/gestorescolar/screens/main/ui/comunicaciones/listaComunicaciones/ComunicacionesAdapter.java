@@ -124,6 +124,7 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
                 mIntent.putExtra("leida", mEmailData.get(holder.getAdapterPosition()).getLeida());
                 mIntent.putExtra("eliminado", mEmailData.get(holder.getAdapterPosition()).getEliminado());
                 mIntent.putExtra("estado", mEmailData.get(holder.getAdapterPosition()).getEstado());
+                mIntent.putExtra("adjuntos", mEmailData.get(holder.getAdapterPosition()).getAdjuntos());
                 if(holder.mFavorite.getColorFilter() != null) {
                     mIntent.putExtra("importante", true);
                 } else {

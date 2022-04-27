@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.csmm.gestorescolar.R;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
 
 public class ComunicacionDetalleEnviada extends AppCompatActivity {
