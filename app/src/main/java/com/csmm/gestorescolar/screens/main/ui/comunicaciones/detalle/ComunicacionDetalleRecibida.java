@@ -69,7 +69,8 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
                     chipAdjunto.setVisibility(View.VISIBLE);
                 }
                 if(mBundle.getBoolean("importante")) {
-                    toggleFavIcon();
+                    favIcon.setTint(getResources().getColor(R.color.importante));
+                    favIconMarked = true;
                 }
                 chipAdjunto.setOnClickListener(new View.OnClickListener() {
                     @Override

@@ -313,6 +313,12 @@ public class ComunicacionesFragment extends Fragment {
         swipLayout.setOnRefreshListener(this::cargarDatos);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        cargarDatos();
+    }
+
     private void cargarDatos() {
         new CargarNuevosEmails().execute();
     }

@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
+import com.google.android.material.chip.Chip;
 
 public class  ComunicacionDetallePapelera extends AppCompatActivity {
 
@@ -21,6 +22,8 @@ public class  ComunicacionDetallePapelera extends AppCompatActivity {
     int idDestino;
     String leida;
     String eliminado;
+    String adjuntos[];
+    Chip chipAdjunto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,7 @@ public class  ComunicacionDetallePapelera extends AppCompatActivity {
         mEmailTime = findViewById(R.id.tvEmailTime);
         volverButton = findViewById(R.id.volverButton);
         restaurarButton = findViewById(R.id.restaurarButton);
+        chipAdjunto = findViewById(R.id.chipAdjunto);
 
         Bundle mBundle = getIntent().getExtras();
         if (mBundle != null) {
@@ -44,6 +48,11 @@ public class  ComunicacionDetallePapelera extends AppCompatActivity {
             idDestino = mBundle.getInt("id_destino");
             leida = mBundle.getString("leida");
             eliminado = mBundle.getString("eliminado");
+            adjuntos = mBundle.getStringArray("adjuntos");
+            if(adjuntos.length != 0) {
+                chipAdjunto.setText(adjuntos[0]);
+                chipAdjunto.setVisibility(View.VISIBLE);
+            }
         }
 
         volverButton.setOnClickListener(new View.OnClickListener() {
