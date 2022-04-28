@@ -29,11 +29,14 @@ import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponse
 import com.csmm.gestorescolar.databinding.ComunicacionesFragmentBinding;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle.ComunicacionDetalleNueva;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesAdapter;
+import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.CustomLinearLayoutManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,16 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComunicacionesFragment extends Fragment {
-
-
-    /**
-     * tutor
-     * enfermería
-     * informática
-     * administración
-     *
-     * con opción de CC al tutor
-     */
 
     private ComunicacionesFragmentBinding binding;
     private List<ComunicacionDTO> toggleList = new ArrayList<>();
@@ -65,6 +58,8 @@ public class ComunicacionesFragment extends Fragment {
     private BottomNavigationView navButton;
     private FloatingActionButton nuevaComButton;
     private String currentNav;
+    private boolean isScrolling;
+
     final String[] filtradoAlumnoString = {"Todos"};
     final String[] filtradoPropiedadString = {"Todos"};
     final int[] filtradoAlumnoInt = {0};
@@ -212,24 +207,48 @@ public class ComunicacionesFragment extends Fragment {
 
         // Asignamos el RecyclerView de la lista de comunicaciones
         mRecyclerView = root.findViewById(R.id.recyclerView);
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
+        CustomLinearLayoutManager customLinearLayoutManager = new CustomLinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(root.getContext(), DividerItemDecoration.VERTICAL));
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setLayoutManager(customLinearLayoutManager);
         mAdapter = new ComunicacionesAdapter(getContext(), allList);
         mRecyclerView.setAdapter(mAdapter);
 
         navButton.setOnItemSelectedListener(item -> {
-            if(item.getItemId() == R.id.enviados) {
-                currentNav = "enviados";
-                updateToEnviadas();
-            } else if(item.getItemId() == R.id.recibidos) {
-                currentNav = "recibidos";
-                updateToRecibidos();
-            } else if(item.getItemId() == R.id.papelera) {
-                currentNav = "papelera";
-                updateToPapelera();
+            if(!isScrolling) {
+                if(item.getItemId() == R.id.enviados) {
+                    currentNav = "enviados";
+                    updateToEnviadas();
+                } else if(item.getItemId() == R.id.recibidos) {
+                    currentNav = "recibidos";
+                    updateToRecibidos();
+                } else if(item.getItemId() == R.id.papelera) {
+                    currentNav = "papelera";
+                    updateToPapelera();
+                }
+                return true;
+            } else {
+                return false;
             }
-            return true;
+        });
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                switch (newState) {
+                    case RecyclerView.SCROLL_STATE_IDLE:
+                        isScrolling = false;
+                        break;
+                    case RecyclerView.SCROLL_STATE_DRAGGING:
+                        isScrolling = true;
+                        break;
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
         });
 
         cargarDatos();
