@@ -13,12 +13,14 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
+import com.csmm.gestorescolar.client.dtos.DestinoDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
 import com.csmm.gestorescolar.client.handlers.CompareDataResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
+import com.csmm.gestorescolar.client.handlers.GetDestinosResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
 import com.csmm.gestorescolar.client.handlers.PostLoginResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostSendComunicacionResponseHandler;
@@ -44,7 +46,7 @@ import java.util.Map;
 
 public class RestClient {
 
-    //public static final String REST_API_BASE_URL = "http://192.168.11.21:3000/v1";
+    //public static final String REST_API_BASE_URL = "http://192.168.28.30:3000/v1";
     public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
     private RequestQueue queue;
     private Context context;
@@ -428,5 +430,41 @@ public class RestClient {
             }
         }
         return sb.toString();
+    }
+
+    public void getDestinos(int idAlumno, GetDestinosResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                REST_API_BASE_URL + "/comms/senders?id_alumno=" + idAlumno,
+                null,
+                response -> {
+                    List<DestinoDTO> listaDestinos = new ArrayList<>();
+                    for(int i = 0; i < response.length(); i++) {
+                        try {
+                            JSONObject iterationElement = response.getJSONObject(i);
+                            DestinoDTO destino = new DestinoDTO(iterationElement);
+                            listaDestinos.add(destino);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            handler.requestDidFail(-1);
+                        }
+                    }
+                    handler.requestDidComplete(listaDestinos);
+                }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
+        queue.add(request);
     }
 }

@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
+import com.csmm.gestorescolar.client.dtos.DestinoDTO;
+import com.csmm.gestorescolar.client.handlers.GetDestinosResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostSendComunicacionResponseHandler;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle.utils.AdjuntoUtils;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -34,7 +36,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -52,8 +56,13 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
     private String path;
     private String fileName;
 
-    final String[] filtradoAlumnoString = {""};
-    final int[] filtradoAlumnoInt = {0};
+    final String[] seleccionAlumnoString = {""};
+    final int[] seleccionAlumnoInt = {0};
+    final String[] seleccionDestinoString = {""};
+    final int[] seleccionDestinosInt = {0};
+
+    String[] arrayDestinos;
+    List<DestinoDTO> destinos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +78,8 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
         textoEditText = findViewById(R.id.textoEditText);
         topBar = findViewById(R.id.topAppBar);
 
+        btnSeleccionarDestino.setVisibility(View.INVISIBLE);
+
         topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -83,40 +94,8 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
             }
         });
 
-        chipAdjunto.setOnCloseIconClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                path = null;
-                fileName = null;
-                chipAdjunto.setVisibility(View.INVISIBLE);
-            }
-        });
-
         // Selector de alumnos
-        SharedPreferences sharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE);
-        ArrayList<String> listAlumnos = new ArrayList<String>();
-        try {
-            JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
-            if(alumnos.length() == 1) {
-                JSONObject json = alumnos.getJSONObject(0);
-                setDefaultAlumno(json.getString("nombre"));
-            } else {
-                for(int i = 0; i < alumnos.length(); i++) {
-                    JSONObject json = alumnos.getJSONObject(i);
-                    listAlumnos.add(json.getString("nombre"));
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        String[] arrayAlumnosSoloNombre = new String[listAlumnos.size()];
-        for(int i=0; i<listAlumnos.size(); i++) {
-            String nombre = listAlumnos.get(i);
-            String[] splited = nombre.split("\\s+");
-            arrayAlumnosSoloNombre[i] = splited[0];
-        }
-
+        String[] arrayAlumnos = getAlumnosSharedPreferences();
         btnSeleccionarAlumno.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,25 +104,69 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
                         .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumnoInt[0] = 0;
-                                filtradoAlumnoString[0] = arrayAlumnosSoloNombre[0];
+                                seleccionAlumnoInt[0] = 0;
+                                seleccionAlumnoString[0] = arrayAlumnos[0];
                             }
                         })
                         .setPositiveButton("Seleccionar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumnoString[0] = arrayAlumnosSoloNombre[filtradoAlumnoInt[0]];
-                                chipAlumno.setText("Alumno: " + filtradoAlumnoString[0]);
+                                seleccionAlumnoString[0] = arrayAlumnos[seleccionAlumnoInt[0]];
+                                chipAlumno.setText("Alumno: " + seleccionAlumnoString[0]);
+                                getDestinos(calcularIdAlumno(seleccionAlumnoString[0]));
                                 btnSeleccionarAlumno.setVisibility(View.INVISIBLE);
                                 chipAlumno.setCloseIconVisible(true);
+                                btnSeleccionarDestino.setVisibility(View.VISIBLE);
                             }
                         })
-                        .setSingleChoiceItems(arrayAlumnosSoloNombre, filtradoAlumnoInt[0], new DialogInterface.OnClickListener() {
+                        .setSingleChoiceItems(arrayAlumnos, seleccionAlumnoInt[0], new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumnoInt[0] = i;
+                                seleccionAlumnoInt[0] = i;
                             }
                         }).create().show();
+            }
+        });
+
+        // Selector de destino
+        btnSeleccionarDestino.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new MaterialAlertDialogBuilder(ComunicacionDetalleNueva.this)
+                        .setTitle("Destinos disponibles")
+                        .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                seleccionDestinosInt[0] = 0;
+                                seleccionDestinoString[0] = arrayDestinos[0];
+                            }
+                        })
+                        .setPositiveButton("Seleccionar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                seleccionDestinoString[0] = arrayDestinos[seleccionDestinosInt[0]];
+                                chipPara.setText("Para: " + seleccionDestinoString[0]);
+                                btnSeleccionarDestino.setVisibility(View.INVISIBLE);
+                                chipPara.setCloseIconVisible(true);
+                            }
+                        })
+                        .setSingleChoiceItems(arrayDestinos, seleccionDestinosInt[0], new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                seleccionDestinosInt[0] = i;
+                            }
+                        }).create().show();
+            }
+        });
+
+        chipPara.setOnCloseIconClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnSeleccionarDestino.setVisibility(View.VISIBLE);
+                chipPara.setText("Para:");
+                chipPara.setCloseIconVisible(false);
+                seleccionDestinosInt[0] = 0;
+                seleccionDestinoString[0] = "";
             }
         });
 
@@ -153,8 +176,22 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
                 btnSeleccionarAlumno.setVisibility(View.VISIBLE);
                 chipAlumno.setText("Alumno:");
                 chipAlumno.setCloseIconVisible(false);
-                filtradoAlumnoString[0] = "";
-                filtradoAlumnoInt[0] = 0;
+                seleccionAlumnoString[0] = "";
+                seleccionAlumnoInt[0] = 0;
+
+                // Reinicamos botón y chip de destinos
+                btnSeleccionarDestino.setVisibility(View.INVISIBLE);
+                chipPara.setText("Para:");
+                chipPara.setCloseIconVisible(false);
+            }
+        });
+
+        chipAdjunto.setOnCloseIconClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                path = null;
+                fileName = null;
+                chipAdjunto.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -165,8 +202,16 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
     }
 
     private void sendCom() {
+        int idDestino = 0, tipoDestino = 0;
+        for(int i=0; i<arrayDestinos.length; i++) {
+            if(arrayDestinos[i].equals(destinos.get(0).getNombre() + " - " + destinos.get(0).getTipoUsuario())) {
+                idDestino = destinos.get(0).getId();
+                tipoDestino = destinos.get(0).getTipoDestino();
+            }
+        }
+        SharedPreferences sharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE);
         //!TODO Cálculo tipo_destino, idRemite, idDestino, idAlumnoAsociado,
-        RestClient.getInstance(this).postSendComunicacion(asuntoEditText.getText().toString(), textoEditText.getText().toString(), 1, 1, 1, 1, new PostSendComunicacionResponseHandler() {
+        RestClient.getInstance(this).postSendComunicacion(asuntoEditText.getText().toString(), textoEditText.getText().toString(),  sharedPreferences.getInt("id", 0), tipoDestino, idDestino, calcularIdAlumno(seleccionAlumnoString[0]), new PostSendComunicacionResponseHandler() {
             @Override
             public void requestDidComplete(String idNuevaComunicacion) {
                 if (getPath() != null) {
@@ -187,6 +232,52 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
                 System.out.println(statusCode);
             }
         });
+    }
+
+
+    private String[] getAlumnosSharedPreferences() {
+        SharedPreferences sharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE);
+        ArrayList<String> listAlumnos = new ArrayList<String>();
+        try {
+            JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
+            /*if(alumnos.length() == 1) {
+                JSONObject json = alumnos.getJSONObject(0);
+                setDefaultAlumno(json.getString("nombre"));
+            } else {*/
+                for (int i = 0; i < alumnos.length(); i++) {
+                    JSONObject json = alumnos.getJSONObject(i);
+                    listAlumnos.add(json.getString("nombre"));
+                }
+            //}
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String[] arrayAlumnos = new String[listAlumnos.size()];
+        for(int i=0; i<listAlumnos.size(); i++) {
+            String nombre = listAlumnos.get(i);
+            String[] splited = nombre.split("\\s+");
+            arrayAlumnos[i] = splited[0];
+        }
+        return arrayAlumnos;
+    }
+
+    private int calcularIdAlumno(String nombre) {
+        SharedPreferences sharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE);
+        try {
+            JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
+            for (int i = 0; i < alumnos.length(); i++) {
+                JSONObject json = alumnos.getJSONObject(i);
+                String nombreEntero = json.getString("nombre");
+                String[] splited = nombreEntero.split("\\s+");
+                if(nombre.equals(splited[0])) {
+                    return json.getInt("id");
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 
@@ -220,6 +311,31 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
                         finish();
                     }
                 }).show();
+    }
+
+    private void getDestinos(int id) {
+        RestClient.getInstance(getApplicationContext()).getDestinos(id, new GetDestinosResponseHandler() {
+            @Override
+            public void requestDidComplete(List<DestinoDTO> response) {
+                destinos = response;
+                arrayDestinos = new String[response.size()];
+                for(int i=0; i < arrayDestinos.length; i++) {
+                    arrayDestinos[i] = response.get(i).getNombre() + " - " + response.get(0).getTipoUsuario();
+                }
+            }
+
+            @Override
+            public void requestDidFail(int statusCode) {
+                Snackbar.make(chipAdjunto, "No se han podido calcular los destinos disponibles", Snackbar.LENGTH_SHORT).show();
+                Handler handler = new Handler();
+                btnSeleccionarDestino.setVisibility(View.INVISIBLE);
+                handler.postDelayed(this::finishActivity, 2000);
+            }
+
+            private void finishActivity() {
+                finish();
+            }
+        });
     }
 
     private void askPermissionAndBrowserFile() {

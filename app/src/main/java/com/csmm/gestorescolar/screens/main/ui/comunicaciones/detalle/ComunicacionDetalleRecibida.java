@@ -75,13 +75,12 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
                 chipAdjunto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        String token = idComunicacion + adjuntos[0];
-                        StringBuilder strb = new StringBuilder(token);
-                        token = strb.reverse().toString();
+                        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+                        String savedtoken= sharedPref.getString("token",null);
                         Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/download").buildUpon()
                                 .appendQueryParameter("file_name", adjuntos[0])
                                 .appendQueryParameter("id_comunicacion", String.valueOf(idComunicacion))
-                                .appendQueryParameter("auth", token)
+                                .appendQueryParameter("auth", savedtoken)
                                 .build();
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                         startActivity(intent);
