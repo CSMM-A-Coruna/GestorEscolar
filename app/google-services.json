@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "891350466924",
+    "project_id": "gestorescolar-b6bd9",
+    "storage_bucket": "gestorescolar-b6bd9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:891350466924:android:3cf7f86e78670d65153349",
+        "android_client_info": {
+          "package_name": "com.csmm.gestorescolar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "891350466924-enlli9d2kg0ih5sbe11n870fejei7e61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz1FV4MQt4miHBb0BeZxXAjZecdFGOK7w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "891350466924-enlli9d2kg0ih5sbe11n870fejei7e61.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
