@@ -1,7 +1,12 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Browser;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -12,7 +17,7 @@ import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.chip.Chip;
 
 public class ComunicacionDetalleRecibida extends AppCompatActivity {
 
@@ -28,6 +33,8 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
     int idDestino;
     String leida;
     String eliminado;
+    String adjuntos[];
+    Chip chipAdjunto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +48,7 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
         topBar = findViewById(R.id.topAppBar);
         volverButton = findViewById(R.id.volverButton);
         favIcon = topBar.getMenu().findItem(R.id.iconTopFavorite).getIcon();
+        chipAdjunto = findViewById(R.id.chipAdjunto);
         favIconMarked = false;
 
 
@@ -55,16 +63,46 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
                 idDestino = mBundle.getInt("id_destino");
                 leida = mBundle.getString("leida");
                 eliminado = mBundle.getString("eliminado");
-                if(mBundle.getBoolean("importante")) {
-                    toggleFavIcon();
+                adjuntos = mBundle.getStringArray("adjuntos");
+                if(adjuntos.length != 0) {
+                    chipAdjunto.setText(adjuntos[0]);
+                    chipAdjunto.setVisibility(View.VISIBLE);
                 }
+                if(mBundle.getBoolean("importante")) {
+                    favIcon.setTint(getResources().getColor(R.color.importante));
+                    favIconMarked = true;
+                }
+                chipAdjunto.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+                        String savedtoken= sharedPref.getString("token",null);
+                        Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/download").buildUpon()
+                                .appendQueryParameter("file_name", adjuntos[0])
+                                .appendQueryParameter("id_comunicacion", String.valueOf(idComunicacion))
+                                .appendQueryParameter("auth", savedtoken)
+                                .build();
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                    }
+                });
                 topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         if(item.getItemId() == R.id.iconTopFavorite) {
                             toggleFavIcon();
                         } else if(item.getItemId() == R.id.iconResponder) {
-                            Snackbar.make(mEmailTime, "Por implementar", Snackbar.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), ComunicacionDetalleResponder.class);
+                            intent.putExtra("id_destino", mBundle.getInt("id_remite"));
+                            intent.putExtra("tipo_destino", mBundle.getString("tipo_remite"));
+                            intent.putExtra("destino", mBundle.getString("remite"));
+                            intent.putExtra("id_remite", idDestino);
+                            intent.putExtra("remite", mBundle.getString("destino"));
+                            intent.putExtra("asunto", mBundle.getString("asunto"));
+                            intent.putExtra("texto", mBundle.getString("texto"));
+                            intent.putExtra("fecha", mBundle.getString("fecha"));
+                            intent.putExtra("id_alumnoAsociado", mBundle.getInt("id_alumnoAsociado"));
+                            startActivity(intent);
                         } else if(item.getItemId() == R.id.eliminar) {
                             updateServer("eliminado");
                             finish();

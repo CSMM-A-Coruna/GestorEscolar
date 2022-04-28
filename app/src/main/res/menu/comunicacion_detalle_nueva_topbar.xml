@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/adjuntar"
+        android:icon="@drawable/ic_adjunto"
+        android:title="Adjuntar"
+        android:contentDescription="Adjuntar un documento"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/enviar"
+        android:icon="@drawable/ic_enviar2"
+        android:title="Enviar"
+        android:contentDescription="Enviar comunicación"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/descartar"
+        android:icon="@drawable/ic_descartar"
+        android:title="Descartar"
+        android:contentDescription="Descartar comunicación"
+        app:showAsAction="ifRoom" />
+
+</menu>

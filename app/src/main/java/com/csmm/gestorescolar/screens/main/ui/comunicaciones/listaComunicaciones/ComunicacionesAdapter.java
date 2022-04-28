@@ -113,14 +113,18 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
                 }
                 mIntent.putExtra("id_com", mEmailData.get(holder.getAdapterPosition()).getIdComunicacion());
                 mIntent.putExtra("remite", holder.mSender.getText().toString());
+                mIntent.putExtra("id_remite", mEmailData.get(holder.getAdapterPosition()).getIdRemite());
+                mIntent.putExtra("tipo_remite", mEmailData.get(holder.getAdapterPosition()).getTipoRemite());
                 mIntent.putExtra("destino", mEmailData.get(holder.getAdapterPosition()).getNombreDestino());
                 mIntent.putExtra("id_destino", mEmailData.get(holder.getAdapterPosition()).getIdDestino());
+                mIntent.putExtra("id_alumnoAsociado", mEmailData.get(holder.getAdapterPosition()).getIdAlumnoAsociado());
                 mIntent.putExtra("asunto", holder.mEmailTitle.getText().toString());
                 mIntent.putExtra("texto", holder.mEmailDetails.getText().toString());
                 mIntent.putExtra("fecha", holder.mEmailTime.getText().toString());
                 mIntent.putExtra("leida", mEmailData.get(holder.getAdapterPosition()).getLeida());
                 mIntent.putExtra("eliminado", mEmailData.get(holder.getAdapterPosition()).getEliminado());
                 mIntent.putExtra("estado", mEmailData.get(holder.getAdapterPosition()).getEstado());
+                mIntent.putExtra("adjuntos", mEmailData.get(holder.getAdapterPosition()).getAdjuntos());
                 if(holder.mFavorite.getColorFilter() != null) {
                     mIntent.putExtra("importante", true);
                 } else {

@@ -3,7 +3,11 @@ package com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,7 +15,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.csmm.gestorescolar.R;
+import com.csmm.gestorescolar.client.RestClient;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
 
 public class ComunicacionDetalleEnviada extends AppCompatActivity {
@@ -26,6 +32,8 @@ public class ComunicacionDetalleEnviada extends AppCompatActivity {
     int idDestino;
     String leida;
     String eliminado;
+    String adjuntos[];
+    Chip chipAdjunto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +45,7 @@ public class ComunicacionDetalleEnviada extends AppCompatActivity {
         mEmailDetails = findViewById(R.id.tvEmailDetails);
         mEmailTime = findViewById(R.id.tvEmailTime);
         volverButton = findViewById(R.id.volverButton);
+        chipAdjunto = findViewById(R.id.chipAdjunto);
 
         Bundle mBundle = getIntent().getExtras();
         if (mBundle != null) {
@@ -48,7 +57,30 @@ public class ComunicacionDetalleEnviada extends AppCompatActivity {
             idDestino = mBundle.getInt("id_destino");
             leida = mBundle.getString("leida");
             eliminado = mBundle.getString("eliminado");
+            adjuntos = mBundle.getStringArray("adjuntos");
+            if(adjuntos.length != 0) {
+                chipAdjunto.setText(adjuntos[0]);
+                chipAdjunto.setVisibility(View.VISIBLE);
+            }
         }
+
+        chipAdjunto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+                String savedtoken= sharedPref.getString("token",null);
+                //String token = idComunicacion + adjuntos[0];
+                //StringBuilder strb = new StringBuilder(token);
+                //token = strb.reverse().toString();
+                Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/download").buildUpon()
+                        .appendQueryParameter("file_name", adjuntos[0])
+                        .appendQueryParameter("id_comunicacion", String.valueOf(idComunicacion))
+                        .appendQueryParameter("auth", savedtoken)
+                        .build();
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+            }
+        });
 
         volverButton.setOnClickListener(new View.OnClickListener() {
             @Override

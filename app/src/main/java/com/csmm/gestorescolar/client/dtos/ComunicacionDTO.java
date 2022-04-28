@@ -1,7 +1,10 @@
 package com.csmm.gestorescolar.client.dtos;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Calendar;
@@ -24,6 +27,8 @@ public class ComunicacionDTO {
     private String nombreAlumnoAsociado;
     private String nombreRemite;
     private String nombreDestino;
+    private JSONArray rawAdjuntos;
+    private String[] adjuntos;
 
     public ComunicacionDTO(JSONObject jsonObject) {
         try {
@@ -49,6 +54,11 @@ public class ComunicacionDTO {
             this.nombreAlumnoAsociado = jsonObject.getString("nombre_alumnoAsociado");
             this.nombreRemite = jsonObject.getString("nombre_remite");
             this.nombreDestino = jsonObject.getString("nombre_destino");
+            this.rawAdjuntos = jsonObject.getJSONArray("adjuntos");
+            this.adjuntos = new String[rawAdjuntos.length()];
+            for(int i=0; i<rawAdjuntos.length(); i++) {
+                this.adjuntos[i] = rawAdjuntos.getString(i);
+            }
         } catch (JSONException ex) {
             ex.printStackTrace();
         }
@@ -152,5 +162,9 @@ public class ComunicacionDTO {
 
     public String getNombreDestino() {
         return nombreDestino;
+    }
+
+    public String[] getAdjuntos() {
+        return adjuntos;
     }
 }
