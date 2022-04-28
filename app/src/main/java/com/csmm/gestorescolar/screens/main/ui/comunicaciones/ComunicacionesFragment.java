@@ -34,6 +34,8 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,16 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComunicacionesFragment extends Fragment {
-
-
-    /**
-     * tutor
-     * enfermería
-     * informática
-     * administración
-     *
-     * con opción de CC al tutor
-     */
 
     private ComunicacionesFragmentBinding binding;
     private List<ComunicacionDTO> toggleList = new ArrayList<>();
