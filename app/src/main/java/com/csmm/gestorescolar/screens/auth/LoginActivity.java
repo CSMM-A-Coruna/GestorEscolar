@@ -17,6 +17,7 @@ import com.csmm.gestorescolar.screens.main.MainActivity;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,11 +26,14 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText password;
     private LinearProgressIndicator progressBar;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         progressBar = findViewById(R.id.linearProgress);
         progressBar.setVisibility(View.GONE);
@@ -69,6 +73,10 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putInt("tipoUsuario", dto.getTipoUsuario());
                         editor.putString("alumnosAsociados", dto.getAlumnosAsociados().toString());
                         editor.apply();
+                        // Log Firebase
+                        Bundle bundle = new Bundle();
+                        bundle.putString(FirebaseAnalytics.Param.METHOD, "login");
+                        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                     }
