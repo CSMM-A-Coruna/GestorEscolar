@@ -9,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
 import com.csmm.gestorescolar.databinding.CerrarsesionFragmentBinding;
@@ -22,8 +20,6 @@ public class CerrarsesionFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        CerrarsesionViewModel cerrarsesionViewModel =
-                new ViewModelProvider(this).get(CerrarsesionViewModel.class);
 
         binding = CerrarsesionFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
