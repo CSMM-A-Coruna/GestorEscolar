@@ -84,9 +84,10 @@ public class ComunicacionDTO {
                 String hour, minutes;
                 SimpleDateFormat df = new SimpleDateFormat("HH");
                 hour = df.format(msgDate);
+                int horaInt = Integer.parseInt(hour);
                 df = new SimpleDateFormat("mm");
                 minutes = df.format(msgDate);
-                finalDate = hour+":"+minutes;
+                finalDate = (horaInt-2)+":"+minutes;
             }
             return finalDate;
         } catch (Exception e) {
