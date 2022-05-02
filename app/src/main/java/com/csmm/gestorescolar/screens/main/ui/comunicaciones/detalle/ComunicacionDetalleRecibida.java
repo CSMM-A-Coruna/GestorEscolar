@@ -104,6 +104,8 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
                             intent.putExtra("id_alumnoAsociado", mBundle.getInt("id_alumnoAsociado"));
                             startActivity(intent);
                         } else if(item.getItemId() == R.id.eliminar) {
+                            // Fix del issue #15
+                            updateServer("no_importante");
                             updateServer("eliminado");
                             finish();
                         }

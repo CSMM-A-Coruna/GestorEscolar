@@ -10,7 +10,7 @@ android {
         minSdk 30
         targetSdk 32
         versionCode 1
-        versionName "1.0.0a2"
+        versionName "1.0.0a3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -60,4 +60,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-perf'
     implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-messaging'
 }

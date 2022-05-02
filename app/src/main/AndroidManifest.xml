@@ -19,6 +19,19 @@
         android:theme="@style/Theme.GestorEscolar"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
+        <service
+            android:name=".services.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/teal_200" />
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
@@ -53,7 +66,12 @@
             android:exported="false" />
         <activity
             android:name=".screens.main.ui.comunicaciones.detalle.ComunicacionDetalleRecibida"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="OPEN_ComunicacionDetalleRecibida" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
