@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.csmm.gestorescolar.client.RestClient;
+import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
 import com.csmm.gestorescolar.databinding.CerrarsesionFragmentBinding;
 import com.csmm.gestorescolar.screens.auth.LoginActivity;
 
@@ -25,12 +28,22 @@ public class CerrarsesionFragment extends Fragment {
         binding = CerrarsesionFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        RestClient.getInstance(root.getContext()).postNewFCMToken("-", new PostFCMTokenResponseHandler() {
+            @Override
+            public void requestDidComplete() {
+            }
+
+            @Override
+            public void requestDidFail(int statusCode) {
+            }
+        });
+
         SharedPreferences preferences;
         preferences = getActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
         preferences.edit().clear().apply();
         preferences = getActivity().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
         preferences.edit().clear().apply();
-        Intent intent = new Intent(getContext(), LoginActivity.class);
+        Intent intent = new Intent(root.getContext(), LoginActivity.class);
         startActivity(intent);
         return root;
     }

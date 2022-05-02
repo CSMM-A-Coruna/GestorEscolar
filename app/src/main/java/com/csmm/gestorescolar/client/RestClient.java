@@ -22,6 +22,7 @@ import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponse
 import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
 import com.csmm.gestorescolar.client.handlers.GetDestinosResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
+import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostLoginResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostSendComunicacionResponseHandler;
 import com.csmm.gestorescolar.client.handlers.UploadAdjuntoResponseHandler;
@@ -46,8 +47,8 @@ import java.util.Map;
 
 public class RestClient {
 
-    //public static final String REST_API_BASE_URL = "http://192.168.28.30:3000/v1";
-    public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
+    public static final String REST_API_BASE_URL = "http://192.168.11.13:3000/v1";
+    //public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
     private RequestQueue queue;
     private Context context;
 
@@ -454,6 +455,36 @@ public class RestClient {
                     }
                     handler.requestDidComplete(listaDestinos);
                 }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
+        queue.add(request);
+    }
+
+    public void postNewFCMToken(String fcmToken, PostFCMTokenResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        int userId = sharedPref.getInt("id", 0);
+        JSONObject body = new JSONObject();
+        try {
+            body.put("id_usuario", userId);
+            body.put("fcm_token", fcmToken);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                REST_API_BASE_URL + "/auth/update/firebase_token",
+                body,
+                response -> {}, new DefaultErrorHandler(handler)
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {

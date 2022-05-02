@@ -8,12 +8,19 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
 import com.csmm.gestorescolar.R;
+import com.csmm.gestorescolar.client.RestClient;
+import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
 import com.csmm.gestorescolar.databinding.MainActivityBinding;
 import com.csmm.gestorescolar.screens.auth.LoginActivity;
+import com.csmm.gestorescolar.services.MyFirebaseMessagingService;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.messaging.FirebaseMessaging;
 
+import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -64,6 +71,24 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if(!task.isSuccessful()) {
+                            return;
+                        }
+                        String token = task.getResult();
+                        RestClient.getInstance(getApplicationContext()).postNewFCMToken(token, new PostFCMTokenResponseHandler() {
+                            @Override
+                            public void requestDidComplete() {}
+
+                            @Override
+                            public void requestDidFail(int statusCode) {}
+                        });
+                    }
+                });
     }
 
 
