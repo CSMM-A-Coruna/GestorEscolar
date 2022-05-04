@@ -2,7 +2,6 @@ package com.csmm.gestorescolar.screens.main.ui.comunicaciones;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -14,12 +13,14 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
@@ -35,28 +36,25 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComunicacionesFragment extends Fragment {
 
     private ComunicacionesFragmentBinding binding;
-    private List<ComunicacionDTO> toggleList = new ArrayList<>();
-    private List<ComunicacionDTO> allList = new ArrayList<>();
+    private final List<ComunicacionDTO> toggleList = new ArrayList<>();
+    private final List<ComunicacionDTO> allList = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout swipLayout;
     private ComunicacionesAdapter mAdapter;
-    private Button filtrarAlumnos;
     private ImageButton filtrar;
     private Chip chipFiltro;
     private SharedPreferences sharedPreferences;
-    private BottomNavigationView navButton;
-    private FloatingActionButton nuevaComButton;
     private String currentNav;
     private boolean isScrolling;
 
@@ -67,7 +65,7 @@ public class ComunicacionesFragment extends Fragment {
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        sharedPreferences = getContext().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
+        sharedPreferences = requireContext().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
         currentNav = "recibidos";
 
         binding = ComunicacionesFragmentBinding.inflate(inflater, container, false);
@@ -75,11 +73,11 @@ public class ComunicacionesFragment extends Fragment {
 
         // Asignamos el swipe to refresh, botones y demás
         swipLayout = root.findViewById(R.id.swipe_layout);
-        filtrarAlumnos = root.findViewById(R.id.btnFiltrarAlumnos);
+        Button filtrarAlumnos = root.findViewById(R.id.btnFiltrarAlumnos);
         filtrar = root.findViewById(R.id.btnFiltros);
         chipFiltro = root.findViewById(R.id.chipFiltradoAlumnos);
-        navButton = root.findViewById(R.id.bottom_navigation);
-        nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
+        BottomNavigationView navButton = root.findViewById(R.id.bottom_navigation);
+        FloatingActionButton nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
 
 
         // Animación fab
@@ -107,17 +105,14 @@ public class ComunicacionesFragment extends Fragment {
                     public void onAnimationRepeat(Animator animation) {}
                 });
 
-        nuevaComButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), ComunicacionDetalleNueva.class);
-                startActivity(intent);
-            }
+        nuevaComButton.setOnClickListener(view -> {
+            Intent intent = new Intent(getContext(), ComunicacionDetalleNueva.class);
+            startActivity(intent);
         });
 
         // Selector de alumnos
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
-        ArrayList<String> listAlumnos = new ArrayList<String>();
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+        ArrayList<String> listAlumnos = new ArrayList<>();
         try {
             JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
             listAlumnos.add("Todos");
@@ -138,72 +133,40 @@ public class ComunicacionesFragment extends Fragment {
             String[] splited = nombre.split("\\s+");
             arrayAlumnosSoloNombre[i] = splited[0];
         }
-        filtrarAlumnos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new MaterialAlertDialogBuilder(root.getContext())
-                        .setTitle("Alumnos")
-                        .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumnoInt[0] = 0;
-                                filtradoAlumnoString[0] = arrayAlumnos[0];
-                                filterData();
-                            }
-                        })
-                        .setPositiveButton("Seleccionar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumnoString[0] = arrayAlumnos[filtradoAlumnoInt[0]];
-                                filterData();
-                            }
-                        })
-                        .setSingleChoiceItems(arrayAlumnosSoloNombre, filtradoAlumnoInt[0], new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumnoInt[0] = i;
-                            }
-                        }).create().show();
-            }
-        });
+        filtrarAlumnos.setOnClickListener(view -> new MaterialAlertDialogBuilder(root.getContext())
+                .setTitle("Alumnos")
+                .setNeutralButton("Cancelar", (dialogInterface, i) -> {
+                    filtradoAlumnoInt[0] = 0;
+                    filtradoAlumnoString[0] = arrayAlumnos[0];
+                    filterData();
+                })
+                .setPositiveButton("Seleccionar", (dialogInterface, i) -> {
+                    filtradoAlumnoString[0] = arrayAlumnos[filtradoAlumnoInt[0]];
+                    filterData();
+                })
+                .setSingleChoiceItems(arrayAlumnosSoloNombre, filtradoAlumnoInt[0], (dialogInterface, i) -> filtradoAlumnoInt[0] = i).create().show());
 
         String[] filtrosArray = {"Todos", "No leídos", "Leídos", "Importantes"};
-        filtrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new MaterialAlertDialogBuilder(root.getContext())
-                        .setTitle("Filtrar")
-                        .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoPropiedadInt[0] = 0;
-                                filtradoPropiedadString[0] = filtrosArray[0];
-                                filterData();
-                            }
-                        })
-                        .setPositiveButton("Filtrar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if(filtradoPropiedadInt[0]==1) {
-                                    filtradoPropiedadString[0] = filtrosArray[1];
-                                } else if(filtradoPropiedadInt[0]==2){
-                                    filtradoPropiedadString[0] = filtrosArray[2];
-                                } else if(filtradoPropiedadInt[0]==3) {
-                                    filtradoPropiedadString[0] = filtrosArray[3];
-                                } else {
-                                    filtradoPropiedadString[0] = filtrosArray[0];
-                                }
-                                filterData();
-                            }
-                        })
-                        .setSingleChoiceItems(filtrosArray, filtradoPropiedadInt[0], new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoPropiedadInt[0] = i;
-                            }
-                        }).create().show();
-            }
-        });
+        filtrar.setOnClickListener(view -> new MaterialAlertDialogBuilder(root.getContext())
+                .setTitle("Filtrar")
+                .setNeutralButton("Cancelar", (dialogInterface, i) -> {
+                    filtradoPropiedadInt[0] = 0;
+                    filtradoPropiedadString[0] = filtrosArray[0];
+                    filterData();
+                })
+                .setPositiveButton("Filtrar", (dialogInterface, i) -> {
+                    if(filtradoPropiedadInt[0]==1) {
+                        filtradoPropiedadString[0] = filtrosArray[1];
+                    } else if(filtradoPropiedadInt[0]==2){
+                        filtradoPropiedadString[0] = filtrosArray[2];
+                    } else if(filtradoPropiedadInt[0]==3) {
+                        filtradoPropiedadString[0] = filtrosArray[3];
+                    } else {
+                        filtradoPropiedadString[0] = filtrosArray[0];
+                    }
+                    filterData();
+                })
+                .setSingleChoiceItems(filtrosArray, filtradoPropiedadInt[0], (dialogInterface, i) -> filtradoPropiedadInt[0] = i).create().show());
 
         // Asignamos el RecyclerView de la lista de comunicaciones
         mRecyclerView = root.findViewById(R.id.recyclerView);
@@ -264,53 +227,62 @@ public class ComunicacionesFragment extends Fragment {
             chipFiltro.setVisibility(View.VISIBLE);
             chipFiltro.setText(filtradoAlumnoString[0]);
             List<ComunicacionDTO> lista = new ArrayList<>();
-            if(filtradoPropiedadString[0].equals("No leídos")) {
-                chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
-                allList.forEach(data -> {
-                    if(data.getLeida().equals("null")) {
-                        lista.add(data);
-                    }
-                });
-            } else if(filtradoPropiedadString[0].equals("Leídos")) {
-                chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
-                allList.forEach(data -> {
-                    if(!data.getLeida().equals("null")) {
-                        lista.add(data);
-                    }
-                });
-            } else if(filtradoPropiedadString[0].equals("Importantes")) {
-                chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
-                allList.forEach(data -> {
-                    if(data.isImportante()) {
-                        lista.add(data);
-                    }
-                });
-            } else {
-                lista.addAll(allList);
+            switch (filtradoPropiedadString[0]) {
+                case "No leídos":
+                    chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
+                    allList.forEach(data -> {
+                        if (data.getLeida().equals("null")) {
+                            lista.add(data);
+                        }
+                    });
+                    break;
+                case "Leídos":
+                    chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
+                    allList.forEach(data -> {
+                        if (!data.getLeida().equals("null")) {
+                            lista.add(data);
+                        }
+                    });
+                    break;
+                case "Importantes":
+                    chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
+                    allList.forEach(data -> {
+                        if (data.isImportante()) {
+                            lista.add(data);
+                        }
+                    });
+                    break;
+                default:
+                    lista.addAll(allList);
+                    break;
             }
             filtroAlumno(lista, filtradoAlumnoString[0]);
         } else {
             toggleList.clear();
             chipFiltro.setVisibility(View.VISIBLE);
             chipFiltro.setText(filtradoPropiedadString[0]);
-            if(filtradoPropiedadString[0].equals("No leídos")) {
-                allList.forEach(data -> {
-                    if(data.getLeida().equals("null")) {
-                        toggleList.add(data);
-                    }
-                });
-            } else if(filtradoPropiedadString[0].equals("Leídos")) {
-                allList.forEach(data -> {
-                    if(!data.getLeida().equals("null")) {
-                        toggleList.add(data);
-                    }
-                });
-            } else if(filtradoPropiedadString[0].equals("Importantes")) {
-                allList.forEach(data -> {
-                    if(data.isImportante()) {
-                        toggleList.add(data);
-                    }
-                });
+            switch (filtradoPropiedadString[0]) {
+                case "No leídos":
+                    allList.forEach(data -> {
+                        if (data.getLeida().equals("null")) {
+                            toggleList.add(data);
+                        }
+                    });
+                    break;
+                case "Leídos":
+                    allList.forEach(data -> {
+                        if (!data.getLeida().equals("null")) {
+                            toggleList.add(data);
+                        }
+                    });
+                    break;
+                case "Importantes":
+                    allList.forEach(data -> {
+                        if (data.isImportante()) {
+                            toggleList.add(data);
+                        }
+                    });
+                    break;
             }
             updateData(toggleList);
         }
@@ -327,7 +299,7 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         swipLayout.setOnRefreshListener(this::cargarDatos);
     }
