@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class CustomLinearLayoutManager extends LinearLayoutManager {
+
     public CustomLinearLayoutManager(Context context) {
         super(context);
     }

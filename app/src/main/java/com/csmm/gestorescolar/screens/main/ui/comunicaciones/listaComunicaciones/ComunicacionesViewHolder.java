@@ -9,21 +9,21 @@ import com.csmm.gestorescolar.R;
 
 public class ComunicacionesViewHolder extends RecyclerView.ViewHolder {
 
-    TextView mSender;
-    TextView mEmailTitle;
-    TextView mEmailDetails;
-    TextView mEmailTime;
-    ImageView mFavorite;
+    TextView mRemite;
+    TextView mAsunto;
+    TextView mCuerpo;
+    TextView mHora;
+    ImageView mImportante;
     RelativeLayout mLayout;
 
     public ComunicacionesViewHolder(View itemView) {
         super(itemView);
 
-        mSender = itemView.findViewById(R.id.tvEmailSender);
-        mEmailTitle = itemView.findViewById(R.id.tvEmailTitle);
-        mEmailDetails = itemView.findViewById(R.id.tvEmailDetails);
-        mEmailTime = itemView.findViewById(R.id.tvEmailTime);
-        mFavorite = itemView.findViewById(R.id.ivFavorite);
+        mRemite = itemView.findViewById(R.id.remite);
+        mAsunto = itemView.findViewById(R.id.asunto);
+        mCuerpo = itemView.findViewById(R.id.cuerpo);
+        mHora = itemView.findViewById(R.id.hora);
+        mImportante = itemView.findViewById(R.id.importante);
         mLayout = itemView.findViewById(R.id.layout);
     }
 }

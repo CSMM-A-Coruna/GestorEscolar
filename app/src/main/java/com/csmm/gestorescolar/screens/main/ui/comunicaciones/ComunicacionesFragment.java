@@ -1,8 +1,8 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -12,14 +12,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
+
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
@@ -31,56 +34,57 @@ import com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle.Comunicacio
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesAdapter;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.CustomLinearLayoutManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComunicacionesFragment extends Fragment {
 
     private ComunicacionesFragmentBinding binding;
-    private List<ComunicacionDTO> toggleList = new ArrayList<>();
-    private List<ComunicacionDTO> allList = new ArrayList<>();
+    private final List<ComunicacionDTO> toggleList = new ArrayList<>();
+    private final List<ComunicacionDTO> allList = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout swipLayout;
     private ComunicacionesAdapter mAdapter;
-    private Button filtrarAlumnos;
-    private ImageButton filtrar;
+    private ImageButton btnFiltrarPorPropiedad;
     private Chip chipFiltro;
     private SharedPreferences sharedPreferences;
-    private BottomNavigationView navButton;
-    private FloatingActionButton nuevaComButton;
     private String currentNav;
     private boolean isScrolling;
 
-    final String[] filtradoAlumnoString = {"Todos"};
-    final String[] filtradoPropiedadString = {"Todos"};
-    final int[] filtradoAlumnoInt = {0};
-    final int[] filtradoPropiedadInt = {0};
+    final String[] alumnoFiltrado = {"Todos"};
+    final String[] propiedadFiltrada = {"Todos"};
 
-
+    @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        sharedPreferences = getContext().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
+        sharedPreferences = requireContext().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
         currentNav = "recibidos";
 
         binding = ComunicacionesFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Asignamos el swipe to refresh, botones y demás
+        // Asignamos el swipe, botones y demás
         swipLayout = root.findViewById(R.id.swipe_layout);
-        filtrarAlumnos = root.findViewById(R.id.btnFiltrarAlumnos);
-        filtrar = root.findViewById(R.id.btnFiltros);
+        MaterialButton btnFiltrarPorAlumno = root.findViewById(R.id.btnFiltrarAlumnos);
+        BottomNavigationView navButton = root.findViewById(R.id.bottom_navigation);
+        FloatingActionButton nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
+        btnFiltrarPorPropiedad = root.findViewById(R.id.btnFiltros);
         chipFiltro = root.findViewById(R.id.chipFiltradoAlumnos);
-        navButton = root.findViewById(R.id.bottom_navigation);
-        nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
 
+
+        // Animaciones de los botones
+        btnFiltrarPorAlumno.setAlpha(0f);
+        btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1500);
+        btnFiltrarPorPropiedad.setAlpha(0f);
+        btnFiltrarPorPropiedad.animate().alpha(1f).setDuration(1500);
 
         // Animación fab
         nuevaComButton.setScaleX(0);
@@ -107,17 +111,14 @@ public class ComunicacionesFragment extends Fragment {
                     public void onAnimationRepeat(Animator animation) {}
                 });
 
-        nuevaComButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), ComunicacionDetalleNueva.class);
-                startActivity(intent);
-            }
+        nuevaComButton.setOnClickListener(view -> {
+            Intent intent = new Intent(getContext(), ComunicacionDetalleNueva.class);
+            startActivity(intent);
         });
 
         // Selector de alumnos
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
-        ArrayList<String> listAlumnos = new ArrayList<String>();
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+        ArrayList<String> listAlumnos = new ArrayList<>();
         try {
             JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
             listAlumnos.add("Todos");
@@ -138,71 +139,49 @@ public class ComunicacionesFragment extends Fragment {
             String[] splited = nombre.split("\\s+");
             arrayAlumnosSoloNombre[i] = splited[0];
         }
-        filtrarAlumnos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new MaterialAlertDialogBuilder(root.getContext())
-                        .setTitle("Alumnos")
-                        .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumnoInt[0] = 0;
-                                filtradoAlumnoString[0] = arrayAlumnos[0];
-                                filterData();
-                            }
-                        })
-                        .setPositiveButton("Seleccionar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumnoString[0] = arrayAlumnos[filtradoAlumnoInt[0]];
-                                filterData();
-                            }
-                        })
-                        .setSingleChoiceItems(arrayAlumnosSoloNombre, filtradoAlumnoInt[0], new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoAlumnoInt[0] = i;
-                            }
-                        }).create().show();
+
+        btnFiltrarPorAlumno.setOnClickListener(view -> {
+            // Animación
+            btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_arriba));
+            // PopUp
+            PopupMenu popupMenu = new PopupMenu(getContext(), view);
+            popupMenu.setOnMenuItemClickListener(item -> {
+                for(int i=0; i<arrayAlumnos.length; i++) {
+                    if(arrayAlumnosSoloNombre[i].contentEquals(item.getTitle())) {
+                        alumnoFiltrado[0] = arrayAlumnos[i];
+                    }
+                }
+                filterData();
+                return true;
+            });
+
+            for (String s : arrayAlumnosSoloNombre) {
+                popupMenu.getMenu().add(s);
             }
+            popupMenu.show();
+
+            // Animación al cerrar el menu
+            popupMenu.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
         });
 
-        String[] filtrosArray = {"Todos", "No leídos", "Leídos", "Importantes"};
-        filtrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new MaterialAlertDialogBuilder(root.getContext())
-                        .setTitle("Filtrar")
-                        .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoPropiedadInt[0] = 0;
-                                filtradoPropiedadString[0] = filtrosArray[0];
-                                filterData();
-                            }
-                        })
-                        .setPositiveButton("Filtrar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if(filtradoPropiedadInt[0]==1) {
-                                    filtradoPropiedadString[0] = filtrosArray[1];
-                                } else if(filtradoPropiedadInt[0]==2){
-                                    filtradoPropiedadString[0] = filtrosArray[2];
-                                } else if(filtradoPropiedadInt[0]==3) {
-                                    filtradoPropiedadString[0] = filtrosArray[3];
-                                } else {
-                                    filtradoPropiedadString[0] = filtrosArray[0];
-                                }
-                                filterData();
-                            }
-                        })
-                        .setSingleChoiceItems(filtrosArray, filtradoPropiedadInt[0], new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                filtradoPropiedadInt[0] = i;
-                            }
-                        }).create().show();
+        btnFiltrarPorPropiedad.setOnClickListener(view -> {
+            // Animación
+            btnFiltrarPorPropiedad.animate().setDuration(300).rotationBy(90f).start();
+            // PopUp
+            PopupMenu popupMenu = new PopupMenu(getContext(), view);
+            popupMenu.setOnMenuItemClickListener(item -> {
+                propiedadFiltrada[0] = String.valueOf(item.getTitle());
+                filterData();
+                return true;
+            });
+            String[] filtrosDisponibles = {"Todos", "No leídos", "Leídos", "Importantes"};
+            for (String s : filtrosDisponibles) {
+                popupMenu.getMenu().add(s);
             }
+            popupMenu.show();
+
+            // Animación al cerrar el menu
+            popupMenu.setOnDismissListener(popupMenu12 -> btnFiltrarPorPropiedad.animate().setDuration(300).rotationBy(-90f).start());
         });
 
         // Asignamos el RecyclerView de la lista de comunicaciones
@@ -251,66 +230,115 @@ public class ComunicacionesFragment extends Fragment {
             }
         });
 
-        cargarDatos();
+        // Listener de scroll hacia los lados, para cambiar de pantallas.
+        /*container.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    x1 = event.getX();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    x2 = event.getX();
+                    float deltaX = x2 - x1;
+                    if (deltaX < 0) {
+                        switch (currentNav) {
+                            case "recibidos":
+                                currentNav = "enviados";
+                                updateToEnviadas();
+                                navButton.setSelectedItemId(R.id.enviados);
+                                break;
+                            case "enviados":
+                                currentNav = "papelera";
+                                updateToPapelera();
+                                navButton.setSelectedItemId(R.id.papelera);
+                                break;
+                        }
+                    }else if(deltaX >0){
+                        switch (currentNav) {
+                            case "papelera":
+                                currentNav = "enviados";
+                                updateToEnviadas();
+                                navButton.setSelectedItemId(R.id.enviados);
+                                break;
+                            case "enviados":
+                                currentNav = "recibidos";
+                                updateToRecibidos();
+                                navButton.setSelectedItemId(R.id.recibidos);
+                                break;
+                        }
+                    }
+                    break;
+            }
+            return false;
+        });*/
 
+        cargarDatos();
         return root;
     }
 
     private void filterData() {
-        if(filtradoPropiedadString[0].equals("Todos") && filtradoAlumnoString[0].equals("Todos")) {
+        if(propiedadFiltrada[0].equals("Todos") && alumnoFiltrado[0].equals("Todos")) {
             updateData(allList);
             chipFiltro.setVisibility(View.GONE);
-        } else if(!filtradoAlumnoString[0].equals("Todos")) {
+        } else if(!alumnoFiltrado[0].equals("Todos")) {
             chipFiltro.setVisibility(View.VISIBLE);
-            chipFiltro.setText(filtradoAlumnoString[0]);
+            chipFiltro.setText(alumnoFiltrado[0]);
             List<ComunicacionDTO> lista = new ArrayList<>();
-            if(filtradoPropiedadString[0].equals("No leídos")) {
-                chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
-                allList.forEach(data -> {
-                    if(data.getLeida().equals("null")) {
-                        lista.add(data);
-                    }
-                });
-            } else if(filtradoPropiedadString[0].equals("Leídos")) {
-                chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
-                allList.forEach(data -> {
-                    if(!data.getLeida().equals("null")) {
-                        lista.add(data);
-                    }
-                });
-            } else if(filtradoPropiedadString[0].equals("Importantes")) {
-                chipFiltro.setText(filtradoAlumnoString[0] + " - " + filtradoPropiedadString[0]);
-                allList.forEach(data -> {
-                    if(data.isImportante()) {
-                        lista.add(data);
-                    }
-                });
-            } else {
-                lista.addAll(allList);
+            switch (propiedadFiltrada[0]) {
+                case "No leídos":
+                    chipFiltro.setText(alumnoFiltrado[0] + " - " + propiedadFiltrada[0]);
+                    allList.forEach(data -> {
+                        if (data.getLeida().equals("null")) {
+                            lista.add(data);
+                        }
+                    });
+                    break;
+                case "Leídos":
+                    chipFiltro.setText(alumnoFiltrado[0] + " - " + propiedadFiltrada[0]);
+                    allList.forEach(data -> {
+                        if (!data.getLeida().equals("null")) {
+                            lista.add(data);
+                        }
+                    });
+                    break;
+                case "Importantes":
+                    chipFiltro.setText(alumnoFiltrado[0] + " - " + propiedadFiltrada[0]);
+                    allList.forEach(data -> {
+                        if (data.isImportante()) {
+                            lista.add(data);
+                        }
+                    });
+                    break;
+                default:
+                    lista.addAll(allList);
+                    break;
             }
-            filtroAlumno(lista, filtradoAlumnoString[0]);
+            filtroAlumno(lista, alumnoFiltrado[0]);
         } else {
             toggleList.clear();
             chipFiltro.setVisibility(View.VISIBLE);
-            chipFiltro.setText(filtradoPropiedadString[0]);
-            if(filtradoPropiedadString[0].equals("No leídos")) {
-                allList.forEach(data -> {
-                    if(data.getLeida().equals("null")) {
-                        toggleList.add(data);
-                    }
-                });
-            } else if(filtradoPropiedadString[0].equals("Leídos")) {
-                allList.forEach(data -> {
-                    if(!data.getLeida().equals("null")) {
-                        toggleList.add(data);
-                    }
-                });
-            } else if(filtradoPropiedadString[0].equals("Importantes")) {
-                allList.forEach(data -> {
-                    if(data.isImportante()) {
-                        toggleList.add(data);
-                    }
-                });
+            chipFiltro.setText(propiedadFiltrada[0]);
+            switch (propiedadFiltrada[0]) {
+                case "No leídos":
+                    allList.forEach(data -> {
+                        if (data.getLeida().equals("null")) {
+                            toggleList.add(data);
+                        }
+                    });
+                    break;
+                case "Leídos":
+                    allList.forEach(data -> {
+                        if (!data.getLeida().equals("null")) {
+                            toggleList.add(data);
+                        }
+                    });
+                    break;
+                case "Importantes":
+                    allList.forEach(data -> {
+                        if (data.isImportante()) {
+                            toggleList.add(data);
+                        }
+                    });
+                    break;
             }
             updateData(toggleList);
         }
@@ -327,7 +355,7 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         swipLayout.setOnRefreshListener(this::cargarDatos);
     }
@@ -339,10 +367,15 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void cargarDatos() {
-        new CargarNuevosEmails().execute();
+        // Prevenimos errores al recargar nuevas comunicaciones y que estén filtradas (mal rendimiento)
+        if(propiedadFiltrada[0].equals("Todos") && alumnoFiltrado[0].equals("Todos")) {
+            new CargarNuevasComunicaciones().execute();
+        } else {
+            swipLayout.setRefreshing(false);
+        }
     }
 
-    private class CargarNuevosEmails extends AsyncTask<Void, Void, Void> {
+    private class CargarNuevasComunicaciones extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
             try {
@@ -357,7 +390,6 @@ public class ComunicacionesFragment extends Fragment {
                         updateToPapelera();
                         break;
                 }
-                Thread.sleep(600);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -380,7 +412,6 @@ public class ComunicacionesFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
 
     private void updateToRecibidos() {
         reiniciarFiltro();
@@ -419,7 +450,7 @@ public class ComunicacionesFragment extends Fragment {
                 updateData(allList);
             }
         });
-        filtrar.setVisibility(View.VISIBLE);
+        btnFiltrarPorPropiedad.setVisibility(View.VISIBLE);
     }
 
     private void updateToEnviadas() {
@@ -461,7 +492,7 @@ public class ComunicacionesFragment extends Fragment {
                 updateData(allList);
             }
         });
-        filtrar.setVisibility(View.INVISIBLE);
+        btnFiltrarPorPropiedad.setVisibility(View.INVISIBLE);
     }
 
     private void updateToPapelera() {
@@ -501,14 +532,12 @@ public class ComunicacionesFragment extends Fragment {
                 updateData(allList);
             }
         });
-        filtrar.setVisibility(View.INVISIBLE);
+        btnFiltrarPorPropiedad.setVisibility(View.INVISIBLE);
     }
 
     private void reiniciarFiltro() {
-        filtradoPropiedadString[0] = "Todos";
-        filtradoAlumnoString[0] = "Todos";
-        filtradoPropiedadInt[0] = 0;
-        filtradoAlumnoInt[0] = 0;
+        propiedadFiltrada[0] = "Todos";
+        alumnoFiltrado[0] = "Todos";
         chipFiltro.setText("");
         chipFiltro.setVisibility(View.GONE);
     }
