@@ -45,6 +45,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ComunicacionesFragment extends Fragment {
 
@@ -55,13 +56,16 @@ public class ComunicacionesFragment extends Fragment {
     private SwipeRefreshLayout swipLayout;
     private ComunicacionesAdapter mAdapter;
     private ImageButton btnFiltrarPorPropiedad;
+    BottomNavigationView navButton;
     private Chip chipFiltro;
     private SharedPreferences sharedPreferences;
     private String currentNav;
     private boolean isScrolling;
 
-    String alumnoFiltrado = "Todos";
-    String propiedadFiltrada = "Todos";
+    private String alumnoFiltrado = "Todos";
+    private String propiedadFiltrada = "Todos";
+
+    boolean firstAttempt = true;
 
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,7 +78,7 @@ public class ComunicacionesFragment extends Fragment {
         // Asignamos el swipe, botones y demás
         swipLayout = root.findViewById(R.id.swipe_layout);
         MaterialButton btnFiltrarPorAlumno = root.findViewById(R.id.btnFiltrarAlumnos);
-        BottomNavigationView navButton = root.findViewById(R.id.bottom_navigation);
+        navButton = root.findViewById(R.id.bottom_navigation);
         FloatingActionButton nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
         btnFiltrarPorPropiedad = root.findViewById(R.id.btnFiltros);
         chipFiltro = root.findViewById(R.id.chipFiltradoAlumnos);
@@ -270,6 +274,7 @@ public class ComunicacionesFragment extends Fragment {
             }
             return false;
         });*/
+        cargarDatos();
         return root;
     }
 
@@ -361,17 +366,24 @@ public class ComunicacionesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        cargarDatos();
+        // Handle si es la primera vez que se crea el fragment, porque resulta que salta el onResume también (ni idea de porqué).
+        // Si no lo controlasemos se ejecutarían dos cargarDatos() y genera errores.
+        if(firstAttempt) {
+            firstAttempt = false;
+        } else {
+            cargarDatos();
+        }
     }
 
     private void cargarDatos() {
         // Prevenimos errores al recargar nuevas comunicaciones y que estén filtradas (mal rendimiento)
-        if(propiedadFiltrada.equals("Todos") && alumnoFiltrado.equals("Todos")) {
+       if(propiedadFiltrada.equals("Todos") && alumnoFiltrado.equals("Todos")) {
             new CargarNuevasComunicaciones().execute();
         } else {
             swipLayout.setRefreshing(false);
         }
     }
+
 
     private class CargarNuevasComunicaciones extends AsyncTask<Void, Void, Void> {
         @Override

@@ -66,6 +66,12 @@
         tools:layout="@layout/misdatos_fragment" />
 
     <fragment
+        android:id="@+id/nav_ajustes"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.AjustesFragment"
+        android:label="Ajustes"
+        tools:layout="@layout/ajustes_fragment" />
+
+    <fragment
         android:id="@+id/nav_cerrarsesion"
         android:name="com.csmm.gestorescolar.screens.main.ui.cerrarsesion.CerrarsesionFragment"
         android:label="Cerrar Sesión"

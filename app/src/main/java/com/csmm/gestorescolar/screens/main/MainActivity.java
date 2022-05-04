@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
         View headerView = navigationView.getHeaderView(0);
         TextView navUsername = headerView.findViewById(R.id.usernameText);
-        navUsername.setText(new StringBuilder().append(nombre).append(" ").append(apellido1).append(" ").append(apellido2).toString());
+        navUsername.setText(String.format("%s %s %s", nombre, apellido1, apellido2));
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -65,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
                 R.id.nav_extraescolares,
                 R.id.nav_enfermeria,
                 R.id.nav_llavero,
-                R.id.nav_misdatos)
+                R.id.nav_misdatos,
+                R.id.nav_ajustes)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
