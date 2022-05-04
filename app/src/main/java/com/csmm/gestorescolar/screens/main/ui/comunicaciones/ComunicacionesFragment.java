@@ -7,14 +7,17 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +35,7 @@ import com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle.Comunicacio
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesAdapter;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.CustomLinearLayoutManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -73,12 +77,18 @@ public class ComunicacionesFragment extends Fragment {
 
         // Asignamos el swipe to refresh, botones y demás
         swipLayout = root.findViewById(R.id.swipe_layout);
-        Button filtrarAlumnos = root.findViewById(R.id.btnFiltrarAlumnos);
-        filtrar = root.findViewById(R.id.btnFiltros);
-        chipFiltro = root.findViewById(R.id.chipFiltradoAlumnos);
+        MaterialButton filtrarAlumnos = root.findViewById(R.id.btnFiltrarAlumnos);
         BottomNavigationView navButton = root.findViewById(R.id.bottom_navigation);
         FloatingActionButton nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
+        filtrar = root.findViewById(R.id.btnFiltros);
+        chipFiltro = root.findViewById(R.id.chipFiltradoAlumnos);
 
+
+        // Animaciones de los botones
+        filtrarAlumnos.setAlpha(0f);
+        filtrarAlumnos.animate().alpha(1f).setDuration(1500);
+        filtrar.setAlpha(0f);
+        filtrar.animate().alpha(1f).setDuration(1500);
 
         // Animación fab
         nuevaComButton.setScaleX(0);
@@ -133,19 +143,46 @@ public class ComunicacionesFragment extends Fragment {
             String[] splited = nombre.split("\\s+");
             arrayAlumnosSoloNombre[i] = splited[0];
         }
-        filtrarAlumnos.setOnClickListener(view -> new MaterialAlertDialogBuilder(root.getContext())
-                .setTitle("Alumnos")
-                .setNeutralButton("Cancelar", (dialogInterface, i) -> {
-                    filtradoAlumnoInt[0] = 0;
-                    filtradoAlumnoString[0] = arrayAlumnos[0];
-                    filterData();
-                })
-                .setPositiveButton("Seleccionar", (dialogInterface, i) -> {
-                    filtradoAlumnoString[0] = arrayAlumnos[filtradoAlumnoInt[0]];
-                    filterData();
-                })
-                .setSingleChoiceItems(arrayAlumnosSoloNombre, filtradoAlumnoInt[0], (dialogInterface, i) -> filtradoAlumnoInt[0] = i).create().show());
 
+        filtrarAlumnos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Animación
+                filtrarAlumnos.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_arriba));
+                // PopUp
+                PopupMenu popupMenu = new PopupMenu(getContext(), view);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getTitle().equals("Todos")) {
+                            filtradoAlumnoString[0] = "Todos";
+                        } else {
+                            for(int i=0; i<arrayAlumnos.length; i++) {
+                                if(arrayAlumnosSoloNombre[i].equals(item.getTitle())) {
+                                    filtradoAlumnoString[0] = arrayAlumnos[i];
+                                }
+                            }
+                        }
+                        filterData();
+                        return true;
+                    }
+                });
+
+                for (String s : arrayAlumnosSoloNombre) {
+                    popupMenu.getMenu().add(s);
+                }
+                popupMenu.show();
+
+                // Animación al cerrar el menu
+                popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+                    @Override
+                    public void onDismiss(PopupMenu popupMenu) {
+                        filtrarAlumnos.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo));
+                    }
+                });
+            }
+        });
+        
         String[] filtrosArray = {"Todos", "No leídos", "Leídos", "Importantes"};
         filtrar.setOnClickListener(view -> new MaterialAlertDialogBuilder(root.getContext())
                 .setTitle("Filtrar")
