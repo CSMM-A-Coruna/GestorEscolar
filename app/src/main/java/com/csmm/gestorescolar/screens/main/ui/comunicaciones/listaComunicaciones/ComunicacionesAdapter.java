@@ -119,6 +119,15 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
             }
             setIntentExtrasAndStartActivity(mIntent, holder);
         });
+
+        //!TODO Implementar selector para borrados en masa...
+        holder.mLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                return false;
+            }
+        });
     }
 
     public void updateData(List<ComunicacionDTO> data) {

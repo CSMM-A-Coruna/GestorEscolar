@@ -62,7 +62,7 @@ public class ComunicacionesFragment extends Fragment {
 
     final String[] alumnoFiltrado = {"Todos"};
     final String[] propiedadFiltrada = {"Todos"};
-    
+
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         sharedPreferences = requireContext().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
