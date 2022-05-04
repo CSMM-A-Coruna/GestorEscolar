@@ -1,6 +1,7 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -61,7 +62,8 @@ public class ComunicacionesFragment extends Fragment {
 
     final String[] alumnoFiltrado = {"Todos"};
     final String[] propiedadFiltrada = {"Todos"};
-
+    
+    @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         sharedPreferences = requireContext().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
         currentNav = "recibidos";
@@ -227,6 +229,48 @@ public class ComunicacionesFragment extends Fragment {
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
+
+        // Listener de scroll hacia los lados, para cambiar de pantallas.
+        /*container.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    x1 = event.getX();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    x2 = event.getX();
+                    float deltaX = x2 - x1;
+                    if (deltaX < 0) {
+                        switch (currentNav) {
+                            case "recibidos":
+                                currentNav = "enviados";
+                                updateToEnviadas();
+                                navButton.setSelectedItemId(R.id.enviados);
+                                break;
+                            case "enviados":
+                                currentNav = "papelera";
+                                updateToPapelera();
+                                navButton.setSelectedItemId(R.id.papelera);
+                                break;
+                        }
+                    }else if(deltaX >0){
+                        switch (currentNav) {
+                            case "papelera":
+                                currentNav = "enviados";
+                                updateToEnviadas();
+                                navButton.setSelectedItemId(R.id.enviados);
+                                break;
+                            case "enviados":
+                                currentNav = "recibidos";
+                                updateToRecibidos();
+                                navButton.setSelectedItemId(R.id.recibidos);
+                                break;
+                        }
+                    }
+                    break;
+            }
+            return false;
+        });*/
+
         cargarDatos();
         return root;
     }
