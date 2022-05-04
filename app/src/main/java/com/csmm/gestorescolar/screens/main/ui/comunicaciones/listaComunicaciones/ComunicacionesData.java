@@ -2,42 +2,42 @@ package com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicacione
 
 public class ComunicacionesData {
 
-    private String mSender;
+    private String mRemite;
     private String mAlumnoAsociado;
-    private String mTitle;
-    private String mDetails;
-    private String mTime;
+    private String mAsunto;
+    private String mCuerpo;
+    private String mHora;
     private boolean mLeido;
     private boolean mImportante;
 
-    public ComunicacionesData(String mSender, String mAlumnoAsociado, String mTitle, String mDetails, String mTime, boolean mLeido, boolean mImportante) {
-        this.mSender = mSender;
+    public ComunicacionesData(String mRemite, String mAlumnoAsociado, String mAsunto, String mCuerpo, String mHora, boolean mLeido, boolean mImportante) {
+        this.mRemite = mRemite;
         this.mAlumnoAsociado = mAlumnoAsociado;
-        this.mTitle = mTitle;
-        this.mDetails = mDetails;
-        this.mTime = mTime;
+        this.mAsunto = mAsunto;
+        this.mCuerpo = mCuerpo;
+        this.mHora = mHora;
         this.mLeido = mLeido;
         this.mImportante = mImportante;
     }
 
-    public String getmSender() {
-        return mSender;
+    public String getmRemite() {
+        return mRemite;
     }
 
     public String getmAlumnoAsociado() {
         return mAlumnoAsociado;
     }
 
-    public String getmTitle() {
-        return mTitle;
+    public String getmAsunto() {
+        return mAsunto;
     }
 
-    public String getmDetails() {
-        return mDetails;
+    public String getmCuerpo() {
+        return mCuerpo;
     }
 
-    public String getmTime() {
-        return mTime;
+    public String getmHora() {
+        return mHora;
     }
 
     public boolean getmLeido() {

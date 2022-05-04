@@ -7,7 +7,7 @@
     android:padding="10dp">
 
     <TextView
-        android:id="@+id/tvEmailSender"
+        android:id="@+id/remite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -17,10 +17,10 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tvEmailTitle"
+        android:id="@+id/asunto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvEmailSender"
+        android:layout_below="@+id/remite"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="5dp"
@@ -28,10 +28,10 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tvEmailDetails"
+        android:id="@+id/cuerpo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvEmailTitle"
+        android:layout_below="@+id/asunto"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="5dp"
@@ -40,21 +40,21 @@
         android:text="Este es el cuerpo del mensaje, si es largo tendrá puntos suspensivos" />
 
     <TextView
-        android:id="@+id/tvEmailTime"
+        android:id="@+id/hora"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/tvEmailSender"
+        android:layout_alignBaseline="@id/remite"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:text="12:00" />
 
     <ImageView
-        android:id="@+id/ivFavorite"
+        android:id="@+id/importante"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/tvEmailTime"
+        android:layout_below="@+id/hora"
         android:padding="5dp"
         android:src="@drawable/ic_star_black_24dp" />
 </RelativeLayout>

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,14 +23,15 @@ import java.util.List;
 
 public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesViewHolder> {
 
-    private List<ComunicacionDTO> mEmailData;
-    private Context mContext;
+    private List<ComunicacionDTO> mData;
+    private final Context mContext;
 
-    public ComunicacionesAdapter(Context mContext, List<ComunicacionDTO> mEmailData) {
-        this.mEmailData = mEmailData;
+    public ComunicacionesAdapter(Context mContext, List<ComunicacionDTO> mData) {
+        this.mData = mData;
         this.mContext = mContext;
     }
 
+    @NonNull
     @Override
     public ComunicacionesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comunicaciones_recyclerviewitem,
@@ -39,111 +41,115 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
 
     @Override
     public void onBindViewHolder(final ComunicacionesViewHolder holder, int position) {
-        holder.mEmailTitle.setText(mEmailData.get(holder.getAdapterPosition()).getAsunto());
-        holder.mEmailDetails.setText(mEmailData.get(holder.getAdapterPosition()).getTexto());
-        holder.mEmailTime.setText(mEmailData.get(holder.getAdapterPosition()).getFecha());
 
-        if(mEmailData.get(holder.getAdapterPosition()).getEstado().equals("enviada")) {
-            String nombre = mEmailData.get(holder.getAdapterPosition()).getNombreDestino();
+        // Setteamos los textos de `Asunto`, `Texto` y `Hora`, que son siempre iguales independientemente del tipo de comunicación
+        holder.mAsunto.setText(mData.get(holder.getAdapterPosition()).getAsunto());
+        holder.mCuerpo.setText(mData.get(holder.getAdapterPosition()).getTexto());
+        holder.mHora.setText(mData.get(holder.getAdapterPosition()).getFecha());
+
+        // Cambiamos el remite según sea enviada o no. (Si es enviada se mostrará el destino `Para: Sara Docampo`)
+        if(mData.get(holder.getAdapterPosition()).getEstado().equals("enviada")) {
+            String nombre = mData.get(holder.getAdapterPosition()).getNombreDestino();
             String[] splited = nombre.split("\\s+");
             String nombreSplit = splited[0] + " " +splited[1];
-            holder.mSender.setText("Para: " + nombreSplit);
+            holder.mRemite.setText("Para: " + nombreSplit);
         } else {
-            String nombre = mEmailData.get(holder.getAdapterPosition()).getNombreRemite();
+            String nombre = mData.get(holder.getAdapterPosition()).getNombreRemite();
             String[] splited = nombre.split("\\s+");
             String nombreSplit = splited[0] + " " + splited[1];
-            holder.mSender.setText(nombreSplit);
+            holder.mRemite.setText(nombreSplit);
         }
-        if(mEmailData.get(holder.getAdapterPosition()).getEstado().equals("recibida")) {
-            holder.mFavorite.setVisibility(View.VISIBLE);
-            if(mEmailData.get(holder.getAdapterPosition()).getLeida().equals("null")) {
+        // Si es una comunicación recibida, damos la posibilidad de marcar como importante. Si no es recibida, mostramos todas las comunicaciones de color gris.
+        if(mData.get(holder.getAdapterPosition()).getEstado().equals("recibida")) {
+            holder.mImportante.setVisibility(View.VISIBLE);
+            // Mostramos si está leída o no, jugando con los colores
+            if(mData.get(holder.getAdapterPosition()).getLeida().equals("null")) {
                 holder.itemView.setBackgroundColor(0xffffffff);
-                holder.mSender.setTypeface(null, Typeface.BOLD);
-                holder.mEmailTitle.setTypeface(null, Typeface.BOLD);
+                holder.mRemite.setTypeface(null, Typeface.BOLD);
+                holder.mAsunto.setTypeface(null, Typeface.BOLD);
             } else {
                 holder.itemView.setBackgroundColor(0x88EAEAEA);
-                holder.mSender.setTypeface(null, Typeface.NORMAL);
-                holder.mEmailTitle.setTypeface(null, Typeface.NORMAL);
+                holder.mRemite.setTypeface(null, Typeface.NORMAL);
+                holder.mAsunto.setTypeface(null, Typeface.NORMAL);
             }
-            if(mEmailData.get(holder.getAdapterPosition()).isImportante()) {
-                holder.mFavorite.setColorFilter(ContextCompat.getColor(mContext, R.color.importante));
+            // Mostramos si está marcada como importante o no, jugando con el color filter.
+            if(mData.get(holder.getAdapterPosition()).isImportante()) {
+                holder.mImportante.setColorFilter(ContextCompat.getColor(mContext, R.color.importante));
             } else {
-                holder.mFavorite.clearColorFilter();
+                holder.mImportante.clearColorFilter();
             }
-            holder.mFavorite.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String estado;
-                    if (holder.mFavorite.getColorFilter() != null) {
-                        holder.mFavorite.clearColorFilter();
-                        mEmailData.get(holder.getAdapterPosition()).setImportante(false);
-                        estado = "no_importante";
-                    } else {
-                        holder.mFavorite.setColorFilter(ContextCompat.getColor(mContext,
-                                R.color.importante));
-                        mEmailData.get(holder.getAdapterPosition()).setImportante(true);
-                        estado = "importante";
-                    }
-                    RestClient.getInstance(mContext).postEstadoComunicacion(mEmailData.get(holder.getAdapterPosition()).getIdComunicacion(), estado, mEmailData.get(holder.getAdapterPosition()).getIdDestino(), new PostEstadoComunicacionHandler() {
-                        @Override
-                        public void sessionRequestDidComplete(boolean update) { }
-                        @Override
-                        public void requestDidFail(int statusCode) { }
-                    });
 
+            // Listener de si es se clicka en el icono importante, actualizando el servidor
+            holder.mImportante.setOnClickListener(view -> {
+                String estado;
+                if (holder.mImportante.getColorFilter() != null) {
+                    holder.mImportante.clearColorFilter();
+                    mData.get(holder.getAdapterPosition()).setImportante(false);
+                    estado = "no_importante";
+                } else {
+                    holder.mImportante.setColorFilter(ContextCompat.getColor(mContext,
+                            R.color.importante));
+                    mData.get(holder.getAdapterPosition()).setImportante(true);
+                    estado = "importante";
                 }
+                RestClient.getInstance(mContext).postEstadoComunicacion(mData.get(holder.getAdapterPosition()).getIdComunicacion(), estado, mData.get(holder.getAdapterPosition()).getIdDestino(), new PostEstadoComunicacionHandler() {
+                    @Override
+                    public void sessionRequestDidComplete(boolean update) { }
+                    @Override
+                    public void requestDidFail(int statusCode) { }
+                });
+
             });
         } else {
             holder.itemView.setBackgroundColor(0x88EAEAEA);
-            holder.mSender.setTypeface(null, Typeface.NORMAL);
-            holder.mEmailTitle.setTypeface(null, Typeface.NORMAL);
-            holder.mFavorite.setVisibility(View.GONE);
+            holder.mRemite.setTypeface(null, Typeface.NORMAL);
+            holder.mAsunto.setTypeface(null, Typeface.NORMAL);
+            holder.mImportante.setVisibility(View.GONE);
         }
 
-        holder.mLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mIntent;
-                if(mEmailData.get(holder.getAdapterPosition()).getEstado().equals("recibida")) {
-                    mIntent = new Intent(mContext, ComunicacionDetalleRecibida.class);
-                } else if (mEmailData.get(holder.getAdapterPosition()).getEstado().equals("enviada")) {
-                    mIntent = new Intent(mContext, ComunicacionDetalleEnviada.class);
-                } else {
-                    mIntent = new Intent(mContext, ComunicacionDetallePapelera.class);
-                }
-                mIntent.putExtra("id_com", mEmailData.get(holder.getAdapterPosition()).getIdComunicacion());
-                mIntent.putExtra("remite", holder.mSender.getText().toString());
-                mIntent.putExtra("id_remite", mEmailData.get(holder.getAdapterPosition()).getIdRemite());
-                mIntent.putExtra("tipo_remite", mEmailData.get(holder.getAdapterPosition()).getTipoRemite());
-                mIntent.putExtra("destino", mEmailData.get(holder.getAdapterPosition()).getNombreDestino());
-                mIntent.putExtra("id_destino", mEmailData.get(holder.getAdapterPosition()).getIdDestino());
-                mIntent.putExtra("id_alumnoAsociado", mEmailData.get(holder.getAdapterPosition()).getIdAlumnoAsociado());
-                mIntent.putExtra("asunto", holder.mEmailTitle.getText().toString());
-                mIntent.putExtra("texto", holder.mEmailDetails.getText().toString());
-                mIntent.putExtra("fecha", holder.mEmailTime.getText().toString());
-                mIntent.putExtra("leida", mEmailData.get(holder.getAdapterPosition()).getLeida());
-                mIntent.putExtra("eliminado", mEmailData.get(holder.getAdapterPosition()).getEliminado());
-                mIntent.putExtra("estado", mEmailData.get(holder.getAdapterPosition()).getEstado());
-                mIntent.putExtra("adjuntos", mEmailData.get(holder.getAdapterPosition()).getAdjuntos());
-                if(holder.mFavorite.getColorFilter() != null) {
-                    mIntent.putExtra("importante", true);
-                } else {
-                    mIntent.putExtra("importante", false);
-                }
-                mContext.startActivity(mIntent);
-                ((Activity)  mContext).overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        // Listener de cada celda
+        holder.mLayout.setOnClickListener(view -> {
+            Intent mIntent;
+            if(mData.get(holder.getAdapterPosition()).getEstado().equals("recibida")) {
+                mIntent = new Intent(mContext, ComunicacionDetalleRecibida.class);
+            } else if (mData.get(holder.getAdapterPosition()).getEstado().equals("enviada")) {
+                mIntent = new Intent(mContext, ComunicacionDetalleEnviada.class);
+            } else {
+                mIntent = new Intent(mContext, ComunicacionDetallePapelera.class);
             }
+            setIntentExtrasAndStartActivity(mIntent, holder);
         });
     }
 
     public void updateData(List<ComunicacionDTO> data) {
-        this.mEmailData = data;
+        this.mData = data;
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return mEmailData.size();
+        return mData.size();
+    }
+
+    // Iniciamos el intent creado por el listener según el tipo de comunicación
+    private void setIntentExtrasAndStartActivity(Intent mIntent, ComunicacionesViewHolder holder) {
+        mIntent.putExtra("id_com", mData.get(holder.getAdapterPosition()).getIdComunicacion());
+        mIntent.putExtra("remite", holder.mRemite.getText().toString());
+        mIntent.putExtra("id_remite", mData.get(holder.getAdapterPosition()).getIdRemite());
+        mIntent.putExtra("tipo_remite", mData.get(holder.getAdapterPosition()).getTipoRemite());
+        mIntent.putExtra("destino", mData.get(holder.getAdapterPosition()).getNombreDestino());
+        mIntent.putExtra("id_destino", mData.get(holder.getAdapterPosition()).getIdDestino());
+        mIntent.putExtra("id_alumnoAsociado", mData.get(holder.getAdapterPosition()).getIdAlumnoAsociado());
+        mIntent.putExtra("asunto", holder.mAsunto.getText().toString());
+        mIntent.putExtra("texto", holder.mCuerpo.getText().toString());
+        mIntent.putExtra("fecha", holder.mHora.getText().toString());
+        mIntent.putExtra("leida", mData.get(holder.getAdapterPosition()).getLeida());
+        mIntent.putExtra("eliminado", mData.get(holder.getAdapterPosition()).getEliminado());
+        mIntent.putExtra("estado", mData.get(holder.getAdapterPosition()).getEstado());
+        mIntent.putExtra("adjuntos", mData.get(holder.getAdapterPosition()).getAdjuntos());
+        mIntent.putExtra("importante", holder.mImportante.getColorFilter() != null);
+        mContext.startActivity(mIntent);
+        ((Activity)  mContext).overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 }
 
