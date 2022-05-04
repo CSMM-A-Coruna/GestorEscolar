@@ -283,7 +283,7 @@ public class ComunicacionesFragment extends Fragment {
             List<ComunicacionDTO> lista = new ArrayList<>();
             switch (propiedadFiltrada) {
                 case "No leídos":
-                    chipFiltro.setText(alumnoFiltrado + " - " + propiedadFiltrada);
+                    chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
                     allList.forEach(data -> {
                         if (data.getLeida().equals("null")) {
                             lista.add(data);
@@ -291,7 +291,7 @@ public class ComunicacionesFragment extends Fragment {
                     });
                     break;
                 case "Leídos":
-                    chipFiltro.setText(alumnoFiltrado + " - " + propiedadFiltrada);
+                    chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
                     allList.forEach(data -> {
                         if (!data.getLeida().equals("null")) {
                             lista.add(data);
@@ -299,7 +299,7 @@ public class ComunicacionesFragment extends Fragment {
                     });
                     break;
                 case "Importantes":
-                    chipFiltro.setText(alumnoFiltrado + " - " + propiedadFiltrada);
+                    chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
                     allList.forEach(data -> {
                         if (data.isImportante()) {
                             lista.add(data);

@@ -6,13 +6,12 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Browser;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
@@ -33,7 +32,7 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
     int idDestino;
     String leida;
     String eliminado;
-    String adjuntos[];
+    String[] adjuntos;
     Chip chipAdjunto;
 
     @Override
@@ -72,45 +71,39 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
                     favIcon.setTint(getResources().getColor(R.color.importante));
                     favIconMarked = true;
                 }
-                chipAdjunto.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("user", Context.MODE_PRIVATE);
-                        String savedtoken= sharedPref.getString("token",null);
-                        Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/download").buildUpon()
-                                .appendQueryParameter("file_name", adjuntos[0])
-                                .appendQueryParameter("id_comunicacion", String.valueOf(idComunicacion))
-                                .appendQueryParameter("auth", savedtoken)
-                                .build();
-                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                        startActivity(intent);
-                    }
+                chipAdjunto.setOnClickListener(view -> {
+                    SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+                    String savedtoken= sharedPref.getString("token",null);
+                    Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/download").buildUpon()
+                            .appendQueryParameter("file_name", adjuntos[0])
+                            .appendQueryParameter("id_comunicacion", String.valueOf(idComunicacion))
+                            .appendQueryParameter("auth", savedtoken)
+                            .build();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
                 });
-                topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if(item.getItemId() == R.id.iconTopFavorite) {
-                            toggleFavIcon();
-                        } else if(item.getItemId() == R.id.iconResponder) {
-                            Intent intent = new Intent(getApplicationContext(), ComunicacionDetalleResponder.class);
-                            intent.putExtra("id_destino", mBundle.getInt("id_remite"));
-                            intent.putExtra("tipo_destino", mBundle.getString("tipo_remite"));
-                            intent.putExtra("destino", mBundle.getString("remite"));
-                            intent.putExtra("id_remite", idDestino);
-                            intent.putExtra("remite", mBundle.getString("destino"));
-                            intent.putExtra("asunto", mBundle.getString("asunto"));
-                            intent.putExtra("texto", mBundle.getString("texto"));
-                            intent.putExtra("fecha", mBundle.getString("fecha"));
-                            intent.putExtra("id_alumnoAsociado", mBundle.getInt("id_alumnoAsociado"));
-                            startActivity(intent);
-                        } else if(item.getItemId() == R.id.eliminar) {
-                            // Fix del issue #15
-                            updateServer("no_importante");
-                            updateServer("eliminado");
-                            finish();
-                        }
-                        return false;
+                topBar.setOnMenuItemClickListener(item -> {
+                    if(item.getItemId() == R.id.iconTopFavorite) {
+                        toggleFavIcon();
+                    } else if(item.getItemId() == R.id.iconResponder) {
+                        Intent intent = new Intent(getApplicationContext(), ComunicacionDetalleResponder.class);
+                        intent.putExtra("id_destino", mBundle.getInt("id_remite"));
+                        intent.putExtra("tipo_destino", mBundle.getString("tipo_remite"));
+                        intent.putExtra("destino", mBundle.getString("remite"));
+                        intent.putExtra("id_remite", idDestino);
+                        intent.putExtra("remite", mBundle.getString("destino"));
+                        intent.putExtra("asunto", mBundle.getString("asunto"));
+                        intent.putExtra("texto", mBundle.getString("texto"));
+                        intent.putExtra("fecha", mBundle.getString("fecha"));
+                        intent.putExtra("id_alumnoAsociado", mBundle.getInt("id_alumnoAsociado"));
+                        startActivity(intent);
+                    } else if(item.getItemId() == R.id.eliminar) {
+                        // Fix del issue #15
+                        updateServer("no_importante");
+                        updateServer("eliminado");
+                        finish();
                     }
+                    return false;
                 });
                 if(leida.equals("null")) {
                     updateServer("leida");
@@ -120,12 +113,7 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
             }
         }
 
-        volverButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        volverButton.setOnClickListener(view -> finish());
     }
 
     private void toggleFavIcon() {

@@ -52,7 +52,7 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
             String nombre = mData.get(holder.getAdapterPosition()).getNombreDestino();
             String[] splited = nombre.split("\\s+");
             String nombreSplit = splited[0] + " " +splited[1];
-            holder.mRemite.setText("Para: " + nombreSplit);
+            holder.mRemite.setText(String.format("Para: %s", nombreSplit));
         } else {
             String nombre = mData.get(holder.getAdapterPosition()).getNombreRemite();
             String[] splited = nombre.split("\\s+");
@@ -121,13 +121,7 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
         });
 
         //!TODO Implementar selector para borrados en masa...
-        holder.mLayout.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-
-                return false;
-            }
-        });
+        holder.mLayout.setOnLongClickListener(view -> false);
     }
 
     public void updateData(List<ComunicacionDTO> data) {
