@@ -60,8 +60,8 @@ public class ComunicacionesFragment extends Fragment {
     private String currentNav;
     private boolean isScrolling;
 
-    final String[] alumnoFiltrado = {"Todos"};
-    final String[] propiedadFiltrada = {"Todos"};
+    String alumnoFiltrado = "Todos";
+    String propiedadFiltrada = "Todos";
 
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,9 +82,9 @@ public class ComunicacionesFragment extends Fragment {
 
         // Animaciones de los botones
         btnFiltrarPorAlumno.setAlpha(0f);
-        btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1500);
+        btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1000);
         btnFiltrarPorPropiedad.setAlpha(0f);
-        btnFiltrarPorPropiedad.animate().alpha(1f).setDuration(1500);
+        btnFiltrarPorPropiedad.animate().alpha(1f).setDuration(1000);
 
         // Animación fab
         nuevaComButton.setScaleX(0);
@@ -148,7 +148,7 @@ public class ComunicacionesFragment extends Fragment {
             popupMenu.setOnMenuItemClickListener(item -> {
                 for(int i=0; i<arrayAlumnos.length; i++) {
                     if(arrayAlumnosSoloNombre[i].contentEquals(item.getTitle())) {
-                        alumnoFiltrado[0] = arrayAlumnos[i];
+                        alumnoFiltrado = arrayAlumnos[i];
                     }
                 }
                 filterData();
@@ -170,7 +170,7 @@ public class ComunicacionesFragment extends Fragment {
             // PopUp
             PopupMenu popupMenu = new PopupMenu(getContext(), view);
             popupMenu.setOnMenuItemClickListener(item -> {
-                propiedadFiltrada[0] = String.valueOf(item.getTitle());
+                propiedadFiltrada = String.valueOf(item.getTitle());
                 filterData();
                 return true;
             });
@@ -270,22 +270,20 @@ public class ComunicacionesFragment extends Fragment {
             }
             return false;
         });*/
-
-        cargarDatos();
         return root;
     }
 
     private void filterData() {
-        if(propiedadFiltrada[0].equals("Todos") && alumnoFiltrado[0].equals("Todos")) {
+        if(propiedadFiltrada.equals("Todos") && alumnoFiltrado.equals("Todos")) {
             updateData(allList);
             chipFiltro.setVisibility(View.GONE);
-        } else if(!alumnoFiltrado[0].equals("Todos")) {
+        } else if(!alumnoFiltrado.equals("Todos")) {
             chipFiltro.setVisibility(View.VISIBLE);
-            chipFiltro.setText(alumnoFiltrado[0]);
+            chipFiltro.setText(alumnoFiltrado);
             List<ComunicacionDTO> lista = new ArrayList<>();
-            switch (propiedadFiltrada[0]) {
+            switch (propiedadFiltrada) {
                 case "No leídos":
-                    chipFiltro.setText(alumnoFiltrado[0] + " - " + propiedadFiltrada[0]);
+                    chipFiltro.setText(alumnoFiltrado + " - " + propiedadFiltrada);
                     allList.forEach(data -> {
                         if (data.getLeida().equals("null")) {
                             lista.add(data);
@@ -293,7 +291,7 @@ public class ComunicacionesFragment extends Fragment {
                     });
                     break;
                 case "Leídos":
-                    chipFiltro.setText(alumnoFiltrado[0] + " - " + propiedadFiltrada[0]);
+                    chipFiltro.setText(alumnoFiltrado + " - " + propiedadFiltrada);
                     allList.forEach(data -> {
                         if (!data.getLeida().equals("null")) {
                             lista.add(data);
@@ -301,7 +299,7 @@ public class ComunicacionesFragment extends Fragment {
                     });
                     break;
                 case "Importantes":
-                    chipFiltro.setText(alumnoFiltrado[0] + " - " + propiedadFiltrada[0]);
+                    chipFiltro.setText(alumnoFiltrado + " - " + propiedadFiltrada);
                     allList.forEach(data -> {
                         if (data.isImportante()) {
                             lista.add(data);
@@ -312,12 +310,12 @@ public class ComunicacionesFragment extends Fragment {
                     lista.addAll(allList);
                     break;
             }
-            filtroAlumno(lista, alumnoFiltrado[0]);
+            filtroAlumno(lista, alumnoFiltrado);
         } else {
             toggleList.clear();
             chipFiltro.setVisibility(View.VISIBLE);
-            chipFiltro.setText(propiedadFiltrada[0]);
-            switch (propiedadFiltrada[0]) {
+            chipFiltro.setText(propiedadFiltrada);
+            switch (propiedadFiltrada) {
                 case "No leídos":
                     allList.forEach(data -> {
                         if (data.getLeida().equals("null")) {
@@ -368,7 +366,7 @@ public class ComunicacionesFragment extends Fragment {
 
     private void cargarDatos() {
         // Prevenimos errores al recargar nuevas comunicaciones y que estén filtradas (mal rendimiento)
-        if(propiedadFiltrada[0].equals("Todos") && alumnoFiltrado[0].equals("Todos")) {
+        if(propiedadFiltrada.equals("Todos") && alumnoFiltrado.equals("Todos")) {
             new CargarNuevasComunicaciones().execute();
         } else {
             swipLayout.setRefreshing(false);
@@ -485,7 +483,7 @@ public class ComunicacionesFragment extends Fragment {
                     }
                     Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
                 } else if(statusCode==404) {
-                    Snackbar.make(mRecyclerView, "No has recibido ninguna comunicación", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mRecyclerView, "No has enviado ninguna comunicación", Snackbar.LENGTH_SHORT).show();
                 } else {
                     Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
                 }
@@ -527,7 +525,7 @@ public class ComunicacionesFragment extends Fragment {
                         e.printStackTrace();
                     }
                 } else {
-                    Snackbar.make(mRecyclerView, "No has recibido ninguna comunicación", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mRecyclerView, "No tienes ninguna comunicación en la papelera", Snackbar.LENGTH_SHORT).show();
                 }
                 updateData(allList);
             }
@@ -536,8 +534,8 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void reiniciarFiltro() {
-        propiedadFiltrada[0] = "Todos";
-        alumnoFiltrado[0] = "Todos";
+        propiedadFiltrada = "Todos";
+        alumnoFiltrado = "Todos";
         chipFiltro.setText("");
         chipFiltro.setVisibility(View.GONE);
     }
