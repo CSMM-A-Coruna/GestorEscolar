@@ -1,0 +1,30 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:key="notifications_category"
+        app:title="Notificaciones">
+
+        <SwitchPreferenceCompat
+            app:key="notificaciones"
+            app:title="Habilitar notificaciones"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="info_category"
+        app:title="Información de la aplicación">
+
+        <Preference
+            app:key="version_name"
+            app:summary="..."
+            app:title="..."/>
+
+        <Preference
+            app:key="version_code"
+            app:summary="..."
+            app:title="..."/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -72,6 +72,30 @@
         tools:layout="@layout/ajustes_fragment" />
 
     <fragment
+        android:id="@+id/nav_ajustes_recursosadicionales"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.RecursosAdicionalesFragment"
+        android:label="Recursos Adicionales"
+        tools:layout="@layout/ajustes_recursosadicionales_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_tucuenta"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.TuCuentaFragment"
+        android:label="Tu Cuenta"
+        tools:layout="@layout/ajustes_tucuenta_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_seguridad"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.SeguridadFragment"
+        android:label="Seguridad y acceso"
+        tools:layout="@layout/ajustes_seguridad_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_notificaciones"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.NotificacionesFragment"
+        android:label="Notificaciones"
+        tools:layout="@layout/ajustes_notificaciones_fragment" />
+
+    <fragment
         android:id="@+id/nav_cerrarsesion"
         android:name="com.csmm.gestorescolar.screens.main.ui.cerrarsesion.CerrarsesionFragment"
         android:label="Cerrar Sesión"
