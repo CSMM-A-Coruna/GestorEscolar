@@ -64,8 +64,7 @@ public class ComunicacionesFragment extends Fragment {
 
     private String alumnoFiltrado = "Todos";
     private String propiedadFiltrada = "Todos";
-
-    boolean firstAttempt = true;
+    
 
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -274,7 +273,6 @@ public class ComunicacionesFragment extends Fragment {
             }
             return false;
         });*/
-        cargarDatos();
         return root;
     }
 
@@ -366,13 +364,7 @@ public class ComunicacionesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Handle si es la primera vez que se crea el fragment, porque resulta que salta el onResume también (ni idea de porqué).
-        // Si no lo controlasemos se ejecutarían dos cargarDatos() y genera errores.
-        if(firstAttempt) {
-            firstAttempt = false;
-        } else {
-            cargarDatos();
-        }
+        cargarDatos();
     }
 
     private void cargarDatos() {
