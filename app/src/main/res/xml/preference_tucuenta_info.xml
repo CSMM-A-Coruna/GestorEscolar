@@ -1,0 +1,28 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:key="usuario"
+        app:title="Usuario" />
+
+    <Preference
+        app:key="nombre_completo"
+        app:title="Nombre completo" />
+
+    <Preference
+        app:key="fecha_nacimiento"
+        app:title="Fecha de nacimiento" />
+
+    <Preference
+        app:key="dni"
+        app:title="DNI" />
+
+    <Preference
+        app:key="accesos"
+        app:title="Accesos totales" />
+
+    <Preference
+        app:key="alumnos"
+        app:title="Alumnos asociados" />
+
+</PreferenceScreen>
