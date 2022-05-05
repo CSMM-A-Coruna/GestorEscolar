@@ -1,30 +1,28 @@
 package com.csmm.gestorescolar.screens.main.ui.ajustes.detalle;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import androidx.annotation.Nullable;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+import com.csmm.gestorescolar.BuildConfig;
+import com.csmm.gestorescolar.R;
 
-import com.csmm.gestorescolar.databinding.AjustesRecursosadicionalesFragmentBinding;
 
-public class RecursosAdicionalesFragment extends Fragment {
+public class RecursosAdicionalesFragment extends PreferenceFragmentCompat {
 
-    private AjustesRecursosadicionalesFragmentBinding binding;
+    @Override
+    public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
+        setPreferencesFromResource(R.xml.preference_recursosadicionales, rootKey);
 
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        binding = AjustesRecursosadicionalesFragmentBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        return root;
+        Preference mVersionName = getPreferenceManager().findPreference("version_name");
+        mVersionName.setSummary(BuildConfig.VERSION_NAME);
     }
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 }

@@ -1,29 +1,44 @@
 <PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+    <Preference
+        app:key="version_name"
+        app:icon="@drawable/ic_info"
+        app:summary="..."
+        app:title="Versión"/>
+
     <PreferenceCategory
-        app:key="notifications_category"
-        app:title="Notificaciones">
+        app:key="obtener_ayuda"
+        app:title="Obtener ayuda">
 
         <SwitchPreferenceCompat
-            app:key="notificaciones"
-            app:title="Habilitar notificaciones"/>
+            app:key="informa_fallos"
+            app:icon="@drawable/ic_bug"
+            app:title="Enviar informe de fallos"
+            app:defaultValue="true"
+            app:summary="Enviar automáticamente los informes de fallos al equipo de desarrollo del CSMM."/>
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:key="info_category"
-        app:title="Información de la aplicación">
+        app:key="legal_category"
+        app:title="Legal">
 
         <Preference
-            app:key="version_name"
-            app:summary="..."
-            app:title="..."/>
+            app:key="condiciones_de_uso"
+            app:title="Condiciones de uso"
+            app:icon="@drawable/ic_uso"/>
 
         <Preference
-            app:key="version_code"
-            app:summary="..."
-            app:title="..."/>
+            app:key="politica_privacidad"
+            app:title="Política de privacidad"
+            app:icon="@drawable/ic_privacidad"/>
+
+        <Preference
+            app:key="avisos_legales"
+            app:title="Avisos legales"
+            app:icon="@drawable/ic_legal"/>
 
     </PreferenceCategory>
 
