@@ -1,16 +1,19 @@
 package com.csmm.gestorescolar.screens.main.ui.ajustes.detalle;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
+import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.handlers.UpdatePreferenceResponseHandler;
 
 import java.util.ArrayList;
@@ -37,6 +40,8 @@ public class NotificacionesFragment extends PreferenceFragmentCompat {
         arrayPreferences.add(getPreferenceManager().findPreference("not_extraescolares_email"));
         arrayPreferences.add(getPreferenceManager().findPreference("not_enfermeria_email"));
 
+        // Chequeamos antes de nada si hay cambios en el sharedPreferences
+        arrayPreferences.forEach(this::checkSharedPreferences);
         // Creamos un listener cada vez que el switch cambia de estado para cada elemento de la lista
         arrayPreferences.forEach(this::setUpOnChangeListener);
 
@@ -57,8 +62,13 @@ public class NotificacionesFragment extends PreferenceFragmentCompat {
         });
     }
 
+    private void checkSharedPreferences(SwitchPreferenceCompat preference) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        preference.setChecked(sharedPreferences.getBoolean(preference.getKey(), false));
+    }
+
     // Cuando se detecta un cambio, se actualiza el servidor
-    private void setUpOnChangeListener(Preference preference) {
+    private void setUpOnChangeListener(SwitchPreferenceCompat preference) {
         preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {

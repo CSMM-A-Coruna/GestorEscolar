@@ -27,13 +27,14 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private MainActivityBinding binding;
-    private SharedPreferences preferences;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +42,10 @@ public class MainActivity extends AppCompatActivity {
         binding = MainActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        preferences = getSharedPreferences("user", MODE_PRIVATE);
-        String nombre = preferences.getString("nombre", null);
-        String apellido1 = preferences.getString("apellido1", null);
-        String apellido2 = preferences.getString("apellido2", null);
+        sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
+        String nombre = sharedPreferences.getString("nombre", null);
+        String apellido1 = sharedPreferences.getString("apellido1", null);
+        String apellido2 = sharedPreferences.getString("apellido2", null);
 
         setSupportActionBar(binding.appBarMain.toolbar);
 
@@ -116,12 +117,6 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }
-
-    private void logOut() {
-        preferences.edit().clear().commit();
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
     }
 
 /*    @Override

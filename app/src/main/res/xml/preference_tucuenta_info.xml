@@ -3,26 +3,32 @@
 
     <Preference
         app:key="usuario"
-        app:title="Usuario" />
+        app:title="Usuario"
+        app:icon="@drawable/ic_usuario"/>
 
     <Preference
         app:key="nombre_completo"
-        app:title="Nombre completo" />
+        app:title="Nombre completo"
+        app:icon="@drawable/ic_dni2"/>
 
     <Preference
         app:key="fecha_nacimiento"
-        app:title="Fecha de nacimiento" />
+        app:title="Fecha de nacimiento"
+        app:icon="@drawable/ic_fecha_nacimiento"/>
 
     <Preference
         app:key="dni"
-        app:title="DNI" />
+        app:title="DNI"
+        app:icon="@drawable/ic_dni"/>
 
     <Preference
         app:key="accesos"
-        app:title="Accesos totales" />
+        app:title="Accesos totales"
+        app:icon="@drawable/ic_accesos"/>
 
     <Preference
         app:key="alumnos"
-        app:title="Alumnos asociados" />
+        app:title="Alumnos asociados"
+        app:icon="@drawable/ic_alumno"/>
 
 </PreferenceScreen>

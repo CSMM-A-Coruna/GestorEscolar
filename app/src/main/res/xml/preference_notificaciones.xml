@@ -8,24 +8,19 @@
         app:icon="@drawable/ic_notification" >
         <SwitchPreferenceCompat
             app:key="not_comunicaciones_push"
-            app:title="Comunicaciones"
-            app:defaultValue="true" />
+            app:title="Comunicaciones" />
         <SwitchPreferenceCompat
             app:key="not_calificaciones_push"
-            app:title="Calificaciones"
-            app:defaultValue="true" />
+            app:title="Calificaciones"/>
         <SwitchPreferenceCompat
             app:key="not_entrevistas_push"
-            app:title="Entrevistas"
-            app:defaultValue="true" />
+            app:title="Entrevistas" />
         <SwitchPreferenceCompat
             app:key="not_extraescolares_push"
-            app:title="Extraescolares"
-            app:defaultValue="true" />
+            app:title="Extraescolares" />
         <SwitchPreferenceCompat
             app:key="not_enfermeria_push"
-            app:title="Enfermería"
-            app:defaultValue="true" />
+            app:title="Enfermería" />
     </PreferenceCategory>
 
 

@@ -11,9 +11,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.client.dtos.DestinoDTO;
+import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
 import com.csmm.gestorescolar.client.handlers.CompareDataResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseHandler;
@@ -21,6 +23,7 @@ import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseH
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
 import com.csmm.gestorescolar.client.handlers.GetDestinosResponseHandler;
+import com.csmm.gestorescolar.client.handlers.GetPreferencesResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
 import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostLoginResponseHandler;
@@ -517,6 +520,32 @@ public class RestClient {
                 REST_API_BASE_URL + "/preferences/update",
                 body,
                 response -> {}, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
+        queue.add(request);
+    }
+
+    public void getPreferences(GetPreferencesResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        int userId = sharedPref.getInt("id", 0);
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
+                REST_API_BASE_URL + "/preferences?id_usuario=" + userId,
+                null,
+                response -> {
+                    PreferencesDTO preferencesDTO = new PreferencesDTO(response);
+                    handler.requestDidComplete(preferencesDTO);
+                }, new DefaultErrorHandler(handler)
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
