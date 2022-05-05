@@ -7,7 +7,7 @@
         app:title="Autentificación en dos fases">
 
         <SwitchPreferenceCompat
-            app:key="mensaje_texto"
+            app:key="autentificacion_dos_fases"
             app:icon="@drawable/ic_bug"
             app:title="Mensaje de texto"
             app:summary="Usa tu teléfono móvil para recibir un mensaje con un código de autentificación que deberás introducir cuando inicies sesión."/>
