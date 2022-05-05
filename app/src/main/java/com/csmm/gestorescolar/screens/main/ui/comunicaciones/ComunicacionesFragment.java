@@ -61,10 +61,11 @@ public class ComunicacionesFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private String currentNav;
     private boolean isScrolling;
+    PopupMenu popupMenuFiltroPropiedad, popupMenuFiltroAlumno;
 
     private String alumnoFiltrado = "Todos";
     private String propiedadFiltrada = "Todos";
-    
+
 
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -147,8 +148,8 @@ public class ComunicacionesFragment extends Fragment {
             // Animación
             btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_arriba));
             // PopUp
-            PopupMenu popupMenu = new PopupMenu(getContext(), view);
-            popupMenu.setOnMenuItemClickListener(item -> {
+            popupMenuFiltroAlumno = new PopupMenu(getContext(), view);
+            popupMenuFiltroAlumno.setOnMenuItemClickListener(item -> {
                 for(int i=0; i<arrayAlumnos.length; i++) {
                     if(arrayAlumnosSoloNombre[i].contentEquals(item.getTitle())) {
                         alumnoFiltrado = arrayAlumnos[i];
@@ -159,32 +160,32 @@ public class ComunicacionesFragment extends Fragment {
             });
 
             for (String s : arrayAlumnosSoloNombre) {
-                popupMenu.getMenu().add(s);
+                popupMenuFiltroAlumno.getMenu().add(s);
             }
-            popupMenu.show();
+            popupMenuFiltroAlumno.show();
 
             // Animación al cerrar el menu
-            popupMenu.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
+            popupMenuFiltroAlumno.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
         });
 
         btnFiltrarPorPropiedad.setOnClickListener(view -> {
             // Animación
             btnFiltrarPorPropiedad.animate().setDuration(300).rotationBy(90f).start();
             // PopUp
-            PopupMenu popupMenu = new PopupMenu(getContext(), view);
-            popupMenu.setOnMenuItemClickListener(item -> {
+            popupMenuFiltroPropiedad = new PopupMenu(getContext(), view);
+            popupMenuFiltroPropiedad.setOnMenuItemClickListener(item -> {
                 propiedadFiltrada = String.valueOf(item.getTitle());
                 filterData();
                 return true;
             });
             String[] filtrosDisponibles = {"Todos", "No leídos", "Leídos", "Importantes"};
             for (String s : filtrosDisponibles) {
-                popupMenu.getMenu().add(s);
+                popupMenuFiltroPropiedad.getMenu().add(s);
             }
-            popupMenu.show();
+            popupMenuFiltroPropiedad.show();
 
             // Animación al cerrar el menu
-            popupMenu.setOnDismissListener(popupMenu12 -> btnFiltrarPorPropiedad.animate().setDuration(300).rotationBy(-90f).start());
+            popupMenuFiltroPropiedad.setOnDismissListener(popupMenu12 -> btnFiltrarPorPropiedad.animate().setDuration(300).rotationBy(-90f).start());
         });
 
         // Asignamos el RecyclerView de la lista de comunicaciones
@@ -368,11 +369,15 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void cargarDatos() {
-        // Prevenimos errores al recargar nuevas comunicaciones y que estén filtradas (mal rendimiento)
-       if(propiedadFiltrada.equals("Todos") && alumnoFiltrado.equals("Todos")) {
+        // Prevenimos errores al recargar nuevas comunicaciones y que estén filtradas. PopUps nulos (Se ha refrescado antes de hacer llenar el menu)
+        try {
+            if(!propiedadFiltrada.equals("Todos") || !alumnoFiltrado.equals("Todos")) {
+                reiniciarFiltro();
+            }
             new CargarNuevasComunicaciones().execute();
-        } else {
+        } catch (Exception e) {
             swipLayout.setRefreshing(false);
+            e.printStackTrace();
         }
     }
 
@@ -416,7 +421,6 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void updateToRecibidos() {
-        reiniciarFiltro();
         allList.clear();
         toggleList.clear();
         RestClient.getInstance(getContext()).getComunicacionesRecibidas(new GetComunicacionesRecibidasResponseHandler() {
@@ -456,7 +460,6 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void updateToEnviadas() {
-        reiniciarFiltro();
         allList.clear();
         toggleList.clear();
         RestClient.getInstance(getContext()).getComunicacionesEnviadas(new GetComunicacionesEnviadasResponseHandler() {
@@ -498,7 +501,6 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void updateToPapelera() {
-        reiniciarFiltro();
         allList.clear();
         toggleList.clear();
         RestClient.getInstance(getContext()).getComunicacionesBorradas(new GetComunicacionesBorradasResponseHandler() {
@@ -539,7 +541,11 @@ public class ComunicacionesFragment extends Fragment {
 
     private void reiniciarFiltro() {
         propiedadFiltrada = "Todos";
+        popupMenuFiltroPropiedad.getMenu().findItem(0).setChecked(true);
+        System.out.println(popupMenuFiltroPropiedad.getMenu().findItem(0).isEnabled());
         alumnoFiltrado = "Todos";
+        popupMenuFiltroAlumno.getMenu().findItem(0).setChecked(true);
+        System.out.println(popupMenuFiltroAlumno.getMenu().findItem(0).isEnabled());
         chipFiltro.setText("");
         chipFiltro.setVisibility(View.GONE);
     }
