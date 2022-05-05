@@ -6,25 +6,27 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 
+import com.csmm.gestorescolar.BuildConfig;
+import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.databinding.AjustesRecursosadicionalesFragmentBinding;
 
-public class SeguridadFragment extends Fragment {
+public class SeguridadFragment extends PreferenceFragmentCompat {
 
-    private AjustesRecursosadicionalesFragmentBinding binding;
+    @Override
+    public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
+        setPreferencesFromResource(R.xml.preference_seguridad, rootKey);
 
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        binding = AjustesRecursosadicionalesFragmentBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        return root;
     }
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 }
+

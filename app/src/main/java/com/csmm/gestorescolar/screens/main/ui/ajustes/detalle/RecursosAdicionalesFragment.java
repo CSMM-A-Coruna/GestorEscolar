@@ -17,6 +17,7 @@ public class RecursosAdicionalesFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.preference_recursosadicionales, rootKey);
 
         Preference mVersionName = getPreferenceManager().findPreference("version_name");
+        assert mVersionName != null;
         mVersionName.setSummary(BuildConfig.VERSION_NAME);
     }
 

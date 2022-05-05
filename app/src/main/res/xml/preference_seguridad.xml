@@ -1,0 +1,29 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <PreferenceCategory
+        app:key="autentificacion_fases_category"
+        app:title="Autentificación en dos fases">
+
+        <SwitchPreferenceCompat
+            app:key="mensaje_texto"
+            app:icon="@drawable/ic_bug"
+            app:title="Mensaje de texto"
+            app:summary="Usa tu teléfono móvil para recibir un mensaje con un código de autentificación que deberás introducir cuando inicies sesión."/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="proteccion_contraseña_category"
+        app:title="Protección con contraseña adicional">
+
+        <SwitchPreferenceCompat
+            app:key="proteccion_restablecimiento"
+            app:icon="@drawable/ic_seguridad"
+            app:title="Protección de restablecimiento de contraseña"
+            app:summary="Deberás confirmar tu dirección de correo o teléfono para poder restablecer la contraseña." />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
