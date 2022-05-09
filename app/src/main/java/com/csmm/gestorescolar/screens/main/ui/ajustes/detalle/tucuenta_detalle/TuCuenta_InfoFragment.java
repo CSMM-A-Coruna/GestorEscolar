@@ -1,4 +1,4 @@
-package com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.cuentadetalle;
+package com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.tucuenta_detalle;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -17,6 +17,7 @@ import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.client.dtos.DestinoDTO;
 import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
+import com.csmm.gestorescolar.client.handlers.CheckPasswordResponseHandler;
 import com.csmm.gestorescolar.client.handlers.CompareDataResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
@@ -51,7 +52,7 @@ import java.util.Map;
 
 public class RestClient {
 
-    public static final String REST_API_BASE_URL = "http://192.168.28.23:3000/v1";
+    public static final String REST_API_BASE_URL = "http://192.168.11.15:3000/v1";
     //public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
     private RequestQueue queue;
     private Context context;
@@ -545,6 +546,72 @@ public class RestClient {
                 response -> {
                     PreferencesDTO preferencesDTO = new PreferencesDTO(response);
                     handler.requestDidComplete(preferencesDTO);
+                }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
+        queue.add(request);
+    }
+
+    public void checkPassword(String password, CheckPasswordResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        int userId = sharedPref.getInt("id", 0);
+        JSONObject body = new JSONObject();
+        try {
+            body.put("id_usuario", userId);
+            body.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                REST_API_BASE_URL + "/auth/check_pass",
+                body,
+                response -> {
+                    handler.requestDidComplete();
+                }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
+        queue.add(request);
+    }
+
+    public void changePassword(String password, CheckPasswordResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        int userId = sharedPref.getInt("id", 0);
+        JSONObject body = new JSONObject();
+        try {
+            body.put("id_usuario", userId);
+            body.put("new_password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                REST_API_BASE_URL + "/auth/change_password",
+                body,
+                response -> {
+                    handler.requestDidComplete();
                 }, new DefaultErrorHandler(handler)
         ) {
             @Override

@@ -85,8 +85,14 @@
 
     <fragment
         android:id="@+id/nav_ajustes_tucuenta_info"
-        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.cuentadetalle.TuCuenta_InfoFragment"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.tucuenta_detalle.TuCuenta_InfoFragment"
         android:label="Información de la cuenta"
+        tools:layout="@layout/ajustes_tucuenta_info_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_tucuenta_cambiocontraseña"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.tucuenta_detalle.TuCuenta_CambioContrasenaFragment"
+        android:label="Cambio de contraseña"
         tools:layout="@layout/ajustes_tucuenta_info_fragment" />
 
     <fragment

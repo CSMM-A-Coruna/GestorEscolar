@@ -9,7 +9,7 @@
 
     <Preference
         app:key="cambio_contraseña"
-        app:title="Cambio tu contraseña"
+        app:title="Cambia tu contraseña"
         app:summary="Cambia tu contraseña en cualquier momento."
         app:icon="@drawable/ic_seguridad" />
 
