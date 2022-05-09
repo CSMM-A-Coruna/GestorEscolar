@@ -1,11 +1,7 @@
 package com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.tucuenta_detalle;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,14 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.CheckPasswordResponseHandler;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
-import java.util.Objects;
 
 public class TuCuenta_CambioContrasenaFragment extends Fragment {
 
@@ -70,18 +68,23 @@ public class TuCuenta_CambioContrasenaFragment extends Fragment {
                             if(contrasenaNueva.getText().toString().isEmpty() || contrasenaNuevaRepeticion.getText().toString().isEmpty()) {
                                 Snackbar.make(cambiarContrasenaBtn, "Rellena todos los campos", Snackbar.LENGTH_SHORT).show();
                             } else {
-                                RestClient.getInstance(requireContext()).changePassword(contrasenaNueva.getText().toString(), new CheckPasswordResponseHandler() {
-                                    @Override
-                                    public void requestDidComplete() {
-                                        Snackbar.make(cambiarContrasenaBtn, "Contraseña cambiada con éxito", Snackbar.LENGTH_SHORT).show();
-                                        handler.postDelayed(finishAsync, 1500);
-                                    }
+                                if(contrasenaActual.getText().toString().equals(contrasenaNueva.getText().toString())) {
+                                    Snackbar.make(cambiarContrasenaBtn, "La nueva contraseña es la misma que la actual", Snackbar.LENGTH_SHORT).show();
+                                } else {
+                                    RestClient.getInstance(requireContext()).changePassword(contrasenaNueva.getText().toString(), new CheckPasswordResponseHandler() {
+                                        @Override
+                                        public void requestDidComplete() {
+                                            Snackbar.make(cambiarContrasenaBtn, "Contraseña cambiada con éxito", Snackbar.LENGTH_SHORT).show();
+                                            cambiarContrasenaBtn.setClickable(false);
+                                            handler.postDelayed(finishAsync, 1500);
+                                        }
 
-                                    @Override
-                                    public void requestDidFail(int statusCode) {
-                                        Snackbar.make(cambiarContrasenaBtn, "Algo ha salido mal...", Snackbar.LENGTH_SHORT).show();
-                                    }
-                                });
+                                        @Override
+                                        public void requestDidFail(int statusCode) {
+                                            Snackbar.make(cambiarContrasenaBtn, "Algo ha salido mal...", Snackbar.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
                             }
                         } else {
                             Snackbar.make(cambiarContrasenaBtn, "Las contraseñas no coinciden...", Snackbar.LENGTH_SHORT).show();
@@ -114,7 +117,80 @@ public class TuCuenta_CambioContrasenaFragment extends Fragment {
                 }
             }
         });
+
+        contrasenaNueva.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Quitamos el callback para solo llamarlo una vez
+                handler.removeCallbacks(checkNewPasswordsMatch);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Evitamos llamar al evento cuando esté vacío
+                if (s.length() > 0) {
+                    last_text_edit = System.currentTimeMillis();
+                    handler.postDelayed(checkNewPasswordsMatch, delay);
+                }
+            }
+        });
+
+        contrasenaNuevaRepeticion.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Quitamos el callback para solo llamarlo una vez
+                handler.removeCallbacks(checkNewPasswordsMatch);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Evitamos llamar al evento cuando esté vacío
+                if (s.length() > 0) {
+                    last_text_edit = System.currentTimeMillis();
+                    handler.postDelayed(checkNewPasswordsMatch, delay);
+                }
+            }
+        });
     }
+
+    private Runnable checkNewPasswordsMatch = new Runnable() {
+        @Override
+        public void run() {
+            if (System.currentTimeMillis() > (last_text_edit + delay - 500)) {
+                if(contrasenaNueva.getText()!=null && contrasenaNuevaRepeticion.getText()!=null) {
+                    if(contrasenaNueva.getText().toString().equals(contrasenaNuevaRepeticion.getText().toString())) {
+                        contrasenaNuevaRepeticionLayout.setErrorEnabled(false);
+                        contrasenaNuevaLayout.setErrorEnabled(false);
+
+                        contrasenaNuevaLayout.setBoxStrokeColor(getResources().getColor(R.color.verde));
+                        contrasenaNuevaLayout.setEndIconDrawable(R.drawable.ic_check);
+                        contrasenaNuevaLayout.setEndIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.verde)));
+                        contrasenaNuevaLayout.setEndIconVisible(true);
+
+                        contrasenaNuevaRepeticionLayout.setBoxStrokeColor(getResources().getColor(R.color.verde));
+                        contrasenaNuevaRepeticionLayout.setEndIconDrawable(R.drawable.ic_check);
+                        contrasenaNuevaRepeticionLayout.setEndIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.verde)));
+                        contrasenaNuevaRepeticionLayout.setEndIconVisible(true);
+                    } else {
+                        contrasenaNuevaRepeticionLayout.setErrorEnabled(true);
+                        contrasenaNuevaRepeticionLayout.setError("Las contraseñas no coinciden");
+                        contrasenaNuevaLayout.setErrorEnabled(true);
+                        contrasenaNuevaLayout.setError(" ");
+                    }
+                }
+            }
+        }
+    };
 
     private Runnable checkPasswordSync = new Runnable() {
         public void run() {
@@ -123,8 +199,10 @@ public class TuCuenta_CambioContrasenaFragment extends Fragment {
                     @Override
                     public void requestDidComplete() {
                         contrasenaActualLayout.setErrorEnabled(false);
+                        contrasenaActualLayout.setBoxStrokeColor(getResources().getColor(R.color.verde));
                         contrasenaActualLayout.setEndIconDrawable(R.drawable.ic_check);
                         contrasenaActualLayout.setEndIconVisible(true);
+                        contrasenaActualLayout.setEndIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.verde)));
                     }
 
                     @Override
