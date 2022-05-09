@@ -1,36 +1,30 @@
 package com.csmm.gestorescolar.screens.main;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Menu;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
-import com.csmm.gestorescolar.R;
-import com.csmm.gestorescolar.client.RestClient;
-import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
-import com.csmm.gestorescolar.databinding.MainActivityBinding;
-import com.csmm.gestorescolar.screens.auth.LoginActivity;
-import com.csmm.gestorescolar.services.MyFirebaseMessagingService;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
+
+import com.csmm.gestorescolar.R;
+import com.csmm.gestorescolar.client.RestClient;
+import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
+import com.csmm.gestorescolar.databinding.MainActivityBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 
 public class MainActivity extends AppCompatActivity {

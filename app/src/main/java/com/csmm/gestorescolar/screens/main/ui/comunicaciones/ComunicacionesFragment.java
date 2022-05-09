@@ -447,7 +447,7 @@ public class ComunicacionesFragment extends Fragment {
                         }
                         allList.addAll(listaComunicaciones);
                         Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
-                    } catch (JSONException e) {
+                    } catch (JSONException | NullPointerException e) {
                         e.printStackTrace();
                     }
                 } else {

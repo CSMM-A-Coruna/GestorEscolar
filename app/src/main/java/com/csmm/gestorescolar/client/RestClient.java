@@ -4,14 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.client.dtos.DestinoDTO;
@@ -19,10 +15,10 @@ import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
 import com.csmm.gestorescolar.client.handlers.CheckPasswordResponseHandler;
 import com.csmm.gestorescolar.client.handlers.CompareDataResponseHandler;
+import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
-import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
 import com.csmm.gestorescolar.client.handlers.GetDestinosResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetPreferencesResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
@@ -30,7 +26,6 @@ import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostLoginResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostSendComunicacionResponseHandler;
 import com.csmm.gestorescolar.client.handlers.UpdatePreferenceResponseHandler;
-import com.csmm.gestorescolar.client.handlers.UploadAdjuntoResponseHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +47,6 @@ import java.util.Map;
 
 public class RestClient {
 
-    //public static final String REST_API_BASE_URL = "http://192.168.11.15:3000/v1";
     public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
     private RequestQueue queue;
     private Context context;
