@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
+
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
 import com.csmm.gestorescolar.databinding.CerrarsesionFragmentBinding;
@@ -38,6 +40,8 @@ public class CerrarsesionFragment extends Fragment {
         preferences = getActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
         preferences.edit().clear().apply();
         preferences = getActivity().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
+        preferences.edit().clear().apply();
+        preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         preferences.edit().clear().apply();
         Intent intent = new Intent(root.getContext(), LoginActivity.class);
         startActivity(intent);

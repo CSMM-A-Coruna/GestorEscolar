@@ -22,7 +22,7 @@ public class  ComunicacionDetallePapelera extends AppCompatActivity {
     int idDestino;
     String leida;
     String eliminado;
-    String adjuntos[];
+    String[] adjuntos;
     Chip chipAdjunto;
 
     @Override
@@ -55,23 +55,15 @@ public class  ComunicacionDetallePapelera extends AppCompatActivity {
             }
         }
 
-        volverButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-        restaurarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateServer("restaurar");
-                finish();
-            }
+        volverButton.setOnClickListener(view -> finish());
+        restaurarButton.setOnClickListener(view -> {
+            restaurarComunicacion();
+            finish();
         });
     }
 
-    private void updateServer(String estado) {
-        RestClient.getInstance(getApplicationContext()).postEstadoComunicacion(idComunicacion, estado, idDestino, new PostEstadoComunicacionHandler() {
+    private void restaurarComunicacion() {
+        RestClient.getInstance(getApplicationContext()).postEstadoComunicacion(idComunicacion, "restaurar", idDestino, new PostEstadoComunicacionHandler() {
             @Override
             public void sessionRequestDidComplete(boolean update) {
 

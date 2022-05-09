@@ -10,7 +10,7 @@ android {
         minSdk 30
         targetSdk 32
         versionCode 1
-        versionName "1.0.0a4"
+        versionName "1.0.0a5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,10 +44,12 @@ dependencies {
     implementation 'com.android.volley:volley:1.2.1'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
-    implementation 'androidx.navigation:navigation-fragment:2.4.1'
-    implementation 'androidx.navigation:navigation-ui:2.4.1'
+    implementation 'androidx.navigation:navigation-fragment:2.4.2'
+    implementation 'androidx.navigation:navigation-ui:2.4.2'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation group: 'com.google.code.bean-matchers', name: 'bean-matchers', version: '0.9'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20180813'
@@ -61,4 +63,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-perf'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-config:21.1.0'
 }

@@ -66,6 +66,48 @@
         tools:layout="@layout/misdatos_fragment" />
 
     <fragment
+        android:id="@+id/nav_ajustes"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.AjustesFragment"
+        android:label="Ajustes"
+        tools:layout="@layout/ajustes_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_recursosadicionales"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.RecursosAdicionalesFragment"
+        android:label="Recursos Adicionales"
+        tools:layout="@layout/ajustes_recursosadicionales_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_tucuenta"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.TuCuentaFragment"
+        android:label="Tu Cuenta"
+        tools:layout="@layout/ajustes_tucuenta_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_tucuenta_info"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.tucuenta_detalle.TuCuenta_InfoFragment"
+        android:label="Información de la cuenta"
+        tools:layout="@layout/ajustes_tucuenta_info_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_tucuenta_cambiocontraseña"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.tucuenta_detalle.TuCuenta_CambioContrasenaFragment"
+        android:label="Cambio de contraseña"
+        tools:layout="@layout/ajustes_tucuenta_info_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_seguridad"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.SeguridadFragment"
+        android:label="Seguridad y acceso"
+        tools:layout="@layout/ajustes_seguridad_fragment" />
+
+    <fragment
+        android:id="@+id/nav_ajustes_notificaciones"
+        android:name="com.csmm.gestorescolar.screens.main.ui.ajustes.detalle.NotificacionesFragment"
+        android:label="Notificaciones"
+        tools:layout="@layout/ajustes_notificaciones_fragment" />
+
+    <fragment
         android:id="@+id/nav_cerrarsesion"
         android:name="com.csmm.gestorescolar.screens.main.ui.cerrarsesion.CerrarsesionFragment"
         android:label="Cerrar Sesión"
