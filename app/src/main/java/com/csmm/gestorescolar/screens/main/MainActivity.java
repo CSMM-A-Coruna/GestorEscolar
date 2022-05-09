@@ -1,11 +1,14 @@
 package com.csmm.gestorescolar.screens.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
@@ -91,6 +94,17 @@ public class MainActivity extends AppCompatActivity {
                         });
                     }
                 });
+    }
+
+
+    // Ocultar keyboard si se toca la pantalla
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
 
