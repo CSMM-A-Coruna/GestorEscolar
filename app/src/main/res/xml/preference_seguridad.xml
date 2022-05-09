@@ -8,7 +8,7 @@
 
         <SwitchPreferenceCompat
             app:key="autentificacion_dos_fases"
-            app:icon="@drawable/ic_bug"
+            app:icon="@drawable/ic_nuevo_mensaje"
             app:title="Mensaje de texto"
             app:summary="Usa tu teléfono móvil para recibir un mensaje con un código de autentificación que deberás introducir cuando inicies sesión."/>
 
