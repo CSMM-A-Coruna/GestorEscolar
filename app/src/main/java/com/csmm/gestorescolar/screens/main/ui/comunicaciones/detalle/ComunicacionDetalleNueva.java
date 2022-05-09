@@ -1,24 +1,22 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
@@ -36,7 +34,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,133 +77,85 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
 
         btnSeleccionarDestino.setVisibility(View.INVISIBLE);
 
-        topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.adjuntar) {
-                    askPermissionAndBrowserFile();
-                } else if (item.getItemId() == R.id.enviar) {
-                    sendCom();
-                } else if (item.getItemId() == R.id.descartar) {
-                    showDialog();
-                }
-                return false;
+        topBar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.adjuntar) {
+                askPermissionAndBrowserFile();
+            } else if (item.getItemId() == R.id.enviar) {
+                sendCom();
+            } else if (item.getItemId() == R.id.descartar) {
+                showDialog();
             }
+            return false;
         });
 
         // Selector de alumnos
         String[] arrayAlumnos = getAlumnosSharedPreferences();
-        btnSeleccionarAlumno.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new MaterialAlertDialogBuilder(ComunicacionDetalleNueva.this)
-                        .setTitle("Alumnos")
-                        .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                seleccionAlumnoInt[0] = 0;
-                                seleccionAlumnoString[0] = arrayAlumnos[0];
-                            }
-                        })
-                        .setPositiveButton("Seleccionar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                seleccionAlumnoString[0] = arrayAlumnos[seleccionAlumnoInt[0]];
-                                chipAlumno.setText("Alumno: " + seleccionAlumnoString[0]);
-                                getDestinos(calcularIdAlumno(seleccionAlumnoString[0]));
-                                btnSeleccionarAlumno.setVisibility(View.INVISIBLE);
-                                chipAlumno.setCloseIconVisible(true);
-                                btnSeleccionarDestino.setVisibility(View.VISIBLE);
-                            }
-                        })
-                        .setSingleChoiceItems(arrayAlumnos, seleccionAlumnoInt[0], new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                seleccionAlumnoInt[0] = i;
-                            }
-                        }).create().show();
-            }
-        });
+        btnSeleccionarAlumno.setOnClickListener(view -> new MaterialAlertDialogBuilder(ComunicacionDetalleNueva.this)
+                .setTitle("Alumnos")
+                .setNeutralButton("Cancelar", (dialogInterface, i) -> {
+                    seleccionAlumnoInt[0] = 0;
+                    seleccionAlumnoString[0] = arrayAlumnos[0];
+                })
+                .setPositiveButton("Seleccionar", (dialogInterface, i) -> {
+                    seleccionAlumnoString[0] = arrayAlumnos[seleccionAlumnoInt[0]];
+                    chipAlumno.setText(String.format("Alumno: %s", seleccionAlumnoString[0]));
+                    getDestinos(calcularIdAlumno(seleccionAlumnoString[0]));
+                    btnSeleccionarAlumno.setVisibility(View.INVISIBLE);
+                    chipAlumno.setCloseIconVisible(true);
+                    btnSeleccionarDestino.setVisibility(View.VISIBLE);
+                })
+                .setSingleChoiceItems(arrayAlumnos, seleccionAlumnoInt[0], (dialogInterface, i) -> seleccionAlumnoInt[0] = i).create().show());
 
         // Selector de destino
-        btnSeleccionarDestino.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new MaterialAlertDialogBuilder(ComunicacionDetalleNueva.this)
-                        .setTitle("Destinos disponibles")
-                        .setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                seleccionDestinosInt[0] = 0;
-                                seleccionDestinoString[0] = arrayDestinos[0];
-                            }
-                        })
-                        .setPositiveButton("Seleccionar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                seleccionDestinoString[0] = arrayDestinos[seleccionDestinosInt[0]];
-                                chipPara.setText("Para: " + seleccionDestinoString[0]);
-                                btnSeleccionarDestino.setVisibility(View.INVISIBLE);
-                                chipPara.setCloseIconVisible(true);
-                            }
-                        })
-                        .setSingleChoiceItems(arrayDestinos, seleccionDestinosInt[0], new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                seleccionDestinosInt[0] = i;
-                            }
-                        }).create().show();
-            }
+        btnSeleccionarDestino.setOnClickListener(view -> new MaterialAlertDialogBuilder(ComunicacionDetalleNueva.this)
+                .setTitle("Destinos disponibles")
+                .setNeutralButton("Cancelar", (dialogInterface, i) -> {
+                    seleccionDestinosInt[0] = 0;
+                    seleccionDestinoString[0] = arrayDestinos[0];
+                })
+                .setPositiveButton("Seleccionar", (dialogInterface, i) -> {
+                    seleccionDestinoString[0] = arrayDestinos[seleccionDestinosInt[0]];
+                    chipPara.setText(String.format("Para: %s", seleccionDestinoString[0]));
+                    btnSeleccionarDestino.setVisibility(View.INVISIBLE);
+                    chipPara.setCloseIconVisible(true);
+                })
+                .setSingleChoiceItems(arrayDestinos, seleccionDestinosInt[0], (dialogInterface, i) -> seleccionDestinosInt[0] = i).create().show());
+
+        chipPara.setOnCloseIconClickListener(view -> {
+            btnSeleccionarDestino.setVisibility(View.VISIBLE);
+            chipPara.setText("Para:");
+            chipPara.setCloseIconVisible(false);
+            seleccionDestinosInt[0] = 0;
+            seleccionDestinoString[0] = "";
         });
 
-        chipPara.setOnCloseIconClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                btnSeleccionarDestino.setVisibility(View.VISIBLE);
-                chipPara.setText("Para:");
-                chipPara.setCloseIconVisible(false);
-                seleccionDestinosInt[0] = 0;
-                seleccionDestinoString[0] = "";
-            }
+        chipAlumno.setOnCloseIconClickListener(view -> {
+            btnSeleccionarAlumno.setVisibility(View.VISIBLE);
+            chipAlumno.setText("Alumno:");
+            chipAlumno.setCloseIconVisible(false);
+            seleccionAlumnoString[0] = "";
+            seleccionAlumnoInt[0] = 0;
+
+            // Reinicamos botón y chip de destinos
+            btnSeleccionarDestino.setVisibility(View.INVISIBLE);
+            chipPara.setText("Para:");
+            chipPara.setCloseIconVisible(false);
         });
 
-        chipAlumno.setOnCloseIconClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                btnSeleccionarAlumno.setVisibility(View.VISIBLE);
-                chipAlumno.setText("Alumno:");
-                chipAlumno.setCloseIconVisible(false);
-                seleccionAlumnoString[0] = "";
-                seleccionAlumnoInt[0] = 0;
-
-                // Reinicamos botón y chip de destinos
-                btnSeleccionarDestino.setVisibility(View.INVISIBLE);
-                chipPara.setText("Para:");
-                chipPara.setCloseIconVisible(false);
-            }
+        chipAdjunto.setOnCloseIconClickListener(view -> {
+            path = null;
+            fileName = null;
+            chipAdjunto.setVisibility(View.INVISIBLE);
         });
-
-        chipAdjunto.setOnCloseIconClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                path = null;
-                fileName = null;
-                chipAdjunto.setVisibility(View.INVISIBLE);
-            }
-        });
-    }
-
-    private void setDefaultAlumno(String alumno) {
-        chipAlumno.setText("Alumno: " + alumno);
-        btnSeleccionarAlumno.setVisibility(View.INVISIBLE);
     }
 
     private void sendCom() {
         int idDestino = 0, tipoDestino = 0;
-        for(int i=0; i<arrayDestinos.length; i++) {
-            if(arrayDestinos[i].equals(destinos.get(0).getNombre() + " - " + destinos.get(0).getTipoUsuario())) {
+        for (String arrayDestino : arrayDestinos) {
+            if (arrayDestino.equals(destinos.get(0).getNombre() + " - " + destinos.get(0).getTipoUsuario())) {
                 idDestino = destinos.get(0).getId();
                 tipoDestino = destinos.get(0).getTipoDestino();
+                break;
             }
         }
         SharedPreferences sharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE);
@@ -237,7 +186,7 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
 
     private String[] getAlumnosSharedPreferences() {
         SharedPreferences sharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE);
-        ArrayList<String> listAlumnos = new ArrayList<String>();
+        ArrayList<String> listAlumnos = new ArrayList<>();
         try {
             JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
             /*if(alumnos.length() == 1) {
@@ -284,10 +233,10 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
     private class UploadFile extends AsyncTask<String, String, Void> {
         protected Void doInBackground(String...urls) {
             //setup params
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             String url = RestClient.REST_API_BASE_URL + "/resources/upload?id_comunicacion="+urls[0];
             try {
-                String result = RestClient.getInstance(getApplicationContext()).uploadAdjunto(url, params, path, fileName);
+                RestClient.getInstance(getApplicationContext()).uploadAdjunto(url, params, path, fileName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -299,18 +248,10 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("¡Cuidado!")
                 .setMessage("¿Estás seguro de que quieres descartar esta comunicación?")
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                .setNegativeButton("Cancelar", (dialogInterface, i) -> {
 
-                    }
                 })
-                .setPositiveButton("Descartar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
-                    }
-                }).show();
+                .setPositiveButton("Descartar", (dialogInterface, i) -> finish()).show();
     }
 
     private void getDestinos(int id) {
@@ -341,14 +282,16 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
     private void askPermissionAndBrowserFile() {
 
         // If you have access to the external storage, do whatever you need
-        if (Environment.isExternalStorageManager()){
-            doBrowseFile();
-        } else {
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-            Uri uri = Uri.fromParts("package", this.getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()){
+                doBrowseFile();
+            } else {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                Uri uri = Uri.fromParts("package", this.getPackageName(), null);
+                intent.setData(uri);
+                startActivity(intent);
+            }
         }
     }
 

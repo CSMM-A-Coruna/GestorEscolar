@@ -1,39 +1,37 @@
 package com.csmm.gestorescolar.screens.main;
 
-import android.content.Intent;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.Menu;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
-import com.csmm.gestorescolar.R;
-import com.csmm.gestorescolar.client.RestClient;
-import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
-import com.csmm.gestorescolar.databinding.MainActivityBinding;
-import com.csmm.gestorescolar.screens.auth.LoginActivity;
-import com.csmm.gestorescolar.services.MyFirebaseMessagingService;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
+
+import com.csmm.gestorescolar.R;
+import com.csmm.gestorescolar.client.RestClient;
+import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
+import com.csmm.gestorescolar.databinding.MainActivityBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private MainActivityBinding binding;
-    private SharedPreferences preferences;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
         binding = MainActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        preferences = getSharedPreferences("user", MODE_PRIVATE);
-        String nombre = preferences.getString("nombre", null);
-        String apellido1 = preferences.getString("apellido1", null);
-        String apellido2 = preferences.getString("apellido2", null);
+        sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
+        String nombre = sharedPreferences.getString("nombre", null);
+        String apellido1 = sharedPreferences.getString("apellido1", null);
+        String apellido2 = sharedPreferences.getString("apellido2", null);
 
         setSupportActionBar(binding.appBarMain.toolbar);
 
@@ -52,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
         View headerView = navigationView.getHeaderView(0);
         TextView navUsername = headerView.findViewById(R.id.usernameText);
-        navUsername.setText(new StringBuilder().append(nombre).append(" ").append(apellido1).append(" ").append(apellido2).toString());
+        navUsername.setText(String.format("%s %s %s", nombre, apellido1, apellido2));
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -65,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
                 R.id.nav_extraescolares,
                 R.id.nav_enfermeria,
                 R.id.nav_llavero,
-                R.id.nav_misdatos)
+                R.id.nav_misdatos,
+                R.id.nav_ajustes)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -92,6 +91,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    // Ocultar keyboard si se toca la pantalla
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+
     protected OnBackPressedListener onBackPressedListener;
 
     public interface OnBackPressedListener {
@@ -115,12 +125,6 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }
-
-    private void logOut() {
-        preferences.edit().clear().commit();
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
     }
 
 /*    @Override

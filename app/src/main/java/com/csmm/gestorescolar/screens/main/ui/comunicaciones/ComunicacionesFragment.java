@@ -45,6 +45,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ComunicacionesFragment extends Fragment {
 
@@ -55,13 +56,16 @@ public class ComunicacionesFragment extends Fragment {
     private SwipeRefreshLayout swipLayout;
     private ComunicacionesAdapter mAdapter;
     private ImageButton btnFiltrarPorPropiedad;
+    BottomNavigationView navButton;
     private Chip chipFiltro;
     private SharedPreferences sharedPreferences;
     private String currentNav;
     private boolean isScrolling;
+    PopupMenu popupMenuFiltroPropiedad, popupMenuFiltroAlumno;
 
-    final String[] alumnoFiltrado = {"Todos"};
-    final String[] propiedadFiltrada = {"Todos"};
+    private String alumnoFiltrado = "Todos";
+    private String propiedadFiltrada = "Todos";
+
 
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,7 +78,7 @@ public class ComunicacionesFragment extends Fragment {
         // Asignamos el swipe, botones y demás
         swipLayout = root.findViewById(R.id.swipe_layout);
         MaterialButton btnFiltrarPorAlumno = root.findViewById(R.id.btnFiltrarAlumnos);
-        BottomNavigationView navButton = root.findViewById(R.id.bottom_navigation);
+        navButton = root.findViewById(R.id.bottom_navigation);
         FloatingActionButton nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
         btnFiltrarPorPropiedad = root.findViewById(R.id.btnFiltros);
         chipFiltro = root.findViewById(R.id.chipFiltradoAlumnos);
@@ -82,9 +86,9 @@ public class ComunicacionesFragment extends Fragment {
 
         // Animaciones de los botones
         btnFiltrarPorAlumno.setAlpha(0f);
-        btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1500);
+        btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1000);
         btnFiltrarPorPropiedad.setAlpha(0f);
-        btnFiltrarPorPropiedad.animate().alpha(1f).setDuration(1500);
+        btnFiltrarPorPropiedad.animate().alpha(1f).setDuration(1000);
 
         // Animación fab
         nuevaComButton.setScaleX(0);
@@ -144,11 +148,11 @@ public class ComunicacionesFragment extends Fragment {
             // Animación
             btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_arriba));
             // PopUp
-            PopupMenu popupMenu = new PopupMenu(getContext(), view);
-            popupMenu.setOnMenuItemClickListener(item -> {
+            popupMenuFiltroAlumno = new PopupMenu(getContext(), view);
+            popupMenuFiltroAlumno.setOnMenuItemClickListener(item -> {
                 for(int i=0; i<arrayAlumnos.length; i++) {
                     if(arrayAlumnosSoloNombre[i].contentEquals(item.getTitle())) {
-                        alumnoFiltrado[0] = arrayAlumnos[i];
+                        alumnoFiltrado = arrayAlumnos[i];
                     }
                 }
                 filterData();
@@ -156,32 +160,32 @@ public class ComunicacionesFragment extends Fragment {
             });
 
             for (String s : arrayAlumnosSoloNombre) {
-                popupMenu.getMenu().add(s);
+                popupMenuFiltroAlumno.getMenu().add(s);
             }
-            popupMenu.show();
+            popupMenuFiltroAlumno.show();
 
             // Animación al cerrar el menu
-            popupMenu.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
+            popupMenuFiltroAlumno.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
         });
 
         btnFiltrarPorPropiedad.setOnClickListener(view -> {
             // Animación
             btnFiltrarPorPropiedad.animate().setDuration(300).rotationBy(90f).start();
             // PopUp
-            PopupMenu popupMenu = new PopupMenu(getContext(), view);
-            popupMenu.setOnMenuItemClickListener(item -> {
-                propiedadFiltrada[0] = String.valueOf(item.getTitle());
+            popupMenuFiltroPropiedad = new PopupMenu(getContext(), view);
+            popupMenuFiltroPropiedad.setOnMenuItemClickListener(item -> {
+                propiedadFiltrada = String.valueOf(item.getTitle());
                 filterData();
                 return true;
             });
             String[] filtrosDisponibles = {"Todos", "No leídos", "Leídos", "Importantes"};
             for (String s : filtrosDisponibles) {
-                popupMenu.getMenu().add(s);
+                popupMenuFiltroPropiedad.getMenu().add(s);
             }
-            popupMenu.show();
+            popupMenuFiltroPropiedad.show();
 
             // Animación al cerrar el menu
-            popupMenu.setOnDismissListener(popupMenu12 -> btnFiltrarPorPropiedad.animate().setDuration(300).rotationBy(-90f).start());
+            popupMenuFiltroPropiedad.setOnDismissListener(popupMenu12 -> btnFiltrarPorPropiedad.animate().setDuration(300).rotationBy(-90f).start());
         });
 
         // Asignamos el RecyclerView de la lista de comunicaciones
@@ -270,22 +274,20 @@ public class ComunicacionesFragment extends Fragment {
             }
             return false;
         });*/
-
-        cargarDatos();
         return root;
     }
 
     private void filterData() {
-        if(propiedadFiltrada[0].equals("Todos") && alumnoFiltrado[0].equals("Todos")) {
+        if(propiedadFiltrada.equals("Todos") && alumnoFiltrado.equals("Todos")) {
             updateData(allList);
             chipFiltro.setVisibility(View.GONE);
-        } else if(!alumnoFiltrado[0].equals("Todos")) {
+        } else if(!alumnoFiltrado.equals("Todos")) {
             chipFiltro.setVisibility(View.VISIBLE);
-            chipFiltro.setText(alumnoFiltrado[0]);
+            chipFiltro.setText(alumnoFiltrado);
             List<ComunicacionDTO> lista = new ArrayList<>();
-            switch (propiedadFiltrada[0]) {
+            switch (propiedadFiltrada) {
                 case "No leídos":
-                    chipFiltro.setText(alumnoFiltrado[0] + " - " + propiedadFiltrada[0]);
+                    chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
                     allList.forEach(data -> {
                         if (data.getLeida().equals("null")) {
                             lista.add(data);
@@ -293,7 +295,7 @@ public class ComunicacionesFragment extends Fragment {
                     });
                     break;
                 case "Leídos":
-                    chipFiltro.setText(alumnoFiltrado[0] + " - " + propiedadFiltrada[0]);
+                    chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
                     allList.forEach(data -> {
                         if (!data.getLeida().equals("null")) {
                             lista.add(data);
@@ -301,7 +303,7 @@ public class ComunicacionesFragment extends Fragment {
                     });
                     break;
                 case "Importantes":
-                    chipFiltro.setText(alumnoFiltrado[0] + " - " + propiedadFiltrada[0]);
+                    chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
                     allList.forEach(data -> {
                         if (data.isImportante()) {
                             lista.add(data);
@@ -312,12 +314,12 @@ public class ComunicacionesFragment extends Fragment {
                     lista.addAll(allList);
                     break;
             }
-            filtroAlumno(lista, alumnoFiltrado[0]);
+            filtroAlumno(lista, alumnoFiltrado);
         } else {
             toggleList.clear();
             chipFiltro.setVisibility(View.VISIBLE);
-            chipFiltro.setText(propiedadFiltrada[0]);
-            switch (propiedadFiltrada[0]) {
+            chipFiltro.setText(propiedadFiltrada);
+            switch (propiedadFiltrada) {
                 case "No leídos":
                     allList.forEach(data -> {
                         if (data.getLeida().equals("null")) {
@@ -367,13 +369,18 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void cargarDatos() {
-        // Prevenimos errores al recargar nuevas comunicaciones y que estén filtradas (mal rendimiento)
-        if(propiedadFiltrada[0].equals("Todos") && alumnoFiltrado[0].equals("Todos")) {
+        // Prevenimos errores al recargar nuevas comunicaciones y que estén filtradas. PopUps nulos (Se ha refrescado antes de hacer llenar el menu)
+        try {
+            if(!propiedadFiltrada.equals("Todos") || !alumnoFiltrado.equals("Todos")) {
+                reiniciarFiltro();
+            }
             new CargarNuevasComunicaciones().execute();
-        } else {
+        } catch (Exception e) {
             swipLayout.setRefreshing(false);
+            e.printStackTrace();
         }
     }
+
 
     private class CargarNuevasComunicaciones extends AsyncTask<Void, Void, Void> {
         @Override
@@ -414,7 +421,6 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void updateToRecibidos() {
-        reiniciarFiltro();
         allList.clear();
         toggleList.clear();
         RestClient.getInstance(getContext()).getComunicacionesRecibidas(new GetComunicacionesRecibidasResponseHandler() {
@@ -441,7 +447,7 @@ public class ComunicacionesFragment extends Fragment {
                         }
                         allList.addAll(listaComunicaciones);
                         Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
-                    } catch (JSONException e) {
+                    } catch (JSONException | NullPointerException e) {
                         e.printStackTrace();
                     }
                 } else {
@@ -454,7 +460,6 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void updateToEnviadas() {
-        reiniciarFiltro();
         allList.clear();
         toggleList.clear();
         RestClient.getInstance(getContext()).getComunicacionesEnviadas(new GetComunicacionesEnviadasResponseHandler() {
@@ -485,7 +490,7 @@ public class ComunicacionesFragment extends Fragment {
                     }
                     Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
                 } else if(statusCode==404) {
-                    Snackbar.make(mRecyclerView, "No has recibido ninguna comunicación", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mRecyclerView, "No has enviado ninguna comunicación", Snackbar.LENGTH_SHORT).show();
                 } else {
                     Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
                 }
@@ -496,7 +501,6 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void updateToPapelera() {
-        reiniciarFiltro();
         allList.clear();
         toggleList.clear();
         RestClient.getInstance(getContext()).getComunicacionesBorradas(new GetComunicacionesBorradasResponseHandler() {
@@ -527,7 +531,7 @@ public class ComunicacionesFragment extends Fragment {
                         e.printStackTrace();
                     }
                 } else {
-                    Snackbar.make(mRecyclerView, "No has recibido ninguna comunicación", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mRecyclerView, "No tienes ninguna comunicación en la papelera", Snackbar.LENGTH_SHORT).show();
                 }
                 updateData(allList);
             }
@@ -536,8 +540,12 @@ public class ComunicacionesFragment extends Fragment {
     }
 
     private void reiniciarFiltro() {
-        propiedadFiltrada[0] = "Todos";
-        alumnoFiltrado[0] = "Todos";
+        propiedadFiltrada = "Todos";
+        popupMenuFiltroPropiedad.getMenu().findItem(0).setChecked(true);
+        System.out.println(popupMenuFiltroPropiedad.getMenu().findItem(0).isEnabled());
+        alumnoFiltrado = "Todos";
+        popupMenuFiltroAlumno.getMenu().findItem(0).setChecked(true);
+        System.out.println(popupMenuFiltroAlumno.getMenu().findItem(0).isEnabled());
         chipFiltro.setText("");
         chipFiltro.setVisibility(View.GONE);
     }

@@ -1,0 +1,16 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:key="info_cuenta"
+        app:title="Información de la cuenta"
+        app:summary="Consulta la información de tu cuenta, como el usuario o email."
+        app:icon="@drawable/ic_avatardefault" />
+
+    <Preference
+        app:key="cambio_contraseña"
+        app:title="Cambia tu contraseña"
+        app:summary="Cambia tu contraseña en cualquier momento."
+        app:icon="@drawable/ic_seguridad" />
+
+</PreferenceScreen>

@@ -1,6 +1,7 @@
 package com.csmm.gestorescolar.screens.auth;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +14,9 @@ import android.widget.Button;
 
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
+import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
+import com.csmm.gestorescolar.client.handlers.GetPreferencesResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostLoginResponseHandler;
 import com.csmm.gestorescolar.screens.main.MainActivity;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -85,6 +88,8 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putInt("tipoUsuario", dto.getTipoUsuario());
                         editor.putString("alumnosAsociados", dto.getAlumnosAsociados().toString());
                         editor.apply();
+                        // Coger la configuración guardada en el servidor del usuario y aplicarla
+                        getUserPreferencesFromServer();
                         // Log Firebase
                         Bundle bundle = new Bundle();
                         bundle.putString(FirebaseAnalytics.Param.METHOD, "login");
@@ -115,5 +120,33 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             Snackbar.make(iniciarSesionButton, "Rellena todos los campos", Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    private void getUserPreferencesFromServer() {
+        RestClient.getInstance(getApplicationContext()).getPreferences(new GetPreferencesResponseHandler() {
+            @Override
+            public void requestDidComplete(PreferencesDTO response) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("autentificacion_dos_fases", response.isAutentificacion_dos_fases());
+                editor.putBoolean("proteccion_restablecimiento", response.isProteccion_restablecimiento());
+                editor.putBoolean("not_comunicaciones_push", response.isNot_comunicaciones_push());
+                editor.putBoolean("not_calificaciones_push", response.isNot_calificaciones_push());
+                editor.putBoolean("not_entrevistas_push", response.isNot_entrevistas_push());
+                editor.putBoolean("not_extraescolares_push", response.isNot_extraescolares_push());
+                editor.putBoolean("not_enfermeria_push", response.isNot_enfermeria_push());
+                editor.putBoolean("not_comunicaciones_email", response.isNot_comunicaciones_email());
+                editor.putBoolean("not_calificaciones_email", response.isNot_calificaciones_email());
+                editor.putBoolean("not_entrevistas_email", response.isNot_entrevistas_email());
+                editor.putBoolean("not_extraescolares_email", response.isNot_extraescolares_email());
+                editor.putBoolean("not_enfermeria_email", response.isNot_enfermeria_email());
+                editor.apply();
+            }
+
+            @Override
+            public void requestDidFail(int statusCode) {
+
+            }
+        });
     }
 }

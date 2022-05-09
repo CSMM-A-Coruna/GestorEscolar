@@ -1,21 +1,21 @@
 package com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.PostSendComunicacionResponseHandler;
@@ -31,13 +31,11 @@ import java.util.StringTokenizer;
 
 public class ComunicacionDetalleResponder extends AppCompatActivity {
 
-    private static final int MY_REQUEST_CODE_PERMISSION = 1000;
     private static final int MY_RESULT_CODE_FILECHOOSER = 2000;
     private String path;
     private String fileName;
 
     private Chip destinoChip;
-    private Chip remiteChip;
     private Chip chipAdjunto;
     private EditText asuntoEditText, textoEditText;
     MaterialToolbar topBar;
@@ -52,7 +50,7 @@ public class ComunicacionDetalleResponder extends AppCompatActivity {
         setContentView(R.layout.comunicacion_detalle_responder);
 
         destinoChip = findViewById(R.id.chipComunicacionDestino);
-        remiteChip = findViewById(R.id.chipComunicacionRemite);
+        Chip remiteChip = findViewById(R.id.chipComunicacionRemite);
         asuntoEditText = findViewById(R.id.asuntoEditText);
         textoEditText = findViewById(R.id.textoEditText);
         topBar = findViewById(R.id.topAppBar);
@@ -66,36 +64,32 @@ public class ComunicacionDetalleResponder extends AppCompatActivity {
             idAlumnoAsociado = mBundle.getInt("id_alumnoAsociado");
 
 
-            destinoChip.setText("Para: " + mBundle.getString("destino"));
-            remiteChip.setText("De: " + mBundle.getString("remite"));
-            asuntoEditText.setText("Re: " + mBundle.getString("asunto"));
+            destinoChip.setText(String.format("Para: %s", mBundle.getString("destino")));
+            remiteChip.setText(String.format("De: %s", mBundle.getString("remite")));
+            asuntoEditText.setText(String.format("Re: %s", mBundle.getString("asunto")));
             if (mBundle.getString("fecha").contains("/")) {
-                textoEditText.setText("El " + mBundle.getString("fecha") + ", " + mBundle.getString("destino") + " escribió: \n" + mBundle.getString("texto"));
+                textoEditText.setText(String.format("El %s, %s escribió: \n%s", mBundle.getString("fecha"), mBundle.getString("destino"), mBundle.getString("texto")));
             } else {
-                textoEditText.setText("Hoy a las " + mBundle.getString("fecha") + ", " + mBundle.getString("destino") + " escribió: \n" + mBundle.getString("texto"));
+                textoEditText.setText(String.format("Hoy a las %s, %s escribió: \n%s", mBundle.getString("fecha"), mBundle.getString("destino"), mBundle.getString("texto")));
             }
 
-            topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    if (item.getItemId() == R.id.adjuntar) {
+            topBar.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.adjuntar) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         askPermissionAndBrowserFile();
-                    } else if (item.getItemId() == R.id.enviar) {
-                        sendCom();
-                    } else if (item.getItemId() == R.id.descartar) {
-                        showDialog();
                     }
-                    return false;
+                } else if (item.getItemId() == R.id.enviar) {
+                    sendCom();
+                } else if (item.getItemId() == R.id.descartar) {
+                    showDialog();
                 }
+                return false;
             });
 
-            chipAdjunto.setOnCloseIconClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    path = null;
-                    fileName = null;
-                    chipAdjunto.setVisibility(View.INVISIBLE);
-                }
+            chipAdjunto.setOnCloseIconClickListener(view -> {
+                path = null;
+                fileName = null;
+                chipAdjunto.setVisibility(View.INVISIBLE);
             });
         }
     }
@@ -104,18 +98,10 @@ public class ComunicacionDetalleResponder extends AppCompatActivity {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("¡Cuidado!")
                 .setMessage("¿Estás seguro de que quieres descartar esta respuesta?")
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                .setNegativeButton("Cancelar", (dialogInterface, i) -> {
 
-                    }
                 })
-                .setPositiveButton("Descartar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
-                    }
-                }).show();
+                .setPositiveButton("Descartar", (dialogInterface, i) -> finish()).show();
     }
 
     private void sendCom() {
@@ -154,10 +140,10 @@ public class ComunicacionDetalleResponder extends AppCompatActivity {
     private class UploadFile extends AsyncTask<String, String, Void> {
         protected Void doInBackground(String...urls) {
             //setup params
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             String url = RestClient.REST_API_BASE_URL + "/resources/upload?id_comunicacion="+urls[0];
             try {
-                String result = RestClient.getInstance(getApplicationContext()).uploadAdjunto(url, params, path, fileName);
+                RestClient.getInstance(getApplicationContext()).uploadAdjunto(url, params, path, fileName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -165,6 +151,7 @@ public class ComunicacionDetalleResponder extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     private void askPermissionAndBrowserFile() {
 
         // If you have access to the external storage, do whatever you need

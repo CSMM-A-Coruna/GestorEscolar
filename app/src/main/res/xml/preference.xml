@@ -1,0 +1,54 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:key="tu_cuenta"
+        app:title="Tu cuenta"
+        app:summary="Consulta la información de tu cuenta."
+        app:icon="@drawable/ic_avatardefault"/>
+
+    <Preference
+        app:key="seguridad"
+        app:title="Seguridad y acceso a la cuenta"
+        app:summary="Administra la seguridad de tu cuenta y lleva un control de su uso."
+        app:icon="@drawable/ic_seguridad"/>
+
+    <Preference
+        app:key="notificaciones"
+        app:title="Notificaciones"
+        app:summary="Selecciona el tipo de notificaciones que quieres recibir."
+        app:icon="@drawable/ic_notification" />
+
+    <Preference
+        app:key="recursos_adicionales"
+        app:title="Recursos adicionales"
+        app:summary="Consulta más información útil sobre la aplicación"
+        app:icon="@drawable/ic_pregunta" />
+
+    <!--<PreferenceCategory
+        app:key="notifications_category"
+        app:title="Notificaciones">
+
+        <SwitchPreferenceCompat
+            app:key="notificaciones"
+            app:title="Habilitar notificaciones"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="info_category"
+        app:title="Información de la aplicación">
+
+        <Preference
+            app:key="version_name"
+            app:summary="..."
+            app:title="..."/>
+
+        <Preference
+            app:key="version_code"
+            app:summary="..."
+            app:title="..."/>
+
+    </PreferenceCategory> -->
+
+</PreferenceScreen>
