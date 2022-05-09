@@ -13,7 +13,6 @@ import androidx.preference.SwitchPreferenceCompat;
 
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
-import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.handlers.UpdatePreferenceResponseHandler;
 
 import java.util.ArrayList;
@@ -69,12 +68,9 @@ public class NotificacionesFragment extends PreferenceFragmentCompat {
 
     // Cuando se detecta un cambio, se actualiza el servidor
     private void setUpOnChangeListener(SwitchPreferenceCompat preference) {
-        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
-                updatePreferencesOnServer(preference.getKey(), (Boolean) newValue);
-                return true;
-            }
+        preference.setOnPreferenceChangeListener((preference1, newValue) -> {
+            updatePreferencesOnServer(preference1.getKey(), (Boolean) newValue);
+            return true;
         });
     }
 

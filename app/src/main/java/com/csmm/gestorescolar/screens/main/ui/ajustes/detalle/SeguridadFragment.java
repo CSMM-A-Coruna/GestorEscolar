@@ -1,22 +1,15 @@
 package com.csmm.gestorescolar.screens.main.ui.ajustes.detalle;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
-import com.csmm.gestorescolar.BuildConfig;
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.UpdatePreferenceResponseHandler;
-import com.csmm.gestorescolar.databinding.AjustesRecursosadicionalesFragmentBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,12 +47,9 @@ public class SeguridadFragment extends PreferenceFragmentCompat {
 
     // Cuando se detecta un cambio, se actualiza el servidor
     private void setUpOnChangeListener(Preference preference) {
-        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
-                updatePreferencesOnServer(preference.getKey(), (Boolean) newValue);
-                return true;
-            }
+        preference.setOnPreferenceChangeListener((preference1, newValue) -> {
+            updatePreferencesOnServer(preference1.getKey(), (Boolean) newValue);
+            return true;
         });
     }
 

@@ -42,15 +42,6 @@ public class AjustesFragment extends PreferenceFragmentCompat {
             Navigation.findNavController(requireView()).navigate(R.id.nav_ajustes_recursosadicionales);
             return true;
         });
-
-        /*mVersionName = (Preference) getPreferenceManager().findPreference("version_name");
-        mVersionCode = (Preference) getPreferenceManager().findPreference("version_code");
-
-        mVersionName.setTitle("Versión");
-        mVersionName.setSummary(BuildConfig.VERSION_NAME);
-
-        mVersionCode.setTitle("Código de versión");
-        mVersionCode.setSummary(String.valueOf(BuildConfig.VERSION_CODE));*/
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.csmm.gestorescolar.screens.main.ui.ajustes.detalle;
 
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
 
 import com.csmm.gestorescolar.BuildConfig;
 import com.csmm.gestorescolar.R;
