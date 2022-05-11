@@ -1,37 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".screens.main.ui.horario.HorarioFragment">
 
-
-    <com.alamkanak.weekview.WeekView
-        android:id="@+id/weekView"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:eventTextColor="@android:color/white"
-        app:textSize="12sp"
-        app:hourHeight="60dp"
-        app:headerColumnPadding="8dp"
-        app:headerColumnTextColor="#8f000000"
-        app:headerRowPadding="12dp"
-        app:columnGap="8dp"
-        app:headerRowBackgroundColor="#ffefefef"
-        app:dayBackgroundColor="#05000000"
-        app:todayBackgroundColor="#1848adff"
-        app:headerColumnBackground="#ffffffff"
-        android:visibility="gone"/>
+        android:layout_height="wrap_content">
 
-    <com.csmm.gestorescolar.screens.main.ui.horario.TimetableView.TimetableView
-        android:id="@+id/timetable"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:column_count="6"
-        app:row_count="12"
-        app:start_time="8"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <com.csmm.gestorescolar.screens.main.ui.horario.TimetableView.TimetableView
+            android:id="@+id/timetable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:column_count="6"
+            app:row_count="12"
+            app:start_time="8"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/anotaciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Anotaciones"
+            android:textSize="24sp"
+            app:layout_constraintTop_toBottomOf="@id/timetable"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="15dp"
+            android:textAlignment="center"
+            android:textColor="@color/teal_200"
+            android:textStyle="bold"/>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/anotaciones"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/anotaciones_texto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Día 15 y 16 de Mayo no lectivos.\n\n• Día 15 y 16 de Mayo no lectivos.\n\n• Día 15 y 16 de Mayo no lectivos.\n\n• Día 15 y 16 de Mayo no lectivos.\n\n• Día 15 y 16 de Mayo no lectivos."
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/divider1"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="20dp"
+            android:paddingBottom="30dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

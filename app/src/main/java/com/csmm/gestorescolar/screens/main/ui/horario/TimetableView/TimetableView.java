@@ -42,6 +42,7 @@ public class TimetableView extends LinearLayout {
     private int rowCount;
     private int columnCount;
     private int cellHeight;
+    private int cellHeightHeader;
     private int sideCellWidth;
     private String[] headerTitle;
     private int startTime;
@@ -51,7 +52,7 @@ public class TimetableView extends LinearLayout {
     TableLayout tableHeader;
     TableLayout tableBox;
 
-    private Context context;
+    private final Context context;
 
     List<Sticker> stickers = new ArrayList<>();
 
@@ -82,6 +83,7 @@ public class TimetableView extends LinearLayout {
         rowCount = a.getInt(R.styleable.TimetableView_row_count, DEFAULT_ROW_COUNT) - 1;
         columnCount = a.getInt(R.styleable.TimetableView_column_count, DEFAULT_COLUMN_COUNT);
         cellHeight = a.getDimensionPixelSize(R.styleable.TimetableView_cell_height, dp2Px(DEFAULT_CELL_HEIGHT_DP));
+        cellHeightHeader = dp2Px(DEFAULT_CELL_HEIGHT_DP-10);
         sideCellWidth = a.getDimensionPixelSize(R.styleable.TimetableView_side_cell_width, dp2Px(DEFAULT_SIDE_CELL_WIDTH_DP));
         int titlesId = a.getResourceId(R.styleable.TimetableView_header_title, R.array.default_header_title);
         headerTitle = a.getResources().getStringArray(titlesId);
@@ -111,35 +113,6 @@ public class TimetableView extends LinearLayout {
         stickerSelectedListener = listener;
     }
 
-    /**
-     * date : 2019-02-08
-     * get all schedules TimetableView has.
-     */
-    /*public ArrayList<Schedule> getAllSchedulesInStickers() {
-        ArrayList<Schedule> allSchedules = new ArrayList<Schedule>();
-        for (int key : stickers.keySet()) {
-            for (Schedule schedule : stickers.get(key).getSchedules()) {
-                allSchedules.add(schedule);
-            }
-        }
-        return allSchedules;
-    }*/
-
-    /**
-     * date : 2019-02-08
-     * Used in Edit mode, To check a invalidate schedule.
-     */
-    /*public ArrayList<Schedule> getAllSchedulesInStickersExceptIdx(int idx) {
-        ArrayList<Schedule> allSchedules = new ArrayList<Schedule>();
-        for (int key : stickers.keySet()) {
-            if (idx == key) continue;
-            for (Schedule schedule : stickers.get(key).getSchedules()) {
-                allSchedules.add(schedule);
-            }
-        }
-        return allSchedules;
-    }*/
-
     public void addSchedules(ArrayList<Schedule> schedules) {
         add(schedules);
     }
@@ -161,12 +134,9 @@ public class TimetableView extends LinearLayout {
             tv.setGravity(Gravity.CENTER);
 
 
-            tv.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(stickerSelectedListener != null)
-                        stickerSelectedListener.OnStickerSelected(schedule);
-                }
+            tv.setOnClickListener(v -> {
+                if(stickerSelectedListener != null)
+                    stickerSelectedListener.OnStickerSelected(schedule);
             });
 
             sticker.addTextView(tv);
@@ -176,49 +146,21 @@ public class TimetableView extends LinearLayout {
             stickers.add(sticker);
             stickerBox.addView(tv);
         }
-        //setStickerColor();
     }
 
-    /*public String createSaveData() {
-        return SaveManager.saveSticker(stickers);
-    }*/
-
-    /*public void load(String data) {
-        removeAll();
-        stickers = SaveManager.loadSticker(data);
-        int maxKey = 0;
-        for (int key : stickers.keySet()) {
-            ArrayList<Schedule> schedules = stickers.get(key).getSchedules();
-            add(schedules, key);
-            if (maxKey < key) maxKey = key;
-        }
-        stickerCount = maxKey + 1;
-        setStickerColor();
-    }*/
-
-    /*public void removeAll() {
-        for (int key : stickers.keySet()) {
-            Sticker sticker = stickers.get(key);
-            for (TextView tv : sticker.getView()) {
-                stickerBox.removeView(tv);
-            }
+    public void removeAll() {
+        for(int i=0; i<stickers.size(); i++) {
+            Sticker sticker = stickers.get(i);
+            stickerBox.removeView(sticker.getView());
         }
         stickers.clear();
-    }*/
+    }
 
-    /*public void edit(int idx, ArrayList<Schedule> schedules) {
-        remove(idx);
-        add(schedules, idx);
-    }*/
-
-    /*public void remove(int idx) {
-        Sticker sticker = stickers.get(idx);
-        for (TextView tv : sticker.getView()) {
-            stickerBox.removeView(tv);
-        }
-        stickers.remove(idx);
-        setStickerColor();
-    }*/
+    public void remove(int position) {
+        Sticker sticker = stickers.get(position);
+        stickerBox.removeView(sticker.getView());
+        stickers.remove(position);
+    }
 
     public void setHeaderHighlight(int idx) {
         if(idx < 0)return;
@@ -266,7 +208,7 @@ public class TimetableView extends LinearLayout {
                     tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, DEFAULT_SIDE_HEADER_FONT_SIZE_DP);
                     tv.setBackgroundColor(getContext().getColor(R.color.colorHeader));
                     tv.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-                    tv.setPadding(0, -10, 0, 0);
+                    tv.setPadding(0, 0, 0, 0);
                     tv.setLayoutParams(createTableRowParam(sideCellWidth, cellHeight));
                 } else {
                     tv.setText("");
@@ -286,9 +228,9 @@ public class TimetableView extends LinearLayout {
         for (int i = 0; i < columnCount; i++) {
             TextView tv = new TextView(context);
             if (i == 0) {
-                tv.setLayoutParams(createTableRowParam(sideCellWidth, cellHeight));
+                tv.setLayoutParams(createTableRowParam(sideCellWidth, cellHeightHeader));
             } else {
-                tv.setLayoutParams(createTableRowParam(cellHeight));
+                tv.setLayoutParams(createTableRowParam(cellHeightHeader));
             }
             tv.setTextColor(getContext().getColor(R.color.colorHeaderText));
             tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, DEFAULT_HEADER_FONT_SIZE_DP);
@@ -315,16 +257,14 @@ public class TimetableView extends LinearLayout {
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        int cell_w = (size.x-getPaddingLeft() - getPaddingRight()- sideCellWidth) / (columnCount - 1);
-        return cell_w;
+        return (size.x-getPaddingLeft() - getPaddingRight()- sideCellWidth) / (columnCount - 1);
     }
 
     private int calStickerHeightPx(Schedule schedule) {
         int startTopPx = calStickerTopPxByTime(schedule.getStartTime());
         int endTopPx = calStickerTopPxByTime(schedule.getEndTime());
-        int d = endTopPx - startTopPx;
 
-        return d;
+        return endTopPx - startTopPx;
     }
 
     private int calStickerTopPxByTime(Time time) {
@@ -369,13 +309,12 @@ public class TimetableView extends LinearLayout {
     }
 
     static class Builder {
-        private Context context;
+        private final Context context;
         private int rowCount;
         private int columnCount;
         private int cellHeight;
         private int sideCellWidth;
         private String[] headerTitle;
-        private String[] stickerColors;
         private int startTime;
         private int headerHighlightColor;
 
@@ -386,7 +325,6 @@ public class TimetableView extends LinearLayout {
             cellHeight = dp2Px(DEFAULT_CELL_HEIGHT_DP);
             sideCellWidth = dp2Px(DEFAULT_SIDE_CELL_WIDTH_DP);
             headerTitle = context.getResources().getStringArray(R.array.default_header_title);
-            stickerColors = context.getResources().getStringArray(R.array.default_sticker_color);
             startTime = DEFAULT_START_TIME;
             headerHighlightColor = context.getColor(R.color.default_header_highlight_color);
         }
@@ -416,10 +354,6 @@ public class TimetableView extends LinearLayout {
             return this;
         }
 
-        public Builder setStickerColors(String[] colors) {
-            this.stickerColors = colors;
-            return this;
-        }
 
         public Builder setStartTime(int t) {
             this.startTime = t;
