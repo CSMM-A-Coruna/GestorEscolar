@@ -7,16 +7,23 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-
     <string name="menu_comunicaciones">Comunicaciones</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
 
-    <string-array name="spinner_alumnos">
-        <item>Todos</item>
-        <item>Juan Rodríguez</item>
-        <item>Iria Rodríguez</item>
+
+
+    <string-array name="default_header_title">
+        <item></item>
+        <item>L</item>
+        <item>M</item>
+        <item>X</item>
+        <item>J</item>
+        <item>V</item>
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="sticker_colors">
+        <item>#E0E0E0</item>
+        <item>#E1B660</item>
+        <item>#E0E0E0</item>
+        <item>#E1B660</item>
+    </string-array>
 </resources>
