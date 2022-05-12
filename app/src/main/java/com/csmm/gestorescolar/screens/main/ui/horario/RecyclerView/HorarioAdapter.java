@@ -1,8 +1,11 @@
 package com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +18,8 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioViewHolder> {
 
     private List<HorarioData> mData;
     private final Context mContext;
+    // Allows to remember the last item shown on screen
+    private int lastPosition = -1;
 
     public HorarioAdapter(Context mContext, List<HorarioData> mData) {
         this.mData = mData;
@@ -46,6 +51,7 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioViewHolder> {
         holder.tvHoraFinal.setText(mData.get(holder.getAdapterPosition()).getHoraFinal());
         holder.tvAsignatura.setText(mData.get(holder.getAdapterPosition()).getAsignatura());
         holder.tvProfesor.setText(mData.get(holder.getAdapterPosition()).getProfesor());
+        setAnimation(holder.itemView, holder.getAdapterPosition());
     }
 
     public void updateData(List<HorarioData> data) {
@@ -56,6 +62,16 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioViewHolder> {
     @Override
     public int getItemCount() {
         return mData.size();
+    }
+
+    private void setAnimation(View viewToAnimate, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 
 }

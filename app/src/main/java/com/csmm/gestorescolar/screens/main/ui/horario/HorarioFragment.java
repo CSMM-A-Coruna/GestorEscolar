@@ -1,5 +1,6 @@
 package com.csmm.gestorescolar.screens.main.ui.horario;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -14,6 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.csmm.gestorescolar.R;
+import com.csmm.gestorescolar.client.RestClient;
+import com.csmm.gestorescolar.client.dtos.HorarioDTO;
+import com.csmm.gestorescolar.client.handlers.GetHorarioResponseHandler;
 import com.csmm.gestorescolar.databinding.HorarioFragmentBinding;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.CustomLinearLayoutManager;
 import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioAdapter;
@@ -21,7 +25,6 @@ import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioData;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class HorarioFragment extends Fragment {
@@ -30,12 +33,11 @@ public class HorarioFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private MaterialButtonToggleGroup toggleDias;
     private HorarioAdapter mAdapter;
-    private final List<HorarioData> horario = new ArrayList<>();
-    private final int[] diasId = {R.id.lunes, R.id.martes, R.id.miercoles, R.id.jueves, R.id.viernes};
-    private final String[] dias = {"Lunes", "Martes", "Miercoles", "Jueves", "Viernes"};
-    // 0 = Lunes, 1 = Martes...etc
-    private int diaChecked = 0;
+    private List<HorarioData> horario = new ArrayList<>();
+    private List<HorarioData> horarioToggle = new ArrayList<>();
+    private int diaChecked;
 
+    @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         binding = HorarioFragmentBinding.inflate(inflater, container, false);
@@ -46,29 +48,24 @@ public class HorarioFragment extends Fragment {
         toggleDias.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
             @Override
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
-                System.out.println(diaChecked);
                 switch (checkedId) {
                     case R.id.lunes:
                         diaChecked = 0;
-                        updateRecyclerView();
                         break;
                     case R.id.martes:
                         diaChecked = 1;
-                        updateRecyclerView();
                         break;
                     case R.id.miercoles:
                         diaChecked = 2;
-                        updateRecyclerView();
                         break;
                     case R.id.jueves:
                         diaChecked = 3;
-                        updateRecyclerView();
                         break;
                     case R.id.viernes:
                         diaChecked = 4;
-                        updateRecyclerView();
                         break;
                 }
+                filtrarHorarioPorDia();
             }
         });
 
@@ -79,7 +76,6 @@ public class HorarioFragment extends Fragment {
         mRecyclerView.setLayoutManager(customLinearLayoutManager);
         mAdapter = new HorarioAdapter(getContext(), horario);
         mRecyclerView.setAdapter(mAdapter);
-        setUpHorarioRecyclerView();
 
         // Implementación de detector de gestos (para que al desplazar se desplace en los botones también)
         final GestureDetector gesture = new GestureDetector(requireActivity(), new GestureDetector.SimpleOnGestureListener() {
@@ -100,40 +96,50 @@ public class HorarioFragment extends Fragment {
                         // Derecha a izquierda
                         switch (toggleDias.getCheckedButtonId()) {
                             case R.id.viernes:
-                                System.out.println("No rotamos, ultimo botón");
+                                // Nothing
                                 break;
                             case R.id.jueves:
                                 toggleDias.check(R.id.viernes);
+                                diaChecked = 4;
                                 break;
                             case R.id.miercoles:
                                 toggleDias.check(R.id.jueves);
+                                diaChecked = 3;
                                 break;
                             case R.id.martes:
                                 toggleDias.check(R.id.miercoles);
+                                diaChecked = 2;
                                 break;
                             case R.id.lunes:
                                 toggleDias.check(R.id.martes);
+                                diaChecked = 1;
                                 break;
                         }
+                        filtrarHorarioPorDia();
                     } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                         // Izquierda a derecha
                         switch (toggleDias.getCheckedButtonId()) {
                             case R.id.viernes:
                                 toggleDias.check(R.id.jueves);
+                                diaChecked = 3;
                                 break;
                             case R.id.jueves:
                                 toggleDias.check(R.id.miercoles);
+                                diaChecked = 2;
                                 break;
                             case R.id.miercoles:
                                 toggleDias.check(R.id.martes);
+                                diaChecked = 1;
                                 break;
                             case R.id.martes:
                                 toggleDias.check(R.id.lunes);
+                                diaChecked = 1;
                                 break;
                             case R.id.lunes:
-                                System.out.println("No rotamos, primer botón");
+                                // Nothing
                                 break;
                         }
+                        filtrarHorarioPorDia();
                     }
                 } catch (Exception e) {
                     // nothing
@@ -159,31 +165,53 @@ public class HorarioFragment extends Fragment {
             }
         });
 
+        RestClient.getInstance(requireContext()).getHorario(1, new GetHorarioResponseHandler() {
+            @Override
+            public void requestDidComplete(HorarioDTO response) {
+                updateHorario(response.dataToHorarioData());
+            }
+
+            @Override
+            public void requestDidFail(int statusCode) {
+
+            }
+        });
+
         return root;
     }
 
-    private void setUpHorarioRecyclerView() {
-        HorarioData horarioData = new HorarioData("8:30", "9:20", "Biología", "María José García");
-        horario.add(horarioData);
-        HorarioData horarioData1 = new HorarioData("9:20", "10:10", "Física", "Pedro Lounzas");
-        horario.add(horarioData1);
-        HorarioData horarioData2 = new HorarioData("10:10", "11:00", "Física", "Pedro Lounzas");
-        horario.add(horarioData2);
-        HorarioData horarioData3 = new HorarioData("11:00", "11:30", "Recreo", "");
-        horario.add(horarioData3);
-        HorarioData horarioData4 = new HorarioData("11:30", "12:20", "E.Física", "Juan Lounzas");
-        horario.add(horarioData4);
-        HorarioData horarioData5 = new HorarioData("12:20", "13:10", "Matemáticas", "María Dolores García");
-        horario.add(horarioData5);
-        HorarioData horarioData6 = new HorarioData("13:10", "14:00", "Inglés", "Montse Vázquez");
-        horario.add(horarioData6);
-        mAdapter.notifyDataSetChanged();
+    private void updateHorario(List<HorarioData> data) {
+        horario.clear();
+        horario.addAll(data);
+        filtrarHorarioPorDia();
     }
 
-    private void updateRecyclerView() {
-        System.out.println("Día: " + dias[diaChecked]);
-        Collections.shuffle(horario);
-        mAdapter.notifyDataSetChanged();
+    private void filtrarHorarioPorDia() {
+        horarioToggle.clear();
+        int dia = -1;
+        switch (toggleDias.getCheckedButtonId()) {
+            case R.id.viernes:
+                dia = 4;
+                break;
+            case R.id.jueves:
+                dia = 3;
+                break;
+            case R.id.miercoles:
+                dia = 2;
+                break;
+            case R.id.martes:
+                dia = 1;
+                break;
+            case R.id.lunes:
+                dia = 0;
+                break;
+        }
+        for(int i=0; i<horario.toArray().length; i++) {
+            if(horario.get(i).getDia() == dia) {
+                horarioToggle.add(horario.get(i));
+            }
+        }
+        mAdapter.updateData(horarioToggle);
     }
 
     @Override
