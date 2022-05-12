@@ -65,51 +65,5 @@
             app:layout_constraintStart_toStartOf="parent" />
 
 
-        <com.csmm.gestorescolar.screens.main.ui.horario.TimetableView.TimetableView
-            android:id="@+id/timetable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:column_count="6"
-            app:row_count="12"
-            app:start_time="8"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/anotaciones"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Anotaciones"
-            android:textSize="24sp"
-            app:layout_constraintTop_toBottomOf="@id/timetable"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="15dp"
-            android:textAlignment="center"
-            android:textColor="@color/teal_200"
-            android:textStyle="bold"
-            android:visibility="gone"/>
-
-        <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/divider1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintTop_toBottomOf="@id/anotaciones"
-            android:layout_marginTop="10dp"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/anotaciones_texto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="• Día 15 y 16 de Mayo no lectivos.\n\n• Día 15 y 16 de Mayo no lectivos.\n\n• Día 15 y 16 de Mayo no lectivos.\n\n• Día 15 y 16 de Mayo no lectivos.\n\n• Día 15 y 16 de Mayo no lectivos."
-            android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/divider1"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="20dp"
-            android:paddingBottom="30dp"
-            android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

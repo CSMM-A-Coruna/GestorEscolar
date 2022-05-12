@@ -31,12 +31,17 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioViewHolder> {
 
     @Override
     public void onBindViewHolder(final HorarioViewHolder holder, int position) {
+        // Detalles visuales
         if(holder.getAdapterPosition() == 0) {
             holder.lineaArriba.setVisibility(View.INVISIBLE);
         }
         if(mData.get(holder.getAdapterPosition()).getProfesor().equals("")) {
             holder.tvAsignatura.setPadding(0, 40, 0, 0);
+        } else {
+            holder.tvAsignatura.setPadding(0, 0, 0, 0);
         }
+
+        // Seteamos los textos
         holder.tvHoraInicial.setText(mData.get(holder.getAdapterPosition()).getHoraInicio());
         holder.tvHoraFinal.setText(mData.get(holder.getAdapterPosition()).getHoraFinal());
         holder.tvAsignatura.setText(mData.get(holder.getAdapterPosition()).getAsignatura());
