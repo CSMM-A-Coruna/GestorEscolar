@@ -9,8 +9,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,9 +26,11 @@ import com.csmm.gestorescolar.databinding.HorarioFragmentBinding;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.CustomLinearLayoutManager;
 import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioAdapter;
 import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioData;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,12 +40,15 @@ import java.util.List;
 public class HorarioFragment extends Fragment {
 
     private HorarioFragmentBinding binding;
+    private MaterialButton btnFiltrarPorAlumno;
     private RecyclerView mRecyclerView;
     private MaterialButtonToggleGroup toggleDias;
     private HorarioAdapter mAdapter;
-    private List<HorarioData> horario = new ArrayList<>();
-    private List<HorarioData> horarioToggle = new ArrayList<>();
-    private int diaChecked;
+    private final List<HorarioData> horario = new ArrayList<>();
+    private final List<HorarioData> horarioToggle = new ArrayList<>();
+    PopupMenu popupMenuFiltroAlumno;
+
+    private String alumnoFiltrado;
 
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,29 +58,12 @@ public class HorarioFragment extends Fragment {
 
         toggleDias = root.findViewById(R.id.toggleButton);
 
-        toggleDias.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
-            @Override
-            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
-                switch (checkedId) {
-                    case R.id.lunes:
-                        diaChecked = 0;
-                        break;
-                    case R.id.martes:
-                        diaChecked = 1;
-                        break;
-                    case R.id.miercoles:
-                        diaChecked = 2;
-                        break;
-                    case R.id.jueves:
-                        diaChecked = 3;
-                        break;
-                    case R.id.viernes:
-                        diaChecked = 4;
-                        break;
-                }
-                filtrarHorarioPorDia();
-            }
-        });
+        toggleDias.addOnButtonCheckedListener((group, checkedId, isChecked) -> filtrarHorarioPorDia());
+
+        btnFiltrarPorAlumno = root.findViewById(R.id.btnFiltrarAlumnos);
+        // Animaciones de los botones
+        btnFiltrarPorAlumno.setAlpha(0f);
+        btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1000);
 
         // Asignamos el RecyclerView del horario
         mRecyclerView = root.findViewById(R.id.recyclerView);
@@ -90,6 +80,7 @@ public class HorarioFragment extends Fragment {
                 return true;
             }
             //!TODO OJO, está función estaba mucho mas compacta con otro sistema, pero no lo di hecho funcionar. Queda pendiente de refactor para establecer un código más limpio.
+            @SuppressLint("NonConstantResourceId")
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 final int SWIPE_MIN_DISTANCE = 120;
@@ -106,19 +97,15 @@ public class HorarioFragment extends Fragment {
                                 break;
                             case R.id.jueves:
                                 toggleDias.check(R.id.viernes);
-                                diaChecked = 4;
                                 break;
                             case R.id.miercoles:
                                 toggleDias.check(R.id.jueves);
-                                diaChecked = 3;
                                 break;
                             case R.id.martes:
                                 toggleDias.check(R.id.miercoles);
-                                diaChecked = 2;
                                 break;
                             case R.id.lunes:
                                 toggleDias.check(R.id.martes);
-                                diaChecked = 1;
                                 break;
                         }
                         filtrarHorarioPorDia();
@@ -127,19 +114,15 @@ public class HorarioFragment extends Fragment {
                         switch (toggleDias.getCheckedButtonId()) {
                             case R.id.viernes:
                                 toggleDias.check(R.id.jueves);
-                                diaChecked = 3;
                                 break;
                             case R.id.jueves:
                                 toggleDias.check(R.id.miercoles);
-                                diaChecked = 2;
                                 break;
                             case R.id.miercoles:
                                 toggleDias.check(R.id.martes);
-                                diaChecked = 1;
                                 break;
                             case R.id.martes:
                                 toggleDias.check(R.id.lunes);
-                                diaChecked = 1;
                                 break;
                             case R.id.lunes:
                                 // Nothing
@@ -155,24 +138,91 @@ public class HorarioFragment extends Fragment {
         });
 
 
-        root.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                gesture.onTouchEvent(event);
-                return true;
-            }
+        root.setOnTouchListener((v, event) -> {
+            gesture.onTouchEvent(event);
+            return true;
         });
 
-        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                gesture.onTouchEvent(event);
-                return true;
-            }
+        mRecyclerView.setOnTouchListener((view, event) -> {
+            gesture.onTouchEvent(event);
+            return true;
         });
 
-        // !TODO Seleccionar alumno si tienes más de 1
-        int idAlumno = 1;
+        // Selector de alumnos
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+        ArrayList<String> listAlumnos = new ArrayList<>();
+        try {
+            JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
+            if(alumnos.length() > 1) {
+                for(int i = 0; i < alumnos.length(); i++) {
+                    JSONObject json = alumnos.getJSONObject(i);
+                    listAlumnos.add(json.getString("nombre"));
+                }
+                btnFiltrarPorAlumno.setVisibility(View.VISIBLE);
+                String[] arrayAlumnos = new String[listAlumnos.size()];
+                for(int j =0;j<listAlumnos.size();j++){
+                    arrayAlumnos[j] = listAlumnos.get(j);
+                }
+                String[] arrayAlumnosSoloNombre = new String[listAlumnos.size()];
+                for(int i=0; i<listAlumnos.size(); i++) {
+                    String nombre = listAlumnos.get(i);
+                    String[] splited = nombre.split("\\s+");
+                    arrayAlumnosSoloNombre[i] = splited[0];
+                }
+
+                alumnoFiltrado = arrayAlumnos[0];
+                btnFiltrarPorAlumno.setText(arrayAlumnosSoloNombre[0]);
+
+                btnFiltrarPorAlumno.setOnClickListener(view -> {
+                    // Animación
+                    btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_arriba));
+                    // PopUp
+                    popupMenuFiltroAlumno = new PopupMenu(getContext(), view);
+                    popupMenuFiltroAlumno.setOnMenuItemClickListener(item -> {
+                        for(int i=0; i<arrayAlumnos.length; i++) {
+                            if(arrayAlumnosSoloNombre[i].contentEquals(item.getTitle())) {
+                                alumnoFiltrado = arrayAlumnos[i];
+                                btnFiltrarPorAlumno.setText(arrayAlumnosSoloNombre[i]);
+                            }
+                        }
+                        getHorarioFromServer(alumnoFiltrado);
+                        return true;
+                    });
+
+                    for (String s : arrayAlumnosSoloNombre) {
+                        popupMenuFiltroAlumno.getMenu().add(s);
+                    }
+                    popupMenuFiltroAlumno.show();
+
+                    // Animación al cerrar el menu
+                    popupMenuFiltroAlumno.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
+                });
+            } else {
+                alumnoFiltrado = alumnos.getJSONObject(0).getString("nombre");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        getHorarioFromServer(alumnoFiltrado);
+
+        return root;
+    }
+
+    private void getHorarioFromServer(String alumno) {
+        int idAlumno = -1;
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+        try {
+            JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
+            for (int i = 0; i < alumnos.length(); i++) {
+                JSONObject json = alumnos.getJSONObject(i);
+                if(alumno.equals(json.getString("nombre")))
+                    idAlumno = json.getInt("id");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        int finalIdAlumno = idAlumno;
         RestClient.getInstance(requireContext()).getHorario(idAlumno, new GetHorarioResponseHandler() {
             @Override
             public void requestDidComplete(HorarioDTO response) {
@@ -184,7 +234,7 @@ public class HorarioFragment extends Fragment {
                 if(statusCode!=404) {
                     try {
                         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("horario", Context.MODE_PRIVATE);
-                        JSONObject json = new JSONObject(sharedPreferences.getString(String.valueOf(idAlumno), null));
+                        JSONObject json = new JSONObject(sharedPreferences.getString(String.valueOf(finalIdAlumno), null));
                         HorarioDTO horarioDTO = new HorarioDTO(json);
                         Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
                         updateHorario(horarioDTO.dataToHorarioData());
@@ -193,19 +243,19 @@ public class HorarioFragment extends Fragment {
                     }
                 } else {
                     Snackbar.make(mRecyclerView, "No hemos podido recuperar tu horario...", Snackbar.LENGTH_SHORT).show();
+                    updateHorario(null);
                 }
             }
         });
-
-        return root;
     }
-
     private void updateHorario(List<HorarioData> data) {
         horario.clear();
-        horario.addAll(data);
+        if(data!=null)
+            horario.addAll(data);
         filtrarHorarioPorDia();
     }
 
+    @SuppressLint("NonConstantResourceId")
     private void filtrarHorarioPorDia() {
         horarioToggle.clear();
         int dia = -1;

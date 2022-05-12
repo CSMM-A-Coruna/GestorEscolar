@@ -59,37 +59,37 @@ public class HorarioDTO {
             }
             for(int i=0; i<martes.length(); i++) {
                 HorarioData horarioData = new HorarioData(
-                        lunes.getJSONObject(i).getString("inicio"),
-                        lunes.getJSONObject(i).getString("fin"),
-                        lunes.getJSONObject(i).getString("materia"),
-                        lunes.getJSONObject(i).getString("profesor"),
+                        martes.getJSONObject(i).getString("inicio"),
+                        martes.getJSONObject(i).getString("fin"),
+                        martes.getJSONObject(i).getString("materia"),
+                        martes.getJSONObject(i).getString("profesor"),
                         1);
                 list.add(horarioData);
             }
             for(int i=0; i<miercoles.length(); i++) {
                 HorarioData horarioData = new HorarioData(
-                        lunes.getJSONObject(i).getString("inicio"),
-                        lunes.getJSONObject(i).getString("fin"),
-                        lunes.getJSONObject(i).getString("materia"),
-                        lunes.getJSONObject(i).getString("profesor"),
+                        miercoles.getJSONObject(i).getString("inicio"),
+                        miercoles.getJSONObject(i).getString("fin"),
+                        miercoles.getJSONObject(i).getString("materia"),
+                        miercoles.getJSONObject(i).getString("profesor"),
                         2);
                 list.add(horarioData);
             }
             for(int i=0; i<jueves.length(); i++) {
                 HorarioData horarioData = new HorarioData(
-                        lunes.getJSONObject(i).getString("inicio"),
-                        lunes.getJSONObject(i).getString("fin"),
-                        lunes.getJSONObject(i).getString("materia"),
-                        lunes.getJSONObject(i).getString("profesor"),
+                        jueves.getJSONObject(i).getString("inicio"),
+                        jueves.getJSONObject(i).getString("fin"),
+                        jueves.getJSONObject(i).getString("materia"),
+                        jueves.getJSONObject(i).getString("profesor"),
                         3);
                 list.add(horarioData);
             }
             for(int i=0; i<viernes.length(); i++) {
                 HorarioData horarioData = new HorarioData(
-                        lunes.getJSONObject(i).getString("inicio"),
-                        lunes.getJSONObject(i).getString("fin"),
-                        lunes.getJSONObject(i).getString("materia"),
-                        lunes.getJSONObject(i).getString("profesor"),
+                        viernes.getJSONObject(i).getString("inicio"),
+                        viernes.getJSONObject(i).getString("fin"),
+                        viernes.getJSONObject(i).getString("materia"),
+                        viernes.getJSONObject(i).getString("profesor"),
                         4);
                 list.add(horarioData);
             }
