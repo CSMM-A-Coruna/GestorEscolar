@@ -7,36 +7,108 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.databinding.HorarioFragmentBinding;
+import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.CustomLinearLayoutManager;
+import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioAdapter;
+import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioData;
 import com.csmm.gestorescolar.screens.main.ui.horario.TimetableView.Schedule;
 import com.csmm.gestorescolar.screens.main.ui.horario.TimetableView.Time;
 import com.csmm.gestorescolar.screens.main.ui.horario.TimetableView.TimetableView;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class HorarioFragment extends Fragment {
 
     private HorarioFragmentBinding binding;
     private TimetableView timetable;
+    private RecyclerView mRecyclerView;
+    private MaterialButtonToggleGroup toggleDias;
+    private HorarioAdapter mAdapter;
+    private final List<HorarioData> horario = new ArrayList<>();
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         binding = HorarioFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        toggleDias = root.findViewById(R.id.toggleButton);
+
+        toggleDias.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
+            @Override
+            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+                switch (checkedId) {
+                    case R.id.lunes:
+                        updateRecyclerView("Lunes");
+                        break;
+                    case R.id.martes:
+                        updateRecyclerView("Martes");
+                        break;
+                    case R.id.miercoles:
+                        updateRecyclerView("Miercoles");
+                        break;
+                    case R.id.jueves:
+                        updateRecyclerView("Jueves");
+                        break;
+                    case R.id.viernes:
+                        updateRecyclerView("Viernes");
+                        break;
+                }
+            }
+        });
+
+        // Asignamos el RecyclerView del horario
+        mRecyclerView = root.findViewById(R.id.recyclerView);
+        CustomLinearLayoutManager customLinearLayoutManager = new CustomLinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), 0));
+        mRecyclerView.setLayoutManager(customLinearLayoutManager);
+        mAdapter = new HorarioAdapter(getContext(), horario);
+        mRecyclerView.setAdapter(mAdapter);
+        setUpHorarioRecyclerView();
+
         timetable = root.findViewById(R.id.timetable);
         setUpEvents();
         timetable.setHeaderHighlight(1);
-
         timetable.setOnStickerSelectEventListener(new TimetableView.OnStickerSelectedListener() {
             @Override
             public void OnStickerSelected(Schedule schedule) {
                 System.out.println(schedule.getClassTitle());
             }
         });
+
+
         return root;
+    }
+
+    private void setUpHorarioRecyclerView() {
+        HorarioData horarioData = new HorarioData("8:30", "9:20", "Biología", "María José García");
+        horario.add(horarioData);
+        HorarioData horarioData1 = new HorarioData("9:20", "10:10", "Física", "Pedro Lounzas");
+        horario.add(horarioData1);
+        HorarioData horarioData2 = new HorarioData("10:10", "11:00", "Física", "Pedro Lounzas");
+        horario.add(horarioData2);
+        HorarioData horarioData3 = new HorarioData("11:00", "11:30", "Recreo", "");
+        horario.add(horarioData3);
+        HorarioData horarioData4 = new HorarioData("11:30", "12:20", "E.Física", "Juan Lounzas");
+        horario.add(horarioData4);
+        HorarioData horarioData5 = new HorarioData("12:20", "13:10", "Matemáticas", "María Dolores García");
+        horario.add(horarioData5);
+        HorarioData horarioData6 = new HorarioData("13:10", "14:00", "Inglés", "Montse Vázquez");
+        horario.add(horarioData6);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void updateRecyclerView(String dia) {
+        Collections.shuffle(horario);
+        mAdapter.notifyDataSetChanged();
     }
 
     private void setUpEvents() {
