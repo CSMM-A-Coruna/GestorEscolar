@@ -1,6 +1,8 @@
 package com.csmm.gestorescolar.screens.main.ui.horario;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -23,6 +25,10 @@ import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones
 import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioAdapter;
 import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioData;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.snackbar.Snackbar;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,7 +171,9 @@ public class HorarioFragment extends Fragment {
             }
         });
 
-        RestClient.getInstance(requireContext()).getHorario(1, new GetHorarioResponseHandler() {
+        // !TODO Seleccionar alumno si tienes más de 1
+        int idAlumno = 1;
+        RestClient.getInstance(requireContext()).getHorario(idAlumno, new GetHorarioResponseHandler() {
             @Override
             public void requestDidComplete(HorarioDTO response) {
                 updateHorario(response.dataToHorarioData());
@@ -173,7 +181,19 @@ public class HorarioFragment extends Fragment {
 
             @Override
             public void requestDidFail(int statusCode) {
-
+                if(statusCode!=404) {
+                    try {
+                        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("horario", Context.MODE_PRIVATE);
+                        JSONObject json = new JSONObject(sharedPreferences.getString(String.valueOf(idAlumno), null));
+                        HorarioDTO horarioDTO = new HorarioDTO(json);
+                        Snackbar.make(mRecyclerView, "Error de conexión", Snackbar.LENGTH_SHORT).show();
+                        updateHorario(horarioDTO.dataToHorarioData());
+                    } catch (JSONException | NullPointerException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Snackbar.make(mRecyclerView, "No hemos podido recuperar tu horario...", Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
 

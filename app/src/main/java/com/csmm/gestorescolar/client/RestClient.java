@@ -655,6 +655,13 @@ public class RestClient {
                 null,
                 response -> {
                     HorarioDTO dto = new HorarioDTO(response);
+                    SharedPreferences horarioCache = context.getSharedPreferences("horario", Context.MODE_PRIVATE);
+                    String lista = response.toString();
+                    if(!lista.equals(horarioCache.getString(String.valueOf(idAlumno), ""))) {
+                        SharedPreferences.Editor editor = horarioCache.edit();
+                        editor.putString(String.valueOf(idAlumno), lista);
+                        editor.apply();
+                    }
                     handler.requestDidComplete(dto);
                 }, new DefaultErrorHandler(handler)
         ) {
