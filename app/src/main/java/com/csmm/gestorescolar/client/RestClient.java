@@ -54,8 +54,8 @@ import java.util.Map;
 
 public class RestClient {
 
-    public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
-    //public static final String REST_API_BASE_URL = "http://192.168.11.16:3000/v1";
+    //public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
+    public static final String REST_API_BASE_URL = "http://192.168.11.16:3000/v1";
     private RequestQueue queue;
     private Context context;
 
