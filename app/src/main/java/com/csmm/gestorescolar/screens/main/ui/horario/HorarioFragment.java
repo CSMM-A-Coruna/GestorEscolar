@@ -39,6 +39,7 @@ import java.util.List;
 
 public class HorarioFragment extends Fragment {
 
+    private View root;
     private HorarioFragmentBinding binding;
     private MaterialButton btnFiltrarPorAlumno;
     private RecyclerView mRecyclerView;
@@ -46,15 +47,14 @@ public class HorarioFragment extends Fragment {
     private HorarioAdapter mAdapter;
     private final List<HorarioData> horario = new ArrayList<>();
     private final List<HorarioData> horarioToggle = new ArrayList<>();
-    PopupMenu popupMenuFiltroAlumno;
+    private PopupMenu popupMenuFiltroAlumno;
 
     private String alumnoFiltrado;
 
-    @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         binding = HorarioFragmentBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        root = binding.getRoot();
 
         toggleDias = root.findViewById(R.id.toggleButton);
 
@@ -73,80 +73,8 @@ public class HorarioFragment extends Fragment {
         mAdapter = new HorarioAdapter(getContext(), horario);
         mRecyclerView.setAdapter(mAdapter);
 
-        // Implementación de detector de gestos (para que al desplazar se desplace en los botones también)
-        final GestureDetector gesture = new GestureDetector(requireActivity(), new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDown(MotionEvent e) {
-                return true;
-            }
-            //!TODO OJO, está función estaba mucho mas compacta con otro sistema, pero no lo di hecho funcionar. Queda pendiente de refactor para establecer un código más limpio.
-            @SuppressLint("NonConstantResourceId")
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                final int SWIPE_MIN_DISTANCE = 120;
-                final int SWIPE_MAX_OFF_PATH = 250;
-                final int SWIPE_THRESHOLD_VELOCITY = 200;
-                try {
-                    if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                        return false;
-                    if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                        // Derecha a izquierda
-                        switch (toggleDias.getCheckedButtonId()) {
-                            case R.id.viernes:
-                                // Nothing
-                                break;
-                            case R.id.jueves:
-                                toggleDias.check(R.id.viernes);
-                                break;
-                            case R.id.miercoles:
-                                toggleDias.check(R.id.jueves);
-                                break;
-                            case R.id.martes:
-                                toggleDias.check(R.id.miercoles);
-                                break;
-                            case R.id.lunes:
-                                toggleDias.check(R.id.martes);
-                                break;
-                        }
-                        filtrarHorarioPorDia();
-                    } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                        // Izquierda a derecha
-                        switch (toggleDias.getCheckedButtonId()) {
-                            case R.id.viernes:
-                                toggleDias.check(R.id.jueves);
-                                break;
-                            case R.id.jueves:
-                                toggleDias.check(R.id.miercoles);
-                                break;
-                            case R.id.miercoles:
-                                toggleDias.check(R.id.martes);
-                                break;
-                            case R.id.martes:
-                                toggleDias.check(R.id.lunes);
-                                break;
-                            case R.id.lunes:
-                                // Nothing
-                                break;
-                        }
-                        filtrarHorarioPorDia();
-                    }
-                } catch (Exception e) {
-                    // nothing
-                }
-                return super.onFling(e1, e2, velocityX, velocityY);
-            }
-        });
-
-
-        root.setOnTouchListener((v, event) -> {
-            gesture.onTouchEvent(event);
-            return true;
-        });
-
-        mRecyclerView.setOnTouchListener((view, event) -> {
-            gesture.onTouchEvent(event);
-            return true;
-        });
+        // Encapsulación del detector de gestos
+        initializeGestureDetector();
 
         // Selector de alumnos
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
@@ -290,4 +218,80 @@ public class HorarioFragment extends Fragment {
         binding = null;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private void initializeGestureDetector() {
+        // Implementación de detector de gestos (para que al desplazar se desplace en los botones también)
+        final GestureDetector gesture = new GestureDetector(requireActivity(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+            //!TODO OJO, está función estaba mucho mas compacta con otro sistema, pero no lo di hecho funcionar. Queda pendiente de refactor para establecer un código más limpio.
+            @SuppressLint("NonConstantResourceId")
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                final int SWIPE_MIN_DISTANCE = 120;
+                final int SWIPE_MAX_OFF_PATH = 250;
+                final int SWIPE_THRESHOLD_VELOCITY = 200;
+                try {
+                    if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+                        return false;
+                    if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                        // Derecha a izquierda
+                        switch (toggleDias.getCheckedButtonId()) {
+                            case R.id.viernes:
+                                // Nothing
+                                break;
+                            case R.id.jueves:
+                                toggleDias.check(R.id.viernes);
+                                break;
+                            case R.id.miercoles:
+                                toggleDias.check(R.id.jueves);
+                                break;
+                            case R.id.martes:
+                                toggleDias.check(R.id.miercoles);
+                                break;
+                            case R.id.lunes:
+                                toggleDias.check(R.id.martes);
+                                break;
+                        }
+                        filtrarHorarioPorDia();
+                    } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                        // Izquierda a derecha
+                        switch (toggleDias.getCheckedButtonId()) {
+                            case R.id.viernes:
+                                toggleDias.check(R.id.jueves);
+                                break;
+                            case R.id.jueves:
+                                toggleDias.check(R.id.miercoles);
+                                break;
+                            case R.id.miercoles:
+                                toggleDias.check(R.id.martes);
+                                break;
+                            case R.id.martes:
+                                toggleDias.check(R.id.lunes);
+                                break;
+                            case R.id.lunes:
+                                // Nothing
+                                break;
+                        }
+                        filtrarHorarioPorDia();
+                    }
+                } catch (Exception e) {
+                    // nothing
+                }
+                return super.onFling(e1, e2, velocityX, velocityY);
+            }
+        });
+
+        root.setOnTouchListener((v, event) -> {
+            gesture.onTouchEvent(event);
+            return true;
+        });
+
+        mRecyclerView.setOnTouchListener((view, event) -> {
+            gesture.onTouchEvent(event);
+            return true;
+        });
+    }
 }

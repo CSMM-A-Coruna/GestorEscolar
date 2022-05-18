@@ -11,38 +11,38 @@
         <item
             android:id="@+id/nav_horario"
             android:icon="@drawable/ic_horario"
-            android:title="Horario" />
+            android:title="@string/menu_horario" />
         <item
             android:id="@+id/nav_diario"
             android:icon="@drawable/ic_diario"
-            android:title="Diario" />
+            android:title="@string/menu_diario" />
         <item
             android:id="@+id/nav_calificaciones"
             android:icon="@drawable/ic_calificaciones"
-            android:title="Calificaciones" />
+            android:title="@string/menu_calificaciones" />
         <item
             android:id="@+id/nav_entrevistas"
             android:icon="@drawable/ic_entrevistas"
-            android:title="Entrevistas" />
+            android:title="@string/menu_entrevistas" />
         <item
             android:id="@+id/nav_documentacion"
             android:icon="@drawable/ic_documentacion"
-            android:title="Documentación" />
+            android:title="@string/menu_documentacion" />
         <item
             android:id="@+id/nav_extraescolares"
             android:icon="@drawable/ic_extraescolares"
-            android:title="Extraescolares" />
+            android:title="@string/menu_extraescolares" />
         <item
             android:id="@+id/nav_enfermeria"
             android:icon="@drawable/ic_enfermeria"
-            android:title="Enfermería" />
+            android:title="@string/menu_enfermeria" />
         <item
             android:id="@+id/nav_llavero"
             android:icon="@drawable/ic_llavero"
-            android:title="Llavero" />
+            android:title="@string/menu_llavero" />
         <item android:id="@+id/nav_misdatos"
             android:icon="@drawable/ic_misdatos"
-            android:title="Mis datos" />
+            android:title="@string/menu_mis_datos" />
     </group>
 
    <!-- <item android:title="Credenciales">
@@ -53,16 +53,16 @@
     <!-- Sección de configuración -->
     <item
         android:id="@+id/configuration_section"
-        android:title="Configuración">
+        android:title="@string/menu_configuracion">
         <menu>
             <item
                 android:id="@+id/nav_ajustes"
                 android:icon="@drawable/ic_ajustes"
-                android:title="Ajustes" />
+                android:title="@string/menu_ajustes" />
             <item
                 android:id="@+id/nav_cerrarsesion"
                 android:icon="@drawable/ic_cerrarsesion"
-                android:title="Cerrar sesión" />
+                android:title="@string/menu_cerrar_sesion" />
         </menu>
     </item>
 </menu>
