@@ -11,6 +11,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.client.dtos.DestinoDTO;
+import com.csmm.gestorescolar.client.dtos.HorarioDTO;
 import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
 import com.csmm.gestorescolar.client.handlers.CheckPasswordResponseHandler;
@@ -20,6 +21,7 @@ import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseH
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetDestinosResponseHandler;
+import com.csmm.gestorescolar.client.handlers.GetHorarioResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetPreferencesResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostEstadoComunicacionHandler;
 import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
@@ -27,6 +29,7 @@ import com.csmm.gestorescolar.client.handlers.PostLoginResponseHandler;
 import com.csmm.gestorescolar.client.handlers.PostSendComunicacionResponseHandler;
 import com.csmm.gestorescolar.client.handlers.UpdatePreferenceResponseHandler;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,8 +40,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,7 +52,8 @@ import java.util.Map;
 
 public class RestClient {
 
-    public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
+    //public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
+    public static final String REST_API_BASE_URL = "http://192.168.11.16:3000/v1";
     private RequestQueue queue;
     private Context context;
 
@@ -606,6 +612,57 @@ public class RestClient {
                 body,
                 response -> {
                     handler.requestDidComplete();
+                }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
+        queue.add(request);
+    }
+
+    public void getHorario(int idAlumno, GetHorarioResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        String grupo = "";
+        try {
+            JSONArray alumnos = new JSONArray(sharedPref.getString("alumnosAsociados", null));
+            for (int i = 0; i < alumnos.length(); i++) {
+                JSONObject json = alumnos.getJSONObject(i);
+                if(json.getInt("id") == idAlumno) {
+                    grupo = json.getString("grupo");
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // Como el grupo contiene espacios, necesitamos tirar de URL encode
+        String grupoEnc = "";
+        try {
+            grupoEnc = URLEncoder.encode(grupo, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
+                REST_API_BASE_URL + "/horario?grupo="+grupoEnc,
+                null,
+                response -> {
+                    HorarioDTO dto = new HorarioDTO(response);
+                    SharedPreferences horarioCache = context.getSharedPreferences("horario", Context.MODE_PRIVATE);
+                    String lista = response.toString();
+                    if(!lista.equals(horarioCache.getString(String.valueOf(idAlumno), ""))) {
+                        SharedPreferences.Editor editor = horarioCache.edit();
+                        editor.putString(String.valueOf(idAlumno), lista);
+                        editor.apply();
+                    }
+                    handler.requestDidComplete(dto);
                 }, new DefaultErrorHandler(handler)
         ) {
             @Override
