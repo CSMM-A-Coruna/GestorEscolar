@@ -12,7 +12,7 @@ import com.csmm.gestorescolar.R;
 public class DocumentacionViewHolder extends RecyclerView.ViewHolder {
 
     TextView mNombre, mCategoria, mFecha;
-    ImageView tipoDocumento;
+    ImageView tipoDocumento, protegido;
     ConstraintLayout mLayout;
 
     public DocumentacionViewHolder(View itemView) {
@@ -22,6 +22,7 @@ public class DocumentacionViewHolder extends RecyclerView.ViewHolder {
         mCategoria = itemView.findViewById(R.id.tvCategoria);
         mFecha = itemView.findViewById(R.id.tvFecha);
         tipoDocumento = itemView.findViewById(R.id.tipoDocumento);
+        protegido = itemView.findViewById(R.id.protegidoIcon);
         mLayout = itemView.findViewById(R.id.clMain);
     }
 }

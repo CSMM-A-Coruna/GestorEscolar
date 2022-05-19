@@ -27,6 +27,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -68,53 +70,48 @@ public class DocumentacionFragment extends Fragment {
         ArrayList<String> listAlumnos = new ArrayList<>();
         try {
             JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
-            if(alumnos.length() > 1) {
-                for(int i = 0; i < alumnos.length(); i++) {
-                    JSONObject json = alumnos.getJSONObject(i);
-                    listAlumnos.add(json.getString("nombre"));
-                }
-                btnFiltrarPorAlumno.setVisibility(View.VISIBLE);
-                String[] arrayAlumnos = new String[listAlumnos.size()];
-                for(int j =0;j<listAlumnos.size();j++){
-                    arrayAlumnos[j] = listAlumnos.get(j);
-                }
-                String[] arrayAlumnosSoloNombre = new String[listAlumnos.size()];
-                for(int i=0; i<listAlumnos.size(); i++) {
-                    String nombre = listAlumnos.get(i);
-                    String[] splited = nombre.split("\\s+");
-                    arrayAlumnosSoloNombre[i] = splited[0];
-                }
-
-                alumnoFiltrado = arrayAlumnos[0];
-                btnFiltrarPorAlumno.setText(arrayAlumnosSoloNombre[0]);
-
-                btnFiltrarPorAlumno.setOnClickListener(view -> {
-                    // Animación
-                    btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_arriba));
-                    // PopUp
-                    popupMenuFiltroAlumno = new PopupMenu(getContext(), view);
-                    popupMenuFiltroAlumno.setOnMenuItemClickListener(item -> {
-                        for(int i=0; i<arrayAlumnos.length; i++) {
-                            if(arrayAlumnosSoloNombre[i].contentEquals(item.getTitle())) {
-                                alumnoFiltrado = arrayAlumnos[i];
-                                btnFiltrarPorAlumno.setText(arrayAlumnosSoloNombre[i]);
-                            }
-                        }
-                        getDocumentosFromServer(alumnoFiltrado);
-                        return true;
-                    });
-
-                    for (String s : arrayAlumnosSoloNombre) {
-                        popupMenuFiltroAlumno.getMenu().add(s);
-                    }
-                    popupMenuFiltroAlumno.show();
-
-                    // Animación al cerrar el menu
-                    popupMenuFiltroAlumno.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
-                });
-            } else {
-                alumnoFiltrado = alumnos.getJSONObject(0).getString("nombre");
+            listAlumnos.add("Generales");
+            for(int i = 0; i < alumnos.length(); i++) {
+                JSONObject json = alumnos.getJSONObject(i);
+                listAlumnos.add(json.getString("nombre"));
             }
+            btnFiltrarPorAlumno.setVisibility(View.VISIBLE);
+            String[] arrayAlumnos = new String[listAlumnos.size()];
+            for(int j =0;j<listAlumnos.size();j++){
+                arrayAlumnos[j] = listAlumnos.get(j);
+            }
+            String[] arrayAlumnosSoloNombre = new String[listAlumnos.size()];
+            for(int i=0; i<listAlumnos.size(); i++) {
+                String nombre = listAlumnos.get(i);
+                String[] splited = nombre.split("\\s+");
+                arrayAlumnosSoloNombre[i] = splited[0];
+            }
+            alumnoFiltrado = arrayAlumnos[0];
+            btnFiltrarPorAlumno.setText(arrayAlumnosSoloNombre[0]);
+            btnFiltrarPorAlumno.setOnClickListener(view -> {
+                    // Animación
+                btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_arriba));
+                // PopUp
+                popupMenuFiltroAlumno = new PopupMenu(getContext(), view);
+                popupMenuFiltroAlumno.setOnMenuItemClickListener(item -> {
+                    for(int i=0; i<arrayAlumnos.length; i++) {
+                        if(arrayAlumnosSoloNombre[i].contentEquals(item.getTitle())) {
+                            alumnoFiltrado = arrayAlumnos[i];
+                            btnFiltrarPorAlumno.setText(arrayAlumnosSoloNombre[i]);
+                        }
+                    }
+                    getDocumentosFromServer(alumnoFiltrado);
+                    return true;
+                });
+
+                for (String s : arrayAlumnosSoloNombre) {
+                    popupMenuFiltroAlumno.getMenu().add(s);
+                }
+
+                popupMenuFiltroAlumno.show();
+                // Animación al cerrar el menu
+                popupMenuFiltroAlumno.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -170,19 +167,35 @@ public class DocumentacionFragment extends Fragment {
 
     private void getDocumentosFromServer(String alumno) {
         int idAlumno = -1;
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
-        try {
-            JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
-            for (int i = 0; i < alumnos.length(); i++) {
-                JSONObject json = alumnos.getJSONObject(i);
-                if(alumno.equals(json.getString("nombre")))
-                    idAlumno = json.getInt("id");
+        String grupo = "", grupoEnc = "";
+        if(!alumno.equals("Generales")) {
+            SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+            try {
+                JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
+                for (int i = 0; i < alumnos.length(); i++) {
+                    JSONObject json = alumnos.getJSONObject(i);
+                    if(alumno.equals(json.getString("nombre")))
+                        idAlumno = json.getInt("id");
+                }
+                for (int i = 0; i < alumnos.length(); i++) {
+                    JSONObject json = alumnos.getJSONObject(i);
+                    if(json.getInt("id") == idAlumno) {
+                        grupo = json.getString("grupo");
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+            // Como el grupo contiene espacios, necesitamos tirar de URL encode
+            try {
+                grupoEnc = URLEncoder.encode(grupo, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        } else {
+            grupoEnc = "0";
         }
-        int finalIdAlumno = idAlumno;
-        RestClient.getInstance(requireContext()).getAllDocumentos(finalIdAlumno, new GetAllDocumentosResponseHandler() {
+        RestClient.getInstance(requireContext()).getAllDocumentos(idAlumno, grupoEnc, new GetAllDocumentosResponseHandler() {
             @Override
             public void requestDidComplete(List<DocumentoDTO> response) {
                 serverList.clear();
