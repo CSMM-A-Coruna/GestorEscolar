@@ -65,7 +65,7 @@ public class ComunicacionDetalleEnviada extends AppCompatActivity {
             //String token = idComunicacion + adjuntos[0];
             //StringBuilder strb = new StringBuilder(token);
             //token = strb.reverse().toString();
-            Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/download").buildUpon()
+            Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/adjunto/download").buildUpon()
                     .appendQueryParameter("file_name", adjuntos[0])
                     .appendQueryParameter("id_comunicacion", String.valueOf(idComunicacion))
                     .appendQueryParameter("auth", savedtoken)

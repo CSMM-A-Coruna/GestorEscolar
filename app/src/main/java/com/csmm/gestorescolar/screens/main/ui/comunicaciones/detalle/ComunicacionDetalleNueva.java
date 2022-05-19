@@ -234,7 +234,7 @@ public class ComunicacionDetalleNueva extends AppCompatActivity {
         protected Void doInBackground(String...urls) {
             //setup params
             Map<String, String> params = new HashMap<>();
-            String url = RestClient.REST_API_BASE_URL + "/resources/upload?id_comunicacion="+urls[0];
+            String url = RestClient.REST_API_BASE_URL + "/resources/adjunto/upload?id_comunicacion="+urls[0];
             try {
                 RestClient.getInstance(getApplicationContext()).uploadAdjunto(url, params, path, fileName);
             } catch (Exception e) {

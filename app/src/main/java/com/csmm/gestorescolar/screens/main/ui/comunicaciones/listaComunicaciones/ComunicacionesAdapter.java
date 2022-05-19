@@ -42,6 +42,9 @@ public class ComunicacionesAdapter extends RecyclerView.Adapter<ComunicacionesVi
     @Override
     public void onBindViewHolder(final ComunicacionesViewHolder holder, int position) {
 
+        //holder.mLayout.setAnimation(AnimationUtils.loadAnimation(holder.itemView.getContext(), R.anim.alpha));
+
+
         // Setteamos los textos de `Asunto`, `Texto` y `Hora`, que son siempre iguales independientemente del tipo de comunicación
         holder.mAsunto.setText(mData.get(holder.getAdapterPosition()).getAsunto());
         holder.mCuerpo.setText(mData.get(holder.getAdapterPosition()).getTexto());

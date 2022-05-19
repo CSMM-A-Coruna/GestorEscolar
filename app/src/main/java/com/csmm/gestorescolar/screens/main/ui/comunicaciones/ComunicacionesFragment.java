@@ -45,7 +45,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ComunicacionesFragment extends Fragment {
 
@@ -56,12 +55,14 @@ public class ComunicacionesFragment extends Fragment {
     private SwipeRefreshLayout swipLayout;
     private ComunicacionesAdapter mAdapter;
     private ImageButton btnFiltrarPorPropiedad;
-    BottomNavigationView navButton;
+    private BottomNavigationView navButton;
     private Chip chipFiltro;
     private SharedPreferences sharedPreferences;
     private String currentNav;
     private boolean isScrolling;
-    PopupMenu popupMenuFiltroPropiedad, popupMenuFiltroAlumno;
+    private PopupMenu popupMenuFiltroPropiedad, popupMenuFiltroAlumno;
+    MaterialButton btnFiltrarPorAlumno;
+    FloatingActionButton nuevaComButton;
 
     private String alumnoFiltrado = "Todos";
     private String propiedadFiltrada = "Todos";
@@ -77,9 +78,9 @@ public class ComunicacionesFragment extends Fragment {
 
         // Asignamos el swipe, botones y demás
         swipLayout = root.findViewById(R.id.swipe_layout);
-        MaterialButton btnFiltrarPorAlumno = root.findViewById(R.id.btnFiltrarAlumnos);
+        btnFiltrarPorAlumno = root.findViewById(R.id.btnFiltrarAlumnos);
         navButton = root.findViewById(R.id.bottom_navigation);
-        FloatingActionButton nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
+        nuevaComButton = root.findViewById(R.id.nuevaComunicacionButton);
         btnFiltrarPorPropiedad = root.findViewById(R.id.btnFiltros);
         chipFiltro = root.findViewById(R.id.chipFiltradoAlumnos);
 
@@ -89,6 +90,9 @@ public class ComunicacionesFragment extends Fragment {
         btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1000);
         btnFiltrarPorPropiedad.setAlpha(0f);
         btnFiltrarPorPropiedad.animate().alpha(1f).setDuration(1000);
+
+        // Iniciomas el selector de alumnos
+        initializeSelectorAlumnos();
 
         // Animación fab
         nuevaComButton.setScaleX(0);
@@ -118,54 +122,6 @@ public class ComunicacionesFragment extends Fragment {
         nuevaComButton.setOnClickListener(view -> {
             Intent intent = new Intent(getContext(), ComunicacionDetalleNueva.class);
             startActivity(intent);
-        });
-
-        // Selector de alumnos
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
-        ArrayList<String> listAlumnos = new ArrayList<>();
-        try {
-            JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
-            listAlumnos.add("Todos");
-            for(int i = 0; i < alumnos.length(); i++) {
-                JSONObject json = alumnos.getJSONObject(i);
-                listAlumnos.add(json.getString("nombre"));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String[] arrayAlumnos = new String[listAlumnos.size()];
-        for(int j =0;j<listAlumnos.size();j++){
-            arrayAlumnos[j] = listAlumnos.get(j);
-        }
-        String[] arrayAlumnosSoloNombre = new String[listAlumnos.size()];
-        for(int i=0; i<listAlumnos.size(); i++) {
-            String nombre = listAlumnos.get(i);
-            String[] splited = nombre.split("\\s+");
-            arrayAlumnosSoloNombre[i] = splited[0];
-        }
-
-        btnFiltrarPorAlumno.setOnClickListener(view -> {
-            // Animación
-            btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_arriba));
-            // PopUp
-            popupMenuFiltroAlumno = new PopupMenu(getContext(), view);
-            popupMenuFiltroAlumno.setOnMenuItemClickListener(item -> {
-                for(int i=0; i<arrayAlumnos.length; i++) {
-                    if(arrayAlumnosSoloNombre[i].contentEquals(item.getTitle())) {
-                        alumnoFiltrado = arrayAlumnos[i];
-                    }
-                }
-                filterData();
-                return true;
-            });
-
-            for (String s : arrayAlumnosSoloNombre) {
-                popupMenuFiltroAlumno.getMenu().add(s);
-            }
-            popupMenuFiltroAlumno.show();
-
-            // Animación al cerrar el menu
-            popupMenuFiltroAlumno.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
         });
 
         btnFiltrarPorPropiedad.setOnClickListener(view -> {
@@ -234,47 +190,63 @@ public class ComunicacionesFragment extends Fragment {
             }
         });
 
-        // Listener de scroll hacia los lados, para cambiar de pantallas.
-        /*container.setOnTouchListener((v, event) -> {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    x1 = event.getX();
-                    break;
-                case MotionEvent.ACTION_UP:
-                    x2 = event.getX();
-                    float deltaX = x2 - x1;
-                    if (deltaX < 0) {
-                        switch (currentNav) {
-                            case "recibidos":
-                                currentNav = "enviados";
-                                updateToEnviadas();
-                                navButton.setSelectedItemId(R.id.enviados);
-                                break;
-                            case "enviados":
-                                currentNav = "papelera";
-                                updateToPapelera();
-                                navButton.setSelectedItemId(R.id.papelera);
-                                break;
-                        }
-                    }else if(deltaX >0){
-                        switch (currentNav) {
-                            case "papelera":
-                                currentNav = "enviados";
-                                updateToEnviadas();
-                                navButton.setSelectedItemId(R.id.enviados);
-                                break;
-                            case "enviados":
-                                currentNav = "recibidos";
-                                updateToRecibidos();
-                                navButton.setSelectedItemId(R.id.recibidos);
-                                break;
+        return root;
+    }
+
+    private void initializeSelectorAlumnos() {
+        // Selector de alumnos
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+        ArrayList<String> listAlumnos = new ArrayList<>();
+        try {
+            JSONArray alumnos = new JSONArray(sharedPreferences.getString("alumnosAsociados", null));
+            if(alumnos.length() <= 1) {
+                btnFiltrarPorAlumno.setVisibility(View.INVISIBLE);
+                return;
+            }
+            listAlumnos.add("Todos");
+            for(int i = 0; i < alumnos.length(); i++) {
+                JSONObject json = alumnos.getJSONObject(i);
+                listAlumnos.add(json.getString("nombre"));
+            }
+
+            String[] arrayAlumnos = new String[listAlumnos.size()];
+            for(int j =0;j<listAlumnos.size();j++){
+                arrayAlumnos[j] = listAlumnos.get(j);
+            }
+
+            String[] arrayAlumnosSoloNombre = new String[listAlumnos.size()];
+            for(int i=0; i<listAlumnos.size(); i++) {
+                String nombre = listAlumnos.get(i);
+                String[] splited = nombre.split("\\s+");
+                arrayAlumnosSoloNombre[i] = splited[0];
+            }
+
+            btnFiltrarPorAlumno.setOnClickListener(view -> {
+                // Animación
+                btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_arriba));
+                // PopUp
+                popupMenuFiltroAlumno = new PopupMenu(getContext(), view);
+                popupMenuFiltroAlumno.setOnMenuItemClickListener(item -> {
+                    for(int i=0; i<arrayAlumnos.length; i++) {
+                        if(arrayAlumnosSoloNombre[i].contentEquals(item.getTitle())) {
+                            alumnoFiltrado = arrayAlumnos[i];
                         }
                     }
-                    break;
-            }
-            return false;
-        });*/
-        return root;
+                    filterData();
+                    return true;
+                });
+
+                for (String s : arrayAlumnosSoloNombre) {
+                    popupMenuFiltroAlumno.getMenu().add(s);
+                }
+                popupMenuFiltroAlumno.show();
+
+                // Animación al cerrar el menu
+                popupMenuFiltroAlumno.setOnDismissListener(popupMenu1 -> btnFiltrarPorAlumno.setIcon(ContextCompat.getDrawable(requireContext(),R.drawable.ic_flecha_abajo)));
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void filterData() {
@@ -288,27 +260,41 @@ public class ComunicacionesFragment extends Fragment {
             switch (propiedadFiltrada) {
                 case "No leídos":
                     chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if(allList.get(i).getLeida().equals("null")) {
+                            lista.add(allList.get(i));
+                        }
+                    }
+                    /*allList.forEach(data -> {
                         if (data.getLeida().equals("null")) {
                             lista.add(data);
                         }
-                    });
+                    });*/
                     break;
                 case "Leídos":
                     chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if(!allList.get(i).getLeida().equals("null")) {
+                            lista.add(allList.get(i));
+                        }
+                    }
+                    /*allList.forEach(data -> {
                         if (!data.getLeida().equals("null")) {
                             lista.add(data);
                         }
-                    });
+                    });*/
                     break;
                 case "Importantes":
                     chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if(allList.get(i).isImportante())
+                            lista.add(allList.get(i));
+                    }
+                    /*allList.forEach(data -> {
                         if (data.isImportante()) {
                             lista.add(data);
                         }
-                    });
+                    });*/
                     break;
                 default:
                     lista.addAll(allList);
@@ -321,25 +307,39 @@ public class ComunicacionesFragment extends Fragment {
             chipFiltro.setText(propiedadFiltrada);
             switch (propiedadFiltrada) {
                 case "No leídos":
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if (allList.get(i).getLeida().equals("null")) {
+                            toggleList.add(allList.get(i));
+                        }
+                    }
+                    /*allList.forEach(data -> {
                         if (data.getLeida().equals("null")) {
                             toggleList.add(data);
                         }
-                    });
+                    });*/
                     break;
                 case "Leídos":
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if (!allList.get(i).getLeida().equals("null")) {
+                            toggleList.add(allList.get(i));
+                        }
+                    }
+                    /*allList.forEach(data -> {
                         if (!data.getLeida().equals("null")) {
                             toggleList.add(data);
                         }
-                    });
+                    });*/
                     break;
                 case "Importantes":
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if (allList.get(i).isImportante())
+                            toggleList.add(allList.get(i));
+                    }
+                   /*allList.forEach(data -> {
                         if (data.isImportante()) {
                             toggleList.add(data);
                         }
-                    });
+                    });*/
                     break;
             }
             updateData(toggleList);
@@ -348,11 +348,16 @@ public class ComunicacionesFragment extends Fragment {
 
     private void filtroAlumno(List<ComunicacionDTO> list, String alumno) {
         toggleList.clear();
-        list.forEach(data -> {
+        for(int i=0; i<list.toArray().length; i++) {
+            if (list.get(i).getNombreAlumnoAsociado().equals(alumno)) {
+                toggleList.add(list.get(i));
+            }
+        }
+        /*list.forEach(data -> {
             if(data.getNombreAlumnoAsociado().equals(alumno)) {
                 toggleList.add(data);
             }
-        });
+        });*/
         updateData(toggleList);
     }
 

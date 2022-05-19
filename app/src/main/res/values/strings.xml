@@ -12,7 +12,7 @@
     <string name="menu_diario">Diario *</string>
     <string name="menu_calificaciones">Calificaciones *</string>
     <string name="menu_entrevistas">Entrevistas *</string>
-    <string name="menu_documentacion">Documentación *</string>
+    <string name="menu_documentacion">Documentación</string>
     <string name="menu_extraescolares">Extraescolares *</string>
     <string name="menu_enfermeria">Enfermería *</string>
     <string name="menu_llavero">Llavero *</string>

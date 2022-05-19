@@ -11,12 +11,14 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.client.dtos.DestinoDTO;
+import com.csmm.gestorescolar.client.dtos.DocumentoDTO;
 import com.csmm.gestorescolar.client.dtos.HorarioDTO;
 import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
 import com.csmm.gestorescolar.client.handlers.CheckPasswordResponseHandler;
 import com.csmm.gestorescolar.client.handlers.CompareDataResponseHandler;
 import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
+import com.csmm.gestorescolar.client.handlers.GetAllDocumentosResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
@@ -53,7 +55,7 @@ import java.util.Map;
 public class RestClient {
 
     //public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
-    public static final String REST_API_BASE_URL = "http://192.168.11.16:3000/v1";
+    public static final String REST_API_BASE_URL = "http://192.168.28.25:3000/v1";
     private RequestQueue queue;
     private Context context;
 
@@ -264,9 +266,7 @@ public class RestClient {
                 Request.Method.POST,
                 REST_API_BASE_URL + "/comms/update?id_com=" + id + "&id_destino=" + idDestino + "&state=" + estado,
                 null,
-                response -> {
-                        handler.sessionRequestDidComplete(true);
-                    }, new DefaultErrorHandler(handler)
+                response -> handler.sessionRequestDidComplete(true), new DefaultErrorHandler(handler)
                 ) {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -330,7 +330,7 @@ public class RestClient {
         String savedtoken= sharedPref.getString("token",null);
 
         String twoHyphens = "--";
-        String boundary = "*****" + Long.toString(System.currentTimeMillis()) + "*****";
+        String boundary = "*****" + System.currentTimeMillis() + "*****";
         String lineEnd = "\r\n";
 
         String result = "";
@@ -577,9 +577,7 @@ public class RestClient {
                 Request.Method.POST,
                 REST_API_BASE_URL + "/auth/check_pass",
                 body,
-                response -> {
-                    handler.requestDidComplete();
-                }, new DefaultErrorHandler(handler)
+                response -> handler.requestDidComplete(), new DefaultErrorHandler(handler)
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -610,9 +608,7 @@ public class RestClient {
                 Request.Method.POST,
                 REST_API_BASE_URL + "/auth/change_password",
                 body,
-                response -> {
-                    handler.requestDidComplete();
-                }, new DefaultErrorHandler(handler)
+                response -> handler.requestDidComplete(), new DefaultErrorHandler(handler)
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -663,6 +659,41 @@ public class RestClient {
                         editor.apply();
                     }
                     handler.requestDidComplete(dto);
+                }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
+        queue.add(request);
+    }
+
+    public void getAllDocumentos(int idAlumno, String grupo, GetAllDocumentosResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                REST_API_BASE_URL + "/documentos?grupo="+grupo+"&id_alumno="+idAlumno,
+                null,
+                response -> {
+                    try {
+                        List<DocumentoDTO> lista = new ArrayList<>();
+                        for(int i = 0; i < response.length(); i++) {
+                            JSONObject iterationElement = response.getJSONObject(i);
+                            DocumentoDTO doc = new DocumentoDTO(iterationElement);
+                            lista.add(doc);
+                        }
+                        handler.requestDidComplete(lista);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        handler.requestDidFail(-1);
+                    }
                 }, new DefaultErrorHandler(handler)
         ) {
             @Override

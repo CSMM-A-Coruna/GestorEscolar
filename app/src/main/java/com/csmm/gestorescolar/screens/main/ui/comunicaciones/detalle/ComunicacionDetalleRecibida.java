@@ -74,7 +74,7 @@ public class ComunicacionDetalleRecibida extends AppCompatActivity {
                 chipAdjunto.setOnClickListener(view -> {
                     SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("user", Context.MODE_PRIVATE);
                     String savedtoken= sharedPref.getString("token",null);
-                    Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/download").buildUpon()
+                    Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/adjunto/download").buildUpon()
                             .appendQueryParameter("file_name", adjuntos[0])
                             .appendQueryParameter("id_comunicacion", String.valueOf(idComunicacion))
                             .appendQueryParameter("auth", savedtoken)
