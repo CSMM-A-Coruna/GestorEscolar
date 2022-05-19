@@ -55,7 +55,7 @@ import java.util.Map;
 public class RestClient {
 
     //public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
-    public static final String REST_API_BASE_URL = "http://192.168.11.16:3000/v1";
+    public static final String REST_API_BASE_URL = "http://192.168.28.25:3000/v1";
     private RequestQueue queue;
     private Context context;
 
@@ -674,31 +674,12 @@ public class RestClient {
         queue.add(request);
     }
 
-    public void getAllDocumentos(int idAlumno, GetAllDocumentosResponseHandler handler) {
+    public void getAllDocumentos(int idAlumno, String grupo, GetAllDocumentosResponseHandler handler) {
         SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
         String savedtoken= sharedPref.getString("token",null);
-        String grupo = "";
-        try {
-            JSONArray alumnos = new JSONArray(sharedPref.getString("alumnosAsociados", null));
-            for (int i = 0; i < alumnos.length(); i++) {
-                JSONObject json = alumnos.getJSONObject(i);
-                if(json.getInt("id") == idAlumno) {
-                    grupo = json.getString("grupo");
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        // Como el grupo contiene espacios, necesitamos tirar de URL encode
-        String grupoEnc = "";
-        try {
-            grupoEnc = URLEncoder.encode(grupo, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
-                REST_API_BASE_URL + "/documentos?grupo="+grupoEnc,
+                REST_API_BASE_URL + "/documentos?grupo="+grupo+"&id_alumno="+idAlumno,
                 null,
                 response -> {
                     try {

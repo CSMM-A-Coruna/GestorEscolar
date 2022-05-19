@@ -38,6 +38,11 @@ public class DocumentacionAdapter extends RecyclerView.Adapter<DocumentacionView
         holder.mNombre.setText(mData.get(holder.getAdapterPosition()).getDocumento());
         holder.mCategoria.setText(mData.get(holder.getAdapterPosition()).getCategoria());
         holder.mFecha.setText(mData.get(holder.getAdapterPosition()).getFecha());
+        if(mData.get(holder.getAdapterPosition()).isProtegido()) {
+            holder.protegido.setVisibility(View.VISIBLE);
+        } else {
+            holder.protegido.setVisibility(View.GONE);
+        }
 
         switch (mData.get(holder.getAdapterPosition()).getTipoDocumento()) {
             case "pdf":

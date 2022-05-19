@@ -11,6 +11,7 @@ public class DocumentoDTO {
     private String categoria;
     private String fecha;
     private String tipoDocumento;
+    private boolean protegido;
 
     public DocumentoDTO(JSONObject json) {
         try {
@@ -21,6 +22,7 @@ public class DocumentoDTO {
             String[] splited = json.getString("fecha").split("T");
             this.fecha = splited[0];
             this.tipoDocumento = calcularTipoDocumento(json.getString("enlace"));
+            this.protegido = !json.getString("protegido").equals("No");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -48,6 +50,10 @@ public class DocumentoDTO {
 
     public String getTipoDocumento() {
         return tipoDocumento;
+    }
+
+    public boolean isProtegido() {
+        return protegido;
     }
 
     private String calcularTipoDocumento(String enlace) {
