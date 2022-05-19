@@ -2,6 +2,9 @@ package com.csmm.gestorescolar.screens.main.ui.documentacion.recyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.csmm.gestorescolar.R;
+import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.DocumentoDTO;
 
 import java.util.List;
@@ -67,20 +71,32 @@ public class DocumentacionAdapter extends RecyclerView.Adapter<DocumentacionView
                 holder.tipoDocumento.setImageDrawable(mContext.getDrawable(R.drawable.documento));
         }
 
-        /*holder.mLayout.setOnClickListener(new View.OnClickListener() {
+        holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 SharedPreferences sharedPref = mContext.getSharedPreferences("user", Context.MODE_PRIVATE);
                 String savedtoken= sharedPref.getString("token",null);
-                Uri uri = Uri.parse(RestClient.REST_API_BASE_URL + "/resources/download").buildUpon()
-                        .appendQueryParameter("file_name", adjuntos[0])
-                        .appendQueryParameter("id_comunicacion", String.valueOf(idComunicacion))
-                        .appendQueryParameter("auth", savedtoken)
-                        .build();
+                String uriS = "";
+                Uri uri;
+                if(mData.get(holder.getAdapterPosition()).isProtegido()) {
+                    uriS = RestClient.REST_API_BASE_URL + "/documentos/alumnos/download";
+                    uri = Uri.parse(uriS).buildUpon()
+                            .appendQueryParameter("file_name", mData.get(holder.getAdapterPosition()).getEnlace())
+                            .appendQueryParameter("id_alumno", String.valueOf(mData.get(holder.getAdapterPosition()).getIdAlumno()))
+                            .appendQueryParameter("auth", savedtoken)
+                            .build();
+                } else {
+                    uriS = RestClient.REST_API_BASE_URL + "/documentos/generales/download";
+                    uri = Uri.parse(uriS).buildUpon()
+                            .appendQueryParameter("file_name", mData.get(holder.getAdapterPosition()).getEnlace())
+                            .appendQueryParameter("grupo", String.valueOf(mData.get(holder.getAdapterPosition()).getGrupo()))
+                            .appendQueryParameter("auth", savedtoken)
+                            .build();
+                }
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
+                mContext.startActivity(intent);
             }
-        });*/
+        });
     }
 
     public void updateDate(List<DocumentoDTO> data) {

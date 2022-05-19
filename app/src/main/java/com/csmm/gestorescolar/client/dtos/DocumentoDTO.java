@@ -12,6 +12,8 @@ public class DocumentoDTO {
     private String fecha;
     private String tipoDocumento;
     private boolean protegido;
+    private int idAlumno;
+    private String grupo;
 
     public DocumentoDTO(JSONObject json) {
         try {
@@ -23,6 +25,8 @@ public class DocumentoDTO {
             this.fecha = splited[0];
             this.tipoDocumento = calcularTipoDocumento(json.getString("enlace"));
             this.protegido = !json.getString("protegido").equals("No");
+            this.idAlumno = json.getInt("id_alumno");
+            this.grupo = json.getString("grupo");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -54,6 +58,14 @@ public class DocumentoDTO {
 
     public boolean isProtegido() {
         return protegido;
+    }
+
+    public int getIdAlumno() {
+        return idAlumno;
+    }
+
+    public String getGrupo() {
+        return grupo;
     }
 
     private String calcularTipoDocumento(String enlace) {
