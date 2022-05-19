@@ -260,27 +260,41 @@ public class ComunicacionesFragment extends Fragment {
             switch (propiedadFiltrada) {
                 case "No leídos":
                     chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if(allList.get(i).getLeida().equals("null")) {
+                            lista.add(allList.get(i));
+                        }
+                    }
+                    /*allList.forEach(data -> {
                         if (data.getLeida().equals("null")) {
                             lista.add(data);
                         }
-                    });
+                    });*/
                     break;
                 case "Leídos":
                     chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if(!allList.get(i).getLeida().equals("null")) {
+                            lista.add(allList.get(i));
+                        }
+                    }
+                    /*allList.forEach(data -> {
                         if (!data.getLeida().equals("null")) {
                             lista.add(data);
                         }
-                    });
+                    });*/
                     break;
                 case "Importantes":
                     chipFiltro.setText(String.format("%s - %s", alumnoFiltrado, propiedadFiltrada));
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if(allList.get(i).isImportante())
+                            lista.add(allList.get(i));
+                    }
+                    /*allList.forEach(data -> {
                         if (data.isImportante()) {
                             lista.add(data);
                         }
-                    });
+                    });*/
                     break;
                 default:
                     lista.addAll(allList);
@@ -293,25 +307,39 @@ public class ComunicacionesFragment extends Fragment {
             chipFiltro.setText(propiedadFiltrada);
             switch (propiedadFiltrada) {
                 case "No leídos":
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if (allList.get(i).getLeida().equals("null")) {
+                            toggleList.add(allList.get(i));
+                        }
+                    }
+                    /*allList.forEach(data -> {
                         if (data.getLeida().equals("null")) {
                             toggleList.add(data);
                         }
-                    });
+                    });*/
                     break;
                 case "Leídos":
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if (!allList.get(i).getLeida().equals("null")) {
+                            toggleList.add(allList.get(i));
+                        }
+                    }
+                    /*allList.forEach(data -> {
                         if (!data.getLeida().equals("null")) {
                             toggleList.add(data);
                         }
-                    });
+                    });*/
                     break;
                 case "Importantes":
-                    allList.forEach(data -> {
+                    for(int i=0; i<allList.toArray().length; i++) {
+                        if (allList.get(i).isImportante())
+                            toggleList.add(allList.get(i));
+                    }
+                   /*allList.forEach(data -> {
                         if (data.isImportante()) {
                             toggleList.add(data);
                         }
-                    });
+                    });*/
                     break;
             }
             updateData(toggleList);
@@ -320,11 +348,16 @@ public class ComunicacionesFragment extends Fragment {
 
     private void filtroAlumno(List<ComunicacionDTO> list, String alumno) {
         toggleList.clear();
-        list.forEach(data -> {
+        for(int i=0; i<list.toArray().length; i++) {
+            if (list.get(i).getNombreAlumnoAsociado().equals(alumno)) {
+                toggleList.add(list.get(i));
+            }
+        }
+        /*list.forEach(data -> {
             if(data.getNombreAlumnoAsociado().equals(alumno)) {
                 toggleList.add(data);
             }
-        });
+        });*/
         updateData(toggleList);
     }
 
