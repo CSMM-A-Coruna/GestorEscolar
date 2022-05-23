@@ -1,4 +1,4 @@
-package com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones;
+package com.csmm.gestorescolar.screens.main.ui.comunicaciones.RecyclerView;
 
 import android.content.Context;
 import android.util.AttributeSet;

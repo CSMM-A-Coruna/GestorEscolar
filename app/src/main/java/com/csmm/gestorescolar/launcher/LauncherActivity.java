@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
-import com.csmm.gestorescolar.client.handlers.CompareDataResponseHandler;
+import com.csmm.gestorescolar.client.handlers.ReloadTokenResponseHandler;
 import com.csmm.gestorescolar.screens.auth.LoginActivity;
 import com.csmm.gestorescolar.screens.main.MainActivity;
 
@@ -32,7 +32,7 @@ public class LauncherActivity extends AppCompatActivity {
     private void startApp() {
         SharedPreferences sharedPref = getSharedPreferences("user", MODE_PRIVATE);
         if(sharedPref.getString("token", null) != null) {
-            RestClient.getInstance(getApplicationContext()).compareData(new CompareDataResponseHandler() {
+            RestClient.getInstance(getApplicationContext()).reloadToken(new ReloadTokenResponseHandler() {
                 @Override
                 public void sessionRequestDidComplete(UsuarioDTO dto) {
                     SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("user", Context.MODE_PRIVATE);

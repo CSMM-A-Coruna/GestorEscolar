@@ -31,8 +31,8 @@ import com.csmm.gestorescolar.client.handlers.GetComunicacionesEnviadasResponseH
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesRecibidasResponseHandler;
 import com.csmm.gestorescolar.databinding.ComunicacionesFragmentBinding;
 import com.csmm.gestorescolar.screens.main.ui.comunicaciones.detalle.ComunicacionDetalleNueva;
-import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.ComunicacionesAdapter;
-import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.CustomLinearLayoutManager;
+import com.csmm.gestorescolar.screens.main.ui.comunicaciones.RecyclerView.ComunicacionesAdapter;
+import com.csmm.gestorescolar.screens.main.ui.comunicaciones.RecyclerView.CustomLinearLayoutManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;

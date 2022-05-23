@@ -23,7 +23,7 @@ import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.HorarioDTO;
 import com.csmm.gestorescolar.client.handlers.GetHorarioResponseHandler;
 import com.csmm.gestorescolar.databinding.HorarioFragmentBinding;
-import com.csmm.gestorescolar.screens.main.ui.comunicaciones.listaComunicaciones.CustomLinearLayoutManager;
+import com.csmm.gestorescolar.screens.main.ui.comunicaciones.RecyclerView.CustomLinearLayoutManager;
 import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioAdapter;
 import com.csmm.gestorescolar.screens.main.ui.horario.RecyclerView.HorarioData;
 import com.google.android.material.button.MaterialButton;

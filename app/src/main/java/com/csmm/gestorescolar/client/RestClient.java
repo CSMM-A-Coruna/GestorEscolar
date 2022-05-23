@@ -16,7 +16,7 @@ import com.csmm.gestorescolar.client.dtos.HorarioDTO;
 import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
 import com.csmm.gestorescolar.client.handlers.CheckPasswordResponseHandler;
-import com.csmm.gestorescolar.client.handlers.CompareDataResponseHandler;
+import com.csmm.gestorescolar.client.handlers.ReloadTokenResponseHandler;
 import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
 import com.csmm.gestorescolar.client.handlers.GetAllDocumentosResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetComunicacionesBorradasResponseHandler;
@@ -55,7 +55,7 @@ import java.util.Map;
 public class RestClient {
 
     //public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
-    public static final String REST_API_BASE_URL = "http://192.168.28.25:3000/v1";
+    public static final String REST_API_BASE_URL = "http://192.168.11.18:3000/v1";
     private RequestQueue queue;
     private Context context;
 
@@ -95,7 +95,7 @@ public class RestClient {
         queue.add(request);
     }
 
-    public void compareData(CompareDataResponseHandler handler) {
+    public void reloadToken(ReloadTokenResponseHandler handler) {
         SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
         String savedtoken= sharedPref.getString("token",null);
         JSONObject cuerpoPeticion = new JSONObject();
@@ -106,7 +106,7 @@ public class RestClient {
         }
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,
-                REST_API_BASE_URL + "/auth/update",
+                REST_API_BASE_URL + "/auth/reload",
                 cuerpoPeticion,
                 response -> {
                     UsuarioDTO usuarioDTO = new UsuarioDTO(response);
@@ -132,7 +132,7 @@ public class RestClient {
         int savedId = sharedPref.getInt("id", 0);
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
-                REST_API_BASE_URL + "/comms/received?user_id=" + savedId,
+                REST_API_BASE_URL + "/comms/received/"+ savedId,
                 null,
                 response -> {
                     List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
@@ -176,7 +176,7 @@ public class RestClient {
         int savedId = sharedPref.getInt("id", 0);
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
-                REST_API_BASE_URL + "/comms/sent?user_id=" + savedId,
+                REST_API_BASE_URL + "/comms/sent/" + savedId,
                 null,
                 response -> {
                     List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
@@ -220,7 +220,7 @@ public class RestClient {
         int savedId = sharedPref.getInt("id", 0);
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
-                REST_API_BASE_URL + "/comms/deleted?user_id=" + savedId,
+                REST_API_BASE_URL + "/comms/deleted/" + savedId,
                 null,
                 response -> {
                     List<ComunicacionDTO> listaComunicaciones = new ArrayList<>();
@@ -263,8 +263,8 @@ public class RestClient {
         SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
         String savedtoken= sharedPref.getString("token",null);
         JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                REST_API_BASE_URL + "/comms/update?id_com=" + id + "&id_destino=" + idDestino + "&state=" + estado,
+                Request.Method.PUT,
+                REST_API_BASE_URL + "/comms/update/" + id + "?id_destino=" + idDestino + "&state=" + estado,
                 null,
                 response -> handler.sessionRequestDidComplete(true), new DefaultErrorHandler(handler)
                 ) {
@@ -444,7 +444,7 @@ public class RestClient {
 
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
-                REST_API_BASE_URL + "/comms/senders?id_alumno=" + idAlumno,
+                REST_API_BASE_URL + "/comms/senders/" + idAlumno,
                 null,
                 response -> {
                     List<DestinoDTO> listaDestinos = new ArrayList<>();
@@ -486,8 +486,8 @@ public class RestClient {
             e.printStackTrace();
         }
         JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                REST_API_BASE_URL + "/auth/update/firebase_token",
+                Request.Method.PUT,
+                REST_API_BASE_URL + "/auth/firebase_token",
                 body,
                 response -> {}, new DefaultErrorHandler(handler)
         ) {
@@ -605,7 +605,7 @@ public class RestClient {
         }
 
         JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
+                Request.Method.PUT,
                 REST_API_BASE_URL + "/auth/change_password",
                 body,
                 response -> handler.requestDidComplete(), new DefaultErrorHandler(handler)
