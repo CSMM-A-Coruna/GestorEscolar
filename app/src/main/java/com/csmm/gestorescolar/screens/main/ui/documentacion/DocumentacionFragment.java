@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.SearchView;
 
@@ -30,6 +31,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,11 +43,12 @@ public class DocumentacionFragment extends Fragment {
     private List<DocumentoDTO> serverList = new ArrayList<>();
     private List<DocumentoDTO> toggleList = new ArrayList<>();
     private MaterialButton btnFiltrarPorAlumno;
-    private PopupMenu popupMenuFiltroAlumno;
+    private ImageButton btnFiltros;
+    private PopupMenu popupMenuFiltroAlumno, popupMenuFiltro;
     private SearchView searchView;
 
 
-    private String alumnoFiltrado;
+    private String alumnoFiltrado, propiedadFiltrada;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -54,16 +57,40 @@ public class DocumentacionFragment extends Fragment {
 
         searchView = root.findViewById(R.id.searchView);
         btnFiltrarPorAlumno = root.findViewById(R.id.btnFiltrarAlumnos);
+        btnFiltros = root.findViewById(R.id.btnFiltros);
 
         // Animaciones de los botones
         btnFiltrarPorAlumno.setAlpha(0f);
         btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1000);
+        btnFiltros.setAlpha(0f);
+        btnFiltros.animate().alpha(1f).setDuration(1000);
 
         mRecyclerView = root.findViewById(R.id.recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mAdapter = new DocumentacionAdapter(getContext(), serverList);
         mRecyclerView.setAdapter(mAdapter);
+
+        // Botón filtros
+        btnFiltros.setOnClickListener(view -> {
+            // Animación
+            btnFiltros.animate().setDuration(300).rotationBy(90f).start();
+            // PopUp
+            popupMenuFiltro = new PopupMenu(getContext(), view);
+            popupMenuFiltro.setOnMenuItemClickListener(item -> {
+                propiedadFiltrada = String.valueOf(item.getTitle());
+                filtrarPor(propiedadFiltrada);
+                return true;
+            });
+            String[] filtrosDisponibles = {"Todos", "Categoría", "Más reciente", "Más antiguo"};
+            for (String s : filtrosDisponibles) {
+                popupMenuFiltro.getMenu().add(s);
+            }
+            popupMenuFiltro.show();
+
+            // Animación al cerrar el menu
+            popupMenuFiltro.setOnDismissListener(popupMenu12 -> btnFiltros.animate().setDuration(300).rotationBy(-90f).start());
+        });
 
         // Selector de alumnos
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE);
@@ -129,12 +156,9 @@ public class DocumentacionFragment extends Fragment {
             }
         });
 
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                updateDocumentos(serverList);
-                return false;
-            }
+        searchView.setOnCloseListener(() -> {
+            updateDocumentos(serverList);
+            return false;
         });
 
         getDocumentosFromServer(alumnoFiltrado);
@@ -142,7 +166,33 @@ public class DocumentacionFragment extends Fragment {
         return root;
     }
 
-    // Filter Class
+    private void filtrarPor(String propiedad) {
+        switch (propiedad) {
+            case "Todos":
+                toggleList.clear();
+                toggleList.addAll(serverList);
+                updateDocumentos(toggleList);
+                break;
+            case "Categoría":
+                toggleList.clear();
+                toggleList.addAll(serverList);
+                Collections.sort(toggleList,
+                        (o1, o2) -> o1.getCategoria().compareTo(o2.getCategoria()));
+                break;
+            case  "Más reciente":
+                toggleList.clear();
+                toggleList.addAll(serverList);
+                break;
+                case "Más antiguo":
+                    toggleList.clear();
+                    toggleList.addAll(serverList);
+                    Collections.reverse(toggleList);
+                    break;
+        }
+        updateDocumentos(toggleList);
+    }
+
+    // Filtro del SearchView
     public void search(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
         toggleList.clear();
@@ -186,7 +236,7 @@ public class DocumentacionFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            // Como el grupo contiene espacios, necesitamos tirar de URL encode
+            // Como el grupo contiene espacios, necesitamos utilizar URL encode
             try {
                 grupoEnc = URLEncoder.encode(grupo, "UTF-8");
             } catch (UnsupportedEncodingException e) {

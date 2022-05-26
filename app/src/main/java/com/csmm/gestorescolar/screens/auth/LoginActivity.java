@@ -1,8 +1,5 @@
 package com.csmm.gestorescolar.screens.auth;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +8,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
@@ -69,7 +69,10 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void sessionRequestDidComplete(UsuarioDTO dto) {
                     //Guardo esos valores en un objeto SharedPreferences usando su Editor
-                    if(dto.getTipoUsuario() != 2) {
+                    if(dto.getToken().isEmpty()) {
+                        Snackbar.make(iniciarSesionButton, "Ha habido un error con tu inicio de sesión inténtalo de nuevo más tarde...", Snackbar.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                    } else if(dto.getTipoUsuario() != 2) {
                         Snackbar.make(iniciarSesionButton, "Estás intentado iniciar sesión con un usuario que no es considerado \"familia\"", Snackbar.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
                     } else {

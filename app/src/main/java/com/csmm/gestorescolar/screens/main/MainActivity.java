@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
@@ -21,8 +20,6 @@ import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.handlers.PostFCMTokenResponseHandler;
 import com.csmm.gestorescolar.databinding.MainActivityBinding;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -72,21 +69,18 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if(!task.isSuccessful()) {
-                            return;
-                        }
-                        String token = task.getResult();
-                        RestClient.getInstance(getApplicationContext()).postNewFCMToken(token, new PostFCMTokenResponseHandler() {
-                            @Override
-                            public void requestDidComplete() {}
-
-                            @Override
-                            public void requestDidFail(int statusCode) {}
-                        });
+                .addOnCompleteListener(task -> {
+                    if(!task.isSuccessful()) {
+                        return;
                     }
+                    String token = task.getResult();
+                    RestClient.getInstance(getApplicationContext()).postNewFCMToken(token, new PostFCMTokenResponseHandler() {
+                        @Override
+                        public void requestDidComplete() {}
+
+                        @Override
+                        public void requestDidFail(int statusCode) {}
+                    });
                 });
     }
 

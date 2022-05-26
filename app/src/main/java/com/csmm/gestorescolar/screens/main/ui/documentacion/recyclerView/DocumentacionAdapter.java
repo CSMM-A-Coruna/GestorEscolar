@@ -71,31 +71,28 @@ public class DocumentacionAdapter extends RecyclerView.Adapter<DocumentacionView
                 holder.tipoDocumento.setImageDrawable(mContext.getDrawable(R.drawable.documento));
         }
 
-        holder.mLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences sharedPref = mContext.getSharedPreferences("user", Context.MODE_PRIVATE);
-                String savedtoken= sharedPref.getString("token",null);
-                String uriS = "";
-                Uri uri;
-                if(mData.get(holder.getAdapterPosition()).isProtegido()) {
-                    uriS = RestClient.REST_API_BASE_URL + "/documentos/alumnos/download";
-                    uri = Uri.parse(uriS).buildUpon()
-                            .appendQueryParameter("file_name", mData.get(holder.getAdapterPosition()).getEnlace())
-                            .appendQueryParameter("id_alumno", String.valueOf(mData.get(holder.getAdapterPosition()).getIdAlumno()))
-                            .appendQueryParameter("auth", savedtoken)
-                            .build();
-                } else {
-                    uriS = RestClient.REST_API_BASE_URL + "/documentos/generales/download";
-                    uri = Uri.parse(uriS).buildUpon()
-                            .appendQueryParameter("file_name", mData.get(holder.getAdapterPosition()).getEnlace())
-                            .appendQueryParameter("grupo", String.valueOf(mData.get(holder.getAdapterPosition()).getGrupo()))
-                            .appendQueryParameter("auth", savedtoken)
-                            .build();
-                }
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                mContext.startActivity(intent);
+        holder.mLayout.setOnClickListener(view -> {
+            SharedPreferences sharedPref = mContext.getSharedPreferences("user", Context.MODE_PRIVATE);
+            String savedtoken= sharedPref.getString("token",null);
+            String uriS;
+            Uri uri;
+            if(mData.get(holder.getAdapterPosition()).isProtegido()) {
+                uriS = RestClient.REST_API_BASE_URL + "/resources/documentos/alumnos/download";
+                uri = Uri.parse(uriS).buildUpon()
+                        .appendQueryParameter("file_name", mData.get(holder.getAdapterPosition()).getEnlace())
+                        .appendQueryParameter("id_alumno", String.valueOf(mData.get(holder.getAdapterPosition()).getIdAlumno()))
+                        .appendQueryParameter("auth", savedtoken)
+                        .build();
+            } else {
+                uriS = RestClient.REST_API_BASE_URL + "/resources/documentos/generales/download";
+                uri = Uri.parse(uriS).buildUpon()
+                        .appendQueryParameter("file_name", mData.get(holder.getAdapterPosition()).getEnlace())
+                        .appendQueryParameter("grupo", String.valueOf(mData.get(holder.getAdapterPosition()).getGrupo()))
+                        .appendQueryParameter("auth", savedtoken)
+                        .build();
             }
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            mContext.startActivity(intent);
         });
     }
 
