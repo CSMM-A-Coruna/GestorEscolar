@@ -69,13 +69,10 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void sessionRequestDidComplete(UsuarioDTO dto) {
                     //Guardo esos valores en un objeto SharedPreferences usando su Editor
-                    if(dto.getToken().isEmpty()) {
-                        Snackbar.make(iniciarSesionButton, "Ha habido un error con tu inicio de sesión inténtalo de nuevo más tarde...", Snackbar.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);
-                    } else if(dto.getTipoUsuario() != 2) {
+                    if(dto.getTipoUsuario() != 2) {
                         Snackbar.make(iniciarSesionButton, "Estás intentado iniciar sesión con un usuario que no es considerado \"familia\"", Snackbar.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
-                    } else {
+                    } else if(!dto.getToken().isEmpty()){
                         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("user", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString("token", dto.getToken());
@@ -99,6 +96,9 @@ public class LoginActivity extends AppCompatActivity {
                         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
+                    } else {
+                        Snackbar.make(iniciarSesionButton, "Ha habido un error con tu inicio de sesión inténtalo de nuevo más tarde...", Snackbar.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
                     }
                 }
 

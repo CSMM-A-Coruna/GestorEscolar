@@ -1,12 +1,20 @@
 package com.csmm.gestorescolar.screens.main.ui.llavero;
 
+import android.animation.Animator;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -17,10 +25,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.csmm.gestorescolar.R;
 import com.csmm.gestorescolar.client.RestClient;
 import com.csmm.gestorescolar.client.dtos.LlaveroDTO;
+import com.csmm.gestorescolar.client.handlers.CheckPasswordResponseHandler;
 import com.csmm.gestorescolar.client.handlers.GetLlaveroByIdAlumnoResponseHandler;
 import com.csmm.gestorescolar.databinding.LlaveroFragmentBinding;
 import com.csmm.gestorescolar.screens.main.ui.llavero.recyclerView.LlaveroAdapter;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,9 +49,12 @@ public class LlaveroFragment extends Fragment {
     private List<LlaveroDTO> toggleList = new ArrayList<>();
     private MaterialButton btnFiltrarPorAlumno;
     private PopupMenu popupMenuFiltroAlumno;
+    private FloatingActionButton nuevoRegistroLlavero;
+    private TextView noEncontrado;
 
 
     private String alumnoFiltrado = "";
+    private Context mContext;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,24 +62,104 @@ public class LlaveroFragment extends Fragment {
         binding = LlaveroFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        mContext = root.getContext();
         btnFiltrarPorAlumno = root.findViewById(R.id.btnFiltrarAlumnos);
-
-        // Animaciones de los botones
-        btnFiltrarPorAlumno.setAlpha(0f);
-        btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1000);
-
+        nuevoRegistroLlavero = root.findViewById(R.id.nuevoRegistro);
+        noEncontrado = root.findViewById(R.id.noEncontrado);
 
         mRecyclerView = root.findViewById(R.id.recyclerView);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mAdapter = new LlaveroAdapter(getContext(), serverList);
         mRecyclerView.setAdapter(mAdapter);
 
+        autentificar();
+
+        return root;
+    }
+
+    private void autentificar() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
+        alertDialog.setTitle("Confirmar tu identidad.");
+        alertDialog.setMessage("Introduce tu contraseña: ");
+
+        final EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alertDialog.setView(input);
+
+        alertDialog.setPositiveButton("Confirmar",
+                (dialog, which) -> {
+                    String password = input.getText().toString();
+                    RestClient.getInstance(getContext()).checkPassword(password, new CheckPasswordResponseHandler() {
+                        @Override
+                        public void requestDidComplete() {
+                            iniciarFlujo();
+                        }
+
+                        @Override
+                        public void requestDidFail(int statusCode) {
+                            if(statusCode==401) {
+                                Snackbar.make(btnFiltrarPorAlumno, "Contraseña incorrecta.", Snackbar.LENGTH_SHORT).show();
+                                btnFiltrarPorAlumno.setVisibility(View.GONE);
+                                mRecyclerView.setVisibility(View.GONE);
+                                noEncontrado.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
+                });
+
+        alertDialog.setNegativeButton("Cancelar",
+                (dialog, which) -> {
+                    dialog.cancel();
+                    btnFiltrarPorAlumno.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.GONE);
+                    noEncontrado.setVisibility(View.VISIBLE);
+                });
+
+        alertDialog.show();
+
+    }
+
+    private void iniciarFlujo() {
+        // Animaciones de los botones
+        btnFiltrarPorAlumno.setAlpha(0f);
+        btnFiltrarPorAlumno.animate().alpha(1f).setDuration(1000);
+        // Animación fab
+        nuevoRegistroLlavero.setScaleX(0);
+        nuevoRegistroLlavero.setScaleY(0);
+        final Interpolator interpolador = AnimationUtils.loadInterpolator(getContext(),
+                android.R.interpolator.fast_out_slow_in);
+        nuevoRegistroLlavero.animate()
+                .scaleX(1)
+                .scaleY(1)
+                .setInterpolator(interpolador)
+                .setDuration(600)
+                .setStartDelay(1000)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {}
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {}
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {}
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {}
+                });
+
+        nuevoRegistroLlavero.setOnClickListener(view -> {
+            //!TODO
+        });
+
         inicializarFiltradoAlumnos();
 
         getLlaveroFromServer(alumnoFiltrado);
-
-        return root;
     }
 
     private void inicializarFiltradoAlumnos() {

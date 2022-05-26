@@ -37,9 +37,11 @@ public class CerrarsesionFragment extends Fragment {
         });
 
         SharedPreferences preferences;
-        preferences = getActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
+        preferences = requireActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
         preferences.edit().clear().apply();
-        preferences = getActivity().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
+        preferences = requireActivity().getSharedPreferences("comunicaciones", Context.MODE_PRIVATE);
+        preferences.edit().clear().apply();
+        preferences = requireActivity().getSharedPreferences("horario", Context.MODE_PRIVATE);
         preferences.edit().clear().apply();
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         preferences.edit().clear().apply();

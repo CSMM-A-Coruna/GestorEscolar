@@ -35,12 +35,27 @@ public class LlaveroAdapter  extends RecyclerView.Adapter<LlaveroViewHolder> {
     @Override
     public void onBindViewHolder(final LlaveroViewHolder holder, int position) {
         holder.mAplicacion.setText(mData.get(holder.getAdapterPosition()).getAplicacion());
+        holder.tvUsuario.setText(mData.get(holder.getAdapterPosition()).getUsuario());
+        holder.tvEmail.setText(mData.get(holder.getAdapterPosition()).getEmail());
+        holder.tvContrasena.setText(mData.get(holder.getAdapterPosition()).getContraseña());
         if(!mData.get(holder.getAdapterPosition()).isModificable()) {
             holder.protegido.setVisibility(View.VISIBLE);
+            holder.modificarBtn.setVisibility(View.GONE);
         } else {
             holder.protegido.setVisibility(View.GONE);
+            holder.modificarBtn.setVisibility(View.VISIBLE);
         }
 
+        holder.mLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (holder.expandableLayout.isExpanded()) {
+                    holder.expandableLayout.collapse();
+                } else {
+                    holder.expandableLayout.expand();
+                }
+            }
+        });
     }
 
     public void updateDate(List<LlaveroDTO> data) {
