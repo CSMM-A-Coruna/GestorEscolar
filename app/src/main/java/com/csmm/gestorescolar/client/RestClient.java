@@ -13,9 +13,11 @@ import com.csmm.gestorescolar.client.dtos.ComunicacionDTO;
 import com.csmm.gestorescolar.client.dtos.DestinoDTO;
 import com.csmm.gestorescolar.client.dtos.DocumentoDTO;
 import com.csmm.gestorescolar.client.dtos.HorarioDTO;
+import com.csmm.gestorescolar.client.dtos.LlaveroDTO;
 import com.csmm.gestorescolar.client.dtos.PreferencesDTO;
 import com.csmm.gestorescolar.client.dtos.UsuarioDTO;
 import com.csmm.gestorescolar.client.handlers.CheckPasswordResponseHandler;
+import com.csmm.gestorescolar.client.handlers.GetLlaveroByIdAlumnoResponseHandler;
 import com.csmm.gestorescolar.client.handlers.ReloadTokenResponseHandler;
 import com.csmm.gestorescolar.client.handlers.DefaultErrorHandler;
 import com.csmm.gestorescolar.client.handlers.GetAllDocumentosResponseHandler;
@@ -55,7 +57,7 @@ import java.util.Map;
 public class RestClient {
 
     //public static final String REST_API_BASE_URL = "https://csmm-api.herokuapp.com/v1";
-    public static final String REST_API_BASE_URL = "http://192.168.11.18:3000/v1";
+    public static final String REST_API_BASE_URL = "http://192.168.28.34:3000/v1";
     private RequestQueue queue;
     private Context context;
 
@@ -510,15 +512,14 @@ public class RestClient {
         int userId = sharedPref.getInt("id", 0);
         JSONObject body = new JSONObject();
         try {
-            body.put("id_usuario", userId);
             body.put("tipo_preferencia", preference);
             body.put("value", value);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                REST_API_BASE_URL + "/preferences/update",
+                Request.Method.PUT,
+                REST_API_BASE_URL + "/preferences/" + userId,
                 body,
                 response -> {}, new DefaultErrorHandler(handler)
         ) {
@@ -541,7 +542,7 @@ public class RestClient {
         int userId = sharedPref.getInt("id", 0);
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.GET,
-                REST_API_BASE_URL + "/preferences?id_usuario=" + userId,
+                REST_API_BASE_URL + "/preferences/" + userId,
                 null,
                 response -> {
                     PreferencesDTO preferencesDTO = new PreferencesDTO(response);
@@ -679,7 +680,7 @@ public class RestClient {
         String savedtoken= sharedPref.getString("token",null);
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
-                REST_API_BASE_URL + "/documentos?grupo="+grupo+"&id_alumno="+idAlumno,
+                REST_API_BASE_URL + "/resources/documentos?grupo="+grupo+"&id_alumno="+idAlumno,
                 null,
                 response -> {
                     try {
@@ -687,6 +688,41 @@ public class RestClient {
                         for(int i = 0; i < response.length(); i++) {
                             JSONObject iterationElement = response.getJSONObject(i);
                             DocumentoDTO doc = new DocumentoDTO(iterationElement);
+                            lista.add(doc);
+                        }
+                        handler.requestDidComplete(lista);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        handler.requestDidFail(-1);
+                    }
+                }, new DefaultErrorHandler(handler)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>(super.getHeaders());
+                // Añadimos la cabecera deseada
+                if (savedtoken!=null) {
+                    headers.put("Authorization", "Bearer " + savedtoken);
+                }
+                return headers;
+            }
+        };
+        queue.add(request);
+    }
+
+    public void getLlaveroByIdAlumno(int idAlumno, GetLlaveroByIdAlumnoResponseHandler handler) {
+        SharedPreferences sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+        String savedtoken= sharedPref.getString("token",null);
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                REST_API_BASE_URL + "/llavero/"+idAlumno,
+                null,
+                response -> {
+                    try {
+                        List<LlaveroDTO> lista = new ArrayList<>();
+                        for(int i = 0; i < response.length(); i++) {
+                            JSONObject iterationElement = response.getJSONObject(i);
+                            LlaveroDTO doc = new LlaveroDTO(iterationElement);
                             lista.add(doc);
                         }
                         handler.requestDidComplete(lista);
